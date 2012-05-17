@@ -1,7 +1,7 @@
 # Target specific macros
 TARGET = prog
 
-NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
+NXTOSEK_ROOT = ../../../..
 
 # nxtway_gs_balancer library desiged for NXTway-GS two wheeled self-balancing robot
 USER_INC_PATH= $(NXTOSEK_ROOT)/ecrobot/nxtway_gs_balancer
@@ -13,12 +13,12 @@ USER_LIB = nxtway_gs_balancer
 # User application source
 TARGET_SOURCES := \
 	balancer_param.c \
-	sample10-2.c
+	sample10-2.c \
+	TimerUnit.c
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 
 O_PATH ?= build
 
-include /cygdrive/C/cygwin/nxtOSEK/ecrobot/lejos_osek.tmf
-
+include ../../../../ecrobot/lejos_osek.tmf
 

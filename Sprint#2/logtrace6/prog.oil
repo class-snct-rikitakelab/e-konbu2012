@@ -122,6 +122,21 @@ CPU ATMEL_AT91SAM7S256
     		};
   	};
 
+  	ALARM counttimer
+ 	{
+   		COUNTER = SysTimerCnt;
+   		ACTION = ALARMCALLBACK
+    		{
+      		ALARMCALLBACKNAME = "CountTimer";
+    		};
+    		AUTOSTART = TRUE
+    		{
+      			ALARMTIME = 1000;
+      			CYCLETIME = 10;
+      			APPMODE = appmode1;
+    		};
+  	};
+
 	COUNTER SysTimerCnt
 	{
 		MINCYCLE = 1;
