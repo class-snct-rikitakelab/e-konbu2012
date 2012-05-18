@@ -1,5 +1,6 @@
 # nxtOSEKルートディレクトリ
-NXTOSEK_ROOT = ../../nxtOSEK
+NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
+#NXTOSEK_ROOT = ../../nxtOSEK
 
 # ターゲット実行形式ファイル名
 TARGET = sample_c4

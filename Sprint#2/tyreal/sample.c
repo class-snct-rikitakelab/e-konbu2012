@@ -560,19 +560,32 @@ int float_seisu_len=0;
 int float_syosu_len=0;	
 int seisu_val=0;	
 int syosu_val=0;	
+char *p;
+char syousubu_char[100];
 
 	
 	seisu_val=(int)float_val;
 	float_seisu_len =get_int_digit(seisu_val);
 	
-	syosu_val=abs((int)((float_val- (float)seisu_val)*1000));
-	float_syosu_len=get_int_digit(syosu_val);
+	
+	//syosu_val=abs((int)((float_val- (float)seisu_val)*1000));
+	syosu_val=abs((int)((float_val- (float)seisu_val)));
+	
+	sprintf(syousubu_char,"%.3f",(float_val- (float)seisu_val));
+		p=strtok(syousubu_char,".");
+		p=strtok(NULL,".");
+	
+	//float_syosu_len=get_int_digit(syosu_val);
 	
 	if(float_val>=0){
-	sprintf(string,"%d.%-3d",abs(seisu_val),abs(syosu_val));
+	//sprintf(string,"%d.%-3d",abs(seisu_val),abs(syosu_val));
+	sprintf(string,"%d.%s",abs(seisu_val),p);
+	
 	}
 	else{
-	sprintf(string,"-%d.%-3d",abs(seisu_val),abs(syosu_val));
+	//sprintf(string,"-%d.%-3d",abs(seisu_val),abs(syosu_val));
+	sprintf(string,"-%d.%s",abs(seisu_val),p);
+	
 	}
 }
 	
