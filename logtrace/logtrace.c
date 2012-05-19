@@ -20,7 +20,7 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 
 
 //バッテリ降下値
-#define DOWN_BATTERY 850			//バッテリ降下値
+#define DOWN_BATTERY 950			//バッテリ降下値
 
 
 //ジャイロ振幅値
@@ -99,7 +99,7 @@ typedef enum{
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILDOWN;
+RN_TAILMODE tail_mode = RN_TAILUP;
 
 
 //各種プライベート関数
@@ -405,7 +405,7 @@ void RN_setting()
 			break;
 		
 		case (RN_RUN):
-			RA_linetrace_PID(22,0);
+			RA_linetrace_PID(20,0);
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_before = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
@@ -505,7 +505,6 @@ void RN_calibrate()
 			ecrobot_sound_tone(950, 512, 30);
 			setting_mode = RN_RUN;
 			runner_mode = RN_MODE_CONTROL;
-			tail_mode = RN_TAILUP;
 			break;
 		}
 	}
@@ -566,7 +565,6 @@ void RN_modesetting()
 TASK(ActionTask)
 {
 	RN_modesetting();
-	taildown();
 	TerminateTask();
 }
 
