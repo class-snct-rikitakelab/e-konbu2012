@@ -47,7 +47,7 @@
 
 #define TYRE_ANGLE_CHAR_NUM 8
 #define ADJUST_INT_STEP 1
-#define ADJUST_FLOAT_STEP 1
+#define ADJUST_FLOAT_STEP 0.001
 
 /* 関数プロトタイプ宣言 */
 static int sonar_alert(void);
@@ -63,6 +63,8 @@ void display_show_string(char* string,int x,int y);
 void make_printf_string(char* val_string,char* text_msg,char *print_string);
 void float_to_string(float float_val,char *float_string);
 void int_to_string(int int_val,char* int_string);
+
+void do_tyreal();
 
 
 
@@ -170,6 +172,7 @@ static float light_black =700; /* 黒色の光センサ値 */
 	//ループの外で宣言した値をタイヤの回転に合わせて制御している
    while(1){
  
+   	do_tyreal();
    	
    	//各変数に対応させた状態へ遷移  RUNボタン（グレー右側のボタン）が押された 
   	if (ecrobot_is_RUN_button_pressed() == 1) {
@@ -526,15 +529,15 @@ return param;
 float change_float_param(float param){
 	
 	static int temp =0;
-	//param=param/**1000*/; //floatの演算が影響してプログラムが停止するというバグが発生したため1000倍して演算をしている
+	
 	
 	//前回取得した回転角との差を用いて値を制御
 if((int)nxt_motor_get_count(NXT_PORT_C) - temp>0){
-	param=param+0.001;	
+	param=param+ADJUST_FLOAT_STEP/*0.001*/;	
 //	param=(param+0.1)/*(float)ADJUST_FLOAT_STEP*/;
    	}
    	else if((int)nxt_motor_get_count(NXT_PORT_C) - temp<0){
-   	param=param-0.001;	
+   	param=param-ADJUST_FLOAT_STEP/*0.001*/;	
    		//param=param-0.1;/*(float)ADJUST_FLOAT_STEP);*/
    	}
    	
@@ -543,7 +546,7 @@ if((int)nxt_motor_get_count(NXT_PORT_C) - temp>0){
    	
    	systick_wait_ms(SET_PARAM_SPEED); // 100msecウェイト 
 
-return param/*/1000*/;
+return param;
 }
 
 void int_to_string(int int_val,char *int_string){
@@ -561,18 +564,24 @@ int float_syosu_len=0;
 int seisu_val=0;	
 int syosu_val=0;	
 
+
 	
 	seisu_val=(int)float_val;
 	float_seisu_len =get_int_digit(seisu_val);
 	
+	
 	syosu_val=abs((int)((float_val- (float)seisu_val)*1000));
-	float_syosu_len=get_int_digit(syosu_val);
+
 	
 	if(float_val>=0){
 	sprintf(string,"%d.%-3d",abs(seisu_val),abs(syosu_val));
+	
+	
 	}
 	else{
 	sprintf(string,"-%d.%-3d",abs(seisu_val),abs(syosu_val));
+
+	
 	}
 }
 	
@@ -583,3 +592,7 @@ void make_printf_string(char* val_string,char* text_msg,char *string){
 }
 	
 	
+void do_tyreal(){
+	
+	
+}
