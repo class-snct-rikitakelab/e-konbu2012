@@ -12,6 +12,7 @@
 #include "ecrobot_interface.h"
 #include "balancer.h" /* 倒立振子制御用ヘッダファイル */
 #include "logSend.h"
+//#include "Maimai.h"
 #include <stdlib.h>
 
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
@@ -35,16 +36,24 @@
 #define MOKUHYOU 600
 #define DELTA 0.004
 
+#define LIGHT_THRESHOLD .7F
+
 #define VOL 20
 
 /* 関数プロトタイプ宣言 */
 static int sonar_alert(void);
 static void tail_control(signed int angle);
 static int remote_start(void);
+static void Maimai(void);
 
 /* Bluetooth通信用データ受信バッファ */
 char rx_buf[BT_MAX_RX_BUF_SIZE];
 int rx_buf_int[BT_MAX_RX_BUF_SIZE];
+
+
+
+//まいまい式用グローバル変数　目標値
+float brightness;
 //*****************************************************************************
 // 関数名 : ecrobot_device_initialize
 // 引数 : なし
@@ -232,40 +241,80 @@ rx_buf[0]=5;
 	}	
 	
 	*/
-	
+	float mokuhyou_val;
+	 unsigned int counter_maimai=0;
+
 	//通常走行
+	 /*
+	while(1){
+
+		++counter_maimai;
+if(counter_maimai==20/4){//約20ms
+	//赤色LEDを点灯する
+	ecrobot_set_light_sensor_active(NXT_PORT_S3);
+	}
+
+if(counter_maimai==40/4){//約40ms
+	//赤色LEDを消灯する
+	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);
+	//カウンタをクリア
+	counter_maimai=0;
+	}
+systick_wait_ms(4); // 4msecウェイト 
+	}
+	*/
 	while(1)
 	{
 		tail_control(TAIL_ANGLE_DRIVE); /* バランス走行用角度に制御 */
 
 		if (sonar_alert() == 1) /* 障害物検知 */
 		{
-			//forward = turn = 0; /* 障害物を検知したら停止 */
+			forward = turn = 0; /* 障害物を検知したら停止 */
 		}
 		else
 		{
-			forward = 60; /* 前進命令 */
+			forward = 20; /* 前進命令 */
+			//まいまい式とPID制御を組み合わせたturn値の計算	
+			/*mokuhyou_val =*/Maimai();
+
+			if(brightness<=LIGHT_THRESHOLD/*0.6*light_black+0.4*light_white*/){
+				turn =20;
+			}
+			else{
+				turn =-20;
+
+			}
+
+			/*
+			before_diff = now_diff;
+			now_diff = ((0.6*light_black+0.4*light_white)+mokuhyou_val)- ecrobot_get_light_sensor(NXT_PORT_S3);
+			integral = integral + ((now_diff + before_diff)/2.0 * DELTA);
 			
+			turn = Kp*now_diff + Ki*integral + Kd*((now_diff - before_diff) / DELTA);
+			*/
+
+			/* 通常のPID制御
 			before_diff = now_diff;
 			now_diff = (0.6*light_black+0.4*light_white) - ecrobot_get_light_sensor(NXT_PORT_S3);
 			integral = integral + ((now_diff + before_diff)/2.0 * DELTA);
 			
 			turn = Kp*now_diff + Ki*integral + Kd*((now_diff - before_diff) / DELTA);
-			
+			*/
+			/*
 			if(turn > 100){
 				turn = 100;
 			}
 			else if(turn < -100){
 				turn = -100;
 			}
-			
+			*/
 		}
 	
 		
 		
 		// bluetooth send data
-		adc1 = (S16)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-		adc2 =(S16)ecrobot_get_battery_voltage();
+		//adc1 = (S16)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+		//adc2 =(S16)ecrobot_get_battery_voltage();
 		
 	//	logSend(data1,data2,adc1,adc2,adc3,adc4);
 		
@@ -288,7 +337,7 @@ rx_buf[0]=5;
 			&pwm_R);									 /* 右モータPWM出力値 */
 		nxt_motor_set_speed(NXT_PORT_C, pwm_L, 1); /* 左モータPWM出力セット(-100～100) */
 		nxt_motor_set_speed(NXT_PORT_B, pwm_R, 1); /* 右モータPWM出力セット(-100～100) */
-
+		 
 		systick_wait_ms(4); /* 4msecウェイト */
 	
 		
@@ -387,3 +436,42 @@ static int remote_start(void)
 }
 
 
+void Maimai(){
+static unsigned int counter_maimai=0;
+U16 lightDowned;
+U16 lightUpped;
+U16 lightDiff;
+float k;
+
+//static float brighteness,buf_brighness;
+
+++counter_maimai;
+if(counter_maimai==20/4){//約20ms
+	//赤色LED消灯時のセンサ値を取得
+	lightDowned=ecrobot_get_light_sensor(NXT_PORT_S3);
+	//赤色LEDを点灯する
+	ecrobot_set_light_sensor_active(NXT_PORT_S3);
+	}
+
+if(counter_maimai==40/4){//約40ms
+	//赤色LED点灯時のセンサ値を取得
+	lightUpped=ecrobot_get_light_sensor(NXT_PORT_S3);
+	//赤色LEDを消灯する
+	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);
+	//カウンタをクリア
+	counter_maimai=0;
+}
+
+//光センサの変化量を計算
+
+if(lightDowned - lightUpped>0){
+	lightDiff=lightDowned - lightUpped;
+}
+else{
+	lightDiff=0U;
+}
+
+k=(1.0382E-3 * lightDowned -6.3295E-1)*lightDowned + 1.1024E+2;
+brightness = (float)lightDiff/k;
+
+}

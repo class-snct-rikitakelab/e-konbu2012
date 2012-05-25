@@ -11,7 +11,7 @@ USER_INC_PATH= $(NXTOSEK_ROOT)/ecrobot/nxtway_gs_balancer
 USER_LIB = nxtway_gs_balancer
 
 # C�\�[�X�t�@�C��
-TARGET_SOURCES = balancer_param.c sample.c logSend.c
+TARGET_SOURCES = balancer_param.c sample.c logSend.c Maimai.c
 
 # TOPPERS/ATK(OSEK)�ݒ�t�@�C��
 TOPPERS_OSEK_OIL_SOURCE = sample.oil
