@@ -36,7 +36,7 @@
 #define MOKUHYOU 600
 #define DELTA 0.004
 
-#define LIGHT_THRESHOLD .7F
+#define LIGHT_THRESHOLD 0.7F
 
 #define VOL 20
 
@@ -263,6 +263,16 @@ if(counter_maimai==40/4){//約40ms
 systick_wait_ms(4); // 4msecウェイト 
 	}
 	*/
+	 float seikika_mokuhyou,katamuki,b;
+	 b=0;
+	 katamuki= (1.0-0.0) / (1023.0-0.0);
+	 seikika_mokuhyou= (0.6*light_black+0.4*light_white)*katamuki + b;
+
+	 float reverse_seikika_katamuki,reverse_b;
+
+	 reverse_seikika_katamuki= (1023.0-0.0) / (1.0-0.0) ;
+	 reverse_b = 0;
+
 	while(1)
 	{
 		tail_control(TAIL_ANGLE_DRIVE); /* バランス走行用角度に制御 */
@@ -273,25 +283,32 @@ systick_wait_ms(4); // 4msecウェイト
 		}
 		else
 		{
-			forward = 20; /* 前進命令 */
+			forward = 30; /* 前進命令 */
 			//まいまい式とPID制御を組み合わせたturn値の計算	
-			/*mokuhyou_val =*/Maimai();
-
-			if(brightness<=LIGHT_THRESHOLD/*0.6*light_black+0.4*light_white*/){
+			Maimai();
+				
+			
+			//if(brightness<=LIGHT_THRESHOLD/*0.6*light_black+0.4*light_white*/){
+			/*
+			if(brightness<=seikika_mokuhyou){
+			
 				turn =20;
 			}
 			else{
 				turn =-20;
 
-			}
+			}*/
+			
 
-			/*
+
+			
 			before_diff = now_diff;
-			now_diff = ((0.6*light_black+0.4*light_white)+mokuhyou_val)- ecrobot_get_light_sensor(NXT_PORT_S3);
+			now_diff = ( seikika_mokuhyou*reverse_seikika_katamuki - brightness*reverse_seikika_katamuki);
 			integral = integral + ((now_diff + before_diff)/2.0 * DELTA);
 			
 			turn = Kp*now_diff + Ki*integral + Kd*((now_diff - before_diff) / DELTA);
-			*/
+			
+			
 
 			/* 通常のPID制御
 			before_diff = now_diff;
