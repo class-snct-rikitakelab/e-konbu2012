@@ -15,25 +15,23 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static int counter = 0;
 
 //尻尾設定角度
-#define ANGLEOFDOWN 0				//降下目標角度
+#define ANGLEOFDOWN 118				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 
 //速度調節係数
-//#define SPEED_COUNT 10
 #define SPEED_COUNT 10
 
 //バッテリ降下値
-#define DOWN_BATTERY 550			//バッテリ降下値
-
+#define DOWN_BATTERY 600			//バッテリ降下値
 
 //ジャイロ振幅値
 #define PM_GYRO 65
 
-
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
 
+#define CMD_START         '1'    	//リモートスタートコマンド(変更禁止)
 
 //PID制御用偏差値
 static float hensa;					//P制御用
@@ -63,6 +61,7 @@ static U32	cal_start_time;		/* calibration start time */
 //バッテリ電圧値状態
 static U32	battery_value;
 
+char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -111,7 +110,7 @@ typedef enum{
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILUP;
+RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
 //各種プライベート関数
@@ -127,6 +126,7 @@ void RA_linetrace_P(int forward_speed);
 void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
+static int remote_start(void);
 
 
 //カウンタの宣言
@@ -321,7 +321,6 @@ void shock(void){
 			min_vol <= battery_value-DOWN_BATTERY)
 	{
 		ecrobot_sound_tone(880,512,30);
-		tail_mode = RN_TAILDOWN;
 		if(runner_mode == RN_MODE_CONTROL){
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
@@ -387,6 +386,30 @@ void taildown(){
 
 }
 
+static int remote_start(void)
+{
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
+
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
+	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == CMD_START)
+		{
+			start = 1; /* 走行開始 */
+		}
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+	}
+
+	return start;
+}
 
 //bluetoothによるログ送信
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
@@ -418,7 +441,7 @@ void RN_setting()
 			break;
 
 		case (RN_RUN):
-			RA_linetrace_PID(25);
+			RA_linetrace_PID(30);
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_before = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
@@ -429,54 +452,45 @@ void RN_setting()
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_slow = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 
-			if((distance_before - distance_slow <= -7))
+			if((distance_before - distance_slow <= -8))
 			{
-				//gyro_offset -= 250;
 				setting_mode = RN_STOP_WAIT;
 			}
 			else
 			{
-				RA_linetrace(0,1);
+				RA_speed(0,1);
 				cmd_turn = RA_wheels(cmd_turn);
 			}
-
-			//RA_speed(0,1);
-			//cmd_turn = RA_wheels(cmd_turn);
 			break;
 
 		case(RN_BACK_RUN):
 			RA_linetrace_PID(-15);
 			break;
+
 		case(RN_HIGH_RUN):
-			//RA_linetrace_PID(20,0);
-			//cmd_turn = RA_wheels(cmd_turn);
 			break;
+
 		case(RN_STOP_WAIT):
 			wait_count += 1;
-			//if(cmd_forward == 0)
-			//{
-				//systick_wait_ms(100);
-				//runner_mode = RN_STOP;
-				//setting_mode = RN_STOP;
-			//}
-			//else
-			//{
-				RA_linetrace(0,1);
-				cmd_turn=RA_wheels(cmd_turn);
-				if(cmd_forward == 0 && wait_count == 1000)
-				{
-					RA_hensareset();
-					wait_count = 0;
-					setting_mode = RN_RUN;
-					runner_mode = RN_MODE_CONTROL;
-					tail_mode = RN_TAILUP;
-				}
-			//}
+			RA_linetrace(-5,2);
+			if(wait_count == 1000)
+			{
+				balance_init();
+				nxt_motor_set_count(NXT_PORT_B,0);
+				nxt_motor_set_count(NXT_PORT_C,0);
+				RA_hensareset();
+				wait_count = 0;
+				setting_mode = RN_RUN;
+				runner_mode = RN_MODE_CONTROL;
+				tail_mode = RN_TAILUP;
+			}
 			break;
+
 		case(RN_STOP):
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 			break;
+
 		default:
 			break;
 	}
@@ -489,7 +503,8 @@ void RN_calibrate()
 
 	//黒値
 	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
 			ecrobot_sound_tone(880, 512, 30);
 			BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
 			systick_wait_ms(500);
@@ -499,7 +514,8 @@ void RN_calibrate()
 
 	//白値
 	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
 			ecrobot_sound_tone(906, 512, 30);
 			WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
 			systick_wait_ms(500);
@@ -512,7 +528,8 @@ void RN_calibrate()
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
 			ecrobot_sound_tone(932, 512, 30);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
 			battery_value = ecrobot_get_battery_voltage();
@@ -522,23 +539,35 @@ void RN_calibrate()
 		}
 	}
 
+	//走行開始合図
 	while(1){
-		if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE){
-				ecrobot_sound_tone(982,512,30);
+		if(remote_start()==1)
+		{
+			ecrobot_sound_tone(982,512,30);
+			tail_mode = RN_TAILUP;
+			setting_mode = RN_RUN;
+			runner_mode = RN_MODE_CONTROL;
+			break;
+		}
+		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
+			ecrobot_sound_tone(982,512,30);
+
+			while(1){
+					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
+					{
+						setting_mode = RN_RUN;
+						runner_mode = RN_MODE_CONTROL;
+						tail_mode = RN_TAILUP;
+						break;
+					}
+				}
 			break;
 		}
 	}
 
 	//キャリブレーション終了
-	while(1){
-		if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE) {
-			//ecrobot_sound_tone(950, 512, 30);
-			setting_mode = RN_RUN;
-			runner_mode = RN_MODE_CONTROL;
-			tail_mode = RN_TAILUP;
-			break;
-		}
-	}
+
 }
 
 
@@ -617,8 +646,8 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(min_vol,cmd_turn,ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1),
-			distance_before - distance_slow,counter);
+	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),min_vol,
+			distance_before - distance_slow,ecrobot_get_gyro_sensor(NXT_PORT_S1));
 	TerminateTask();
 }
 
