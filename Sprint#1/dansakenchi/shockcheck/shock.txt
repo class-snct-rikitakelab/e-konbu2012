@@ -1,0 +1,13 @@
+void shock(void){
+//	if(ecrobot_get_battery_voltage() <= battery_value-100){
+//		ecrobot_sound_tone(880, 512, 30);
+//	}
+	if((ecrobot_get_gyro_sensor(NXT_PORT_S4) <= gyro_offset-50 || 
+ ecrobot_get_gyro_sensor(NXT_PORT_S4) >= gyro_offset+50) &&
+ ecrobot_get_battery_voltage() <= battery_value-100){
+		ecrobot_sound_tone(880,512,30);}
+	
+//	if(ecrobot_get_gyro_sensor(NXT_PORT_S4) <= gyro_offset-100 || 
+// ecrobot_get_gyro_sensor(NXT_PORT_S4) >= gyro_offset+100)
+//		ecrobot_sound_tone(880,512,30);
+}
