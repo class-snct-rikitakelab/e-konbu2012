@@ -15,15 +15,15 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static int counter = 0;
 
 //尻尾設定角度
-#define ANGLEOFDOWN 118				//降下目標角度
+#define ANGLEOFDOWN 115				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 
 //速度調節係数
-#define SPEED_COUNT 10
+#define SPEED_COUNT 8
 
 //バッテリ降下値
-#define DOWN_BATTERY 600			//バッテリ降下値
+#define DOWN_BATTERY 450			//バッテリ降下値
 
 //ジャイロ振幅値
 #define PM_GYRO 65
@@ -31,7 +31,7 @@ static int counter = 0;
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
 
-#define CMD_START         '1'    	//リモートスタートコマンド(変更禁止)
+#define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
 
 //PID制御用偏差値
 static float hensa;					//P制御用
@@ -50,10 +50,13 @@ static float Kd = 0.003;				//D制御用
 
 static int wait_count = 0;
 
+static int mode_count = 0;
+
 static double min_vol;
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
+
 static U32	avg_cnt = 0;		/* average count to calc gyro offset */
 static U32	cal_start_time;		/* calibration start time */
 
@@ -75,6 +78,7 @@ int revR = 0;
 float distance_now = 0;
 float distance_before = 0;
 float distance_slow = 0;
+float distance_stop = 0;
 
 
 //システム全体の状態
@@ -95,7 +99,9 @@ typedef enum{
 	RN_BACK_RUN,				//反対走行
 	RN_HIGH_RUN,				//高速走行
 	RN_STOP,						//停止
-	RN_STOP_WAIT
+	RN_STOP_WAIT,
+	RN_LITTLE_RUN,
+	RN_LITTLE_LOW
 } RN_SETTINGMODE;
 
 
@@ -134,11 +140,12 @@ DeclareCounter(SysTimerCnt);
 
 
 //タスクの宣言
+/*
 DeclareTask(ActionTask);
 DeclareTask(ActionTask2);
 DeclareTask(DisplayTask);
 DeclareTask(LogTask);
-
+*/
 
 //液晶ディスプレイに表示するシステム名設定
 const char target_subsystem_name[] = "Logtrace";
@@ -234,7 +241,7 @@ void RA_linetrace_PID(int forward_speed) {
 		shock();
 	}
 
-	RA_speed(forward_speed,1);
+	RA_speed(forward_speed,2);
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -327,6 +334,7 @@ void shock(void){
 			distance_before = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			setting_mode = RN_SLOW_RUN;
 			runner_mode = RN_MODE_CONTROL_2;
+			gyro_offset += 10;
 			min_vol = battery_value;
 		}
 	}
@@ -435,6 +443,8 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定
 void RN_setting()
 {
+	static float beforestop;
+
 	switch (setting_mode){
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();
@@ -452,13 +462,17 @@ void RN_setting()
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_slow = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 
-			if((distance_before - distance_slow <= -8))
+			if((distance_before - distance_slow <= -5))
 			{
+				gyro_offset -= 15;
+				balance_init();
+				nxt_motor_set_count(NXT_PORT_B,0);
+				nxt_motor_set_count(NXT_PORT_C,0);
 				setting_mode = RN_STOP_WAIT;
 			}
 			else
 			{
-				RA_speed(0,1);
+				RA_speed(-50,8);
 				cmd_turn = RA_wheels(cmd_turn);
 			}
 			break;
@@ -471,10 +485,45 @@ void RN_setting()
 			break;
 
 		case(RN_STOP_WAIT):
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_stop = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+			beforestop = distance_stop;
 			wait_count += 1;
-			RA_linetrace(-5,2);
-			if(wait_count == 1000)
+			RA_linetrace(0,2);
+
+			if(wait_count == 550)
 			{
+				balance_init();
+				nxt_motor_set_count(NXT_PORT_B,0);
+				nxt_motor_set_count(NXT_PORT_C,0);
+				RA_hensareset();
+				wait_count = 0;
+				gyro_offset -= 15;
+				setting_mode = RN_RUN;
+				runner_mode = RN_MODE_CONTROL;
+				tail_mode = RN_TAILUP;
+			}
+
+			break;
+
+		case(RN_STOP):
+			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			break;
+
+		case(RN_LITTLE_RUN):
+			wait_count += 1;
+			mode_count += 1;
+			RA_linetrace(5,10);
+			if(wait_count >= 500)
+			{
+				wait_count = 0;
+				setting_mode = RN_LITTLE_LOW;
+			}
+			if(mode_count >= 5000)
+			{
+				mode_count = 0;
 				balance_init();
 				nxt_motor_set_count(NXT_PORT_B,0);
 				nxt_motor_set_count(NXT_PORT_C,0);
@@ -486,9 +535,27 @@ void RN_setting()
 			}
 			break;
 
-		case(RN_STOP):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+		case(RN_LITTLE_LOW):
+			wait_count += 1;
+			mode_count += 1;
+			RA_linetrace(-3,2);
+			if(wait_count >= 500)
+			{
+				wait_count = 0;
+				setting_mode = RN_LITTLE_RUN;
+			}
+			if(mode_count >= 5000)
+			{
+				mode_count = 0;
+				balance_init();
+				nxt_motor_set_count(NXT_PORT_B,0);
+				nxt_motor_set_count(NXT_PORT_C,0);
+				RA_hensareset();
+				wait_count = 0;
+				setting_mode = RN_RUN;
+				runner_mode = RN_MODE_CONTROL;
+				tail_mode = RN_TAILUP;
+			}
 			break;
 
 		default:
