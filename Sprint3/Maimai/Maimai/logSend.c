@@ -9,7 +9,7 @@
 #include "balancer.h" /* 倒立振子制御用ヘッダファイル */
 #include "logSend.h"
 
-static void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
+//static void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
 
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4) {
 	
@@ -23,7 +23,7 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4) {
 			*((U32 *)(&data_log_buffer[0]))  = (U32)systick_get_ms();
             *(( S8 *)(&data_log_buffer[4]))  =  (S8)data1;
             *(( S8 *)(&data_log_buffer[5]))  =  (S8)data2;
-            *((U16 *)(&data_log_buffer[6]))  = (U16)ecrobot_get_battery_voltage(); //light sensor value
+            *((U16 *)(&data_log_buffer[6]))  = (U16)ecrobot_get_light_sensor(NXT_PORT_S3); //light sensor value
             *((S32 *)(&data_log_buffer[8]))  = (S32)nxt_motor_get_count(0);
             *((S32 *)(&data_log_buffer[12])) = (S32)nxt_motor_get_count(1);
             *((S32 *)(&data_log_buffer[16])) = (S32)nxt_motor_get_count(2);

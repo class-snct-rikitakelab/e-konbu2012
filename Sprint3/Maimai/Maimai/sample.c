@@ -28,7 +28,7 @@
 #define P_GAIN             2.5F /* 完全停止用モータ制御比例係数 */
 #define PWM_ABS_MAX          60 /* 完全停止用モータ制御PWM絶対最大値 */
 /* sample_c4マクロ */
-#define DEVICE_NAME       "KINGYO"  /* Bluetooth通信用デバイス名 */
+#define DEVICE_NAME       "ROBO00"  /* Bluetooth通信用デバイス名 */
 #define PASS_KEY          "1234" /* Bluetooth通信用パスキー */
 #define CMD_START         '1'    /* リモートスタートコマンド(変更禁止) */
 
@@ -129,6 +129,7 @@ static float light_black =700; /* 黒色の光センサ値 */
 	ecrobot_set_bt_device_name(DEVICE_NAME);
 
 	//キャリブレーション
+	int i;
 	while(1){ //黒色
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4)){
 				ecrobot_sound_tone(440, 512, VOL);
@@ -137,6 +138,12 @@ static float light_black =700; /* 黒色の光センサ値 */
 				systick_wait_ms(10);
 				ecrobot_sound_tone(880, 512, VOL);
 				systick_wait_ms(10);
+				/*
+				for(i=0;i<400;++i){
+				Maimai();
+				systick_wait_ms(4); // 4msecウェイト 
+				light_black = brightness;
+				}*/
 				light_black = ecrobot_get_light_sensor(NXT_PORT_S3);
 				systick_wait_ms(300);
 				break;
@@ -150,7 +157,15 @@ static float light_black =700; /* 黒色の光センサ値 */
 				systick_wait_ms(10);
 				ecrobot_sound_tone(880, 512, VOL);
 				systick_wait_ms(10);
+				
 				light_white = ecrobot_get_light_sensor(NXT_PORT_S3);
+				/*
+				for(i=0;i<400;++i){
+				Maimai();
+				systick_wait_ms(4); //4msecウェイト 
+				light_white = brightness;
+				}*/
+
 				systick_wait_ms(300);
 				break;
 			}
@@ -201,7 +216,7 @@ static float light_black =700; /* 黒色の光センサ値 */
 	U32 recv_byte;
 rx_buf[0]=5;
 	buf[1]=10;
-   int  i;
+   //int  i;
 	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
 	{
 		rx_buf[i] = '0'; /* 受信バッファをクリア */
@@ -266,7 +281,7 @@ systick_wait_ms(4); // 4msecウェイト
 	 float seikika_mokuhyou,katamuki,b;
 	 b=0;
 	 katamuki= (1.0-0.0) / (1023.0-0.0);
-	 seikika_mokuhyou= (0.6*light_black+0.4*light_white)*katamuki + b;
+	 seikika_mokuhyou= (0.5*light_black+0.5*light_white)*katamuki + b;
 
 	 float reverse_seikika_katamuki,reverse_b;
 
@@ -283,33 +298,40 @@ systick_wait_ms(4); // 4msecウェイト
 		}
 		else
 		{
-			forward = 30; /* 前進命令 */
-			//まいまい式とPID制御を組み合わせたturn値の計算	
+			forward = 20; /* 前進命令 */
+			//まいまい式とON OFF turn値の計算	
 			Maimai();
 				
+			if(brightness<=LIGHT_THRESHOLD/*0.6*light_black+0.4*light_white*/){
 			
-			//if(brightness<=LIGHT_THRESHOLD/*0.6*light_black+0.4*light_white*/){
-			/*
-			if(brightness<=seikika_mokuhyou){
+			//if(brightness<=seikika_mokuhyou){
 			
 				turn =20;
 			}
 			else{
 				turn =-20;
 
-			}*/
+			}
 			
 
 
-			
+			/*
+			//PID とまいまいの組み合わせ
 			before_diff = now_diff;
-			now_diff = ( seikika_mokuhyou*reverse_seikika_katamuki - brightness*reverse_seikika_katamuki);
+			now_diff = (LIGHT_THRESHOLD - brightness)*reverse_seikika_katamuki;
+			//now_diff = ( seikika_mokuhyou*reverse_seikika_katamuki - brightness*reverse_seikika_katamuki);
+			
 			integral = integral + ((now_diff + before_diff)/2.0 * DELTA);
 			
 			turn = Kp*now_diff + Ki*integral + Kd*((now_diff - before_diff) / DELTA);
 			
-			
-
+			if(turn > 100){
+				turn = 100;
+			}
+			else if(turn < -100){
+				turn = -100;
+			}
+			*/
 			/* 通常のPID制御
 			before_diff = now_diff;
 			now_diff = (0.6*light_black+0.4*light_white) - ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -330,10 +352,10 @@ systick_wait_ms(4); // 4msecウェイト
 		
 		
 		// bluetooth send data
-		//adc1 = (S16)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-		//adc2 =(S16)ecrobot_get_battery_voltage();
+		adc1 = (S16)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+		adc2 =(S16)ecrobot_get_battery_voltage();
 		
-	//	logSend(data1,data2,adc1,adc2,adc3,adc4);
+	logSend(data1,data2,adc1,adc2,adc3,adc4);
 		
 		
 		
@@ -354,10 +376,14 @@ systick_wait_ms(4); // 4msecウェイト
 			&pwm_R);									 /* 右モータPWM出力値 */
 		nxt_motor_set_speed(NXT_PORT_C, pwm_L, 1); /* 左モータPWM出力セット(-100～100) */
 		nxt_motor_set_speed(NXT_PORT_B, pwm_R, 1); /* 右モータPWM出力セット(-100～100) */
-		 
+		
+
+	//	logSend(0,0,0,0,0,0);
+
 		systick_wait_ms(4); /* 4msecウェイト */
 	
 		
+
 	}
 
 
