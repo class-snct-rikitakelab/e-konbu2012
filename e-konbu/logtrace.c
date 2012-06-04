@@ -237,7 +237,8 @@ void RA_linetrace_PID(int forward_speed) {
 		shock();
 	}
 
-	RA_speed(forward_speed,2);	//速度を段階的に変化
+	//RA_speed(forward_speed,2);	//速度を段階的に変化
+	cmd_forward = forward_speed;
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -452,7 +453,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(45);
+			RA_linetrace_PID(20);
 			/*
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
@@ -462,26 +463,28 @@ void RN_setting()
 
 			//一定距離分ブレーキ
 		case(RN_SLOW_RUN):
-			wait_count += 1000;
+			rapid_speed_up();
+			
+			wait_count += 5;
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_slow = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 
 			//一定距離検知後、停止モードへ
-			if((distance_before - distance_slow <= -10))
+			if((distance_before - distance_slow <= -1000))
 			{
 				wait_count = 0;
 				gyro_offset += 10;
 				balance_init();
 				nxt_motor_set_count(NXT_PORT_B,0);
 				nxt_motor_set_count(NXT_PORT_C,0);
-				setting_mode = RN_STOP_WAIT;
+				//setting_mode = RN_STOP_WAIT;
 			}
 
 			//一定時間経過後、速度降下
 			else if(wait_count >= 500)
 			{
-				RA_speed(-30,1);
+				RA_speed(0,1);
 				cmd_turn = RA_wheels(cmd_turn);
 			}
 
@@ -723,6 +726,10 @@ void RN_modesetting()
 	}
 }
 
+void rapid_speed_up(){
+
+
+}
 
 //走行方法管理(4ms)
 TASK(ActionTask)
