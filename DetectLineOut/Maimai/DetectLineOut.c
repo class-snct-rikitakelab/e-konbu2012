@@ -115,6 +115,7 @@ RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
 //各種プライベート関数
+void RN_stop();
 void RN_calibrate();
 void RN_run_state_change();
 int online();
@@ -130,6 +131,8 @@ void RN_modesetting();
 static int remote_start(void);
 
 static int RN_mandatory_run_remotestart(void); //ライン無視走行切り替え信号用関数
+void initialze_PID_param();
+
 
 //ライン外れるための関数
 void RN_mandatory_line_out(U8 port_B_speed,U8 port_C_speed);
@@ -398,6 +401,7 @@ void taildown(){
 
 }
 
+//リモートスタート用関数
 static int remote_start(void)
 {
 	int i;
@@ -423,6 +427,7 @@ static int remote_start(void)
 	return start;
 }
 
+//ライン無視走行信号受信用関数
 static int RN_mandatory_run_remotestart(void)
 {
 	int i;
@@ -471,6 +476,7 @@ void RN_run_state_change()
 			//PCからの信号を受信（この場合'2'）を受信したら状態繊維
 			if(RN_mandatory_run_remotestart()==1){
 				setting_mode = RN_MANDATORY_LINE_OUT;
+			
 			}
 			break;
 
@@ -483,8 +489,6 @@ void RN_run_state_change()
 	
 		case(RN_MANDATORY_LINE_OUT):
 			RN_mandatory_line_out(30,10);
-			ecrobot_sound_tone(880, 512, 30);
-			systick_wait_ms(500);
 			break;
 
 		default:
@@ -492,6 +496,18 @@ void RN_run_state_change()
 	}
 }
 
+void RN_stop(){
+
+
+}
+
+void initialze_PID_param(){
+
+	hensa = 0;
+	i_hensa =0;
+	d_hensa =0;
+	bf_hensa =0;
+}
 
 //キャリブレーション
 void RN_calibrate()
@@ -613,27 +629,33 @@ void RN_mandatory_line_out(U8 port_B_speed,U8 port_C_speed){
 	static int flag =0;
 	
 	if(flag ==0) {
-	}
-	else {
 	nxt_motor_set_speed(NXT_PORT_C,port_C_speed,1);
 	nxt_motor_set_speed(NXT_PORT_B,port_B_speed,1);
-		}
+	}
+	else {
+		setting_mode = RN_RUN; //PIDを用いた通常走行へ戻る。
+	
+	}
 	
 	if (!TU_is_start() && flag ==0) {
 		/** 4秒のタイマ監視開始 */
-		TU_start(2000); 
+		TU_start(1000); 
 	}
 
 	if (TRUE == TU_is_timeout()) {
+	//balance_init();						/* 倒立振子制御初期化 */
+	//nxt_motor_set_count(NXT_PORT_C, 0); /* 左モータエンコーダリセット */
+	//nxt_motor_set_count(NXT_PORT_B, 0); /* 右モータエンコーダリセット */
+	initialze_PID_param();
+	TU_finish(); /** タイマ監視を終了させる */ 	
+	flag =1; //一回タイマを使ったらもう使わない。
+	
+	ecrobot_sound_tone(440, 512, 30);
+	systick_wait_ms(500); //音を鳴らす
+	
 	setting_mode = RN_RUN; //PIDを用いた通常走行へ戻る。
 	
-	ecrobot_sound_tone(932, 512, 30);
-	systick_wait_ms(500); //音を鳴らす
-	/** タイマ監視を終了させる */ 
-		TU_finish();	
-		flag =1; //一回タイマを使ったらもう使わない。
-	
-
+		
 	}
 		
 	
