@@ -36,7 +36,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <NMakeOutput>e-konbu.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;C:\cygwin\GNUARM\arm-elf\include; C:\cygwin\GNUARM\include; C:\cygwin\nxtOSEK\ecrobot\c; C:\cygwin\nxtOSEK\ecrobot\nxtcommfantom; C:\cygwin\nxtOSEK\ecrobot\nxtway_gs_balancer; C:\cygwin\nxtOSEK\ecrobot\bios; C:\cygwin\nxtOSEK\toppers_osek\include; C:\cygwin\nxtOSEK\toppers_osek\kernel; C:\cygwin\nxtOSEK\lejos_nxj\src\nxtvm\platform\nxt; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu\lego_nxt</IncludePath>
+    <IncludePath>C:\cygwin\GNUARM\arm-elf\include; C:\cygwin\GNUARM\include; C:\cygwin\nxtOSEK\ecrobot\c; C:\cygwin\nxtOSEK\ecrobot\nxtcommfantom; C:\cygwin\nxtOSEK\ecrobot\nxtway_gs_balancer; C:\cygwin\nxtOSEK\ecrobot\bios; C:\cygwin\nxtOSEK\toppers_osek\include; C:\cygwin\nxtOSEK\toppers_osek\kernel; C:\cygwin\nxtOSEK\lejos_nxj\src\nxtvm\platform\nxt; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu\lego_nxt</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>e-konbu.exe</NMakeOutput>
@@ -45,6 +45,7 @@
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Makefile" />
     <None Include="mk.cmd" />
     <None Include="prog.oil" />
@@ -53,6 +54,7 @@
   <ItemGroup>
     <ClCompile Include="balancer_param.c" />
     <ClCompile Include="logtrace.c" />
+    <ClCompile Include="lookup.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logtrace.h" />
