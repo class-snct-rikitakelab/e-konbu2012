@@ -15,7 +15,7 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static int counter = 0;
 
 //尻尾設定角度
-#define ANGLEOFDOWN 110				//降下目標角度
+#define ANGLEOFDOWN 105				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 
@@ -41,6 +41,9 @@ static float bf_hensa = 0;
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
+
+static float t_Kp = 0.9;
+static float t_Ki = 0;
 
 static int wait_count = 0;
 
@@ -75,9 +78,9 @@ typedef enum{
 	RN_RUN,						//基本走行（ライントレース）
 	RN_LOOKUP,
 	RN_LOOKUPDOWN,						//停止
-	RN_LOOKUPMOVE
+	RN_LOOKUPMOVE,
+	RN_LOOKUPUP
 } RN_SETTINGMODE;
-
 
 //尻尾の状態
 typedef enum{
@@ -118,6 +121,7 @@ static int remote_start(void);
 void sonarcheck(void);
 void runner_mode_change(int flag);
 int getsonarflag(void);
+void tailpower(float value);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -315,7 +319,7 @@ int online(void) {
 
 void sonarcheck(void)
 {
-	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= 25)
+	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= 20)
 	{
 		sonarflag = 1;
 	}
@@ -345,12 +349,18 @@ void runner_mode_change(int flag)
 	}
 }
 
+void tailpower(float value)
+{
+	t_Kp = value;
+}
+
+
 //尻尾角度維持
 void taildown(){
 
-	static const float t_Kp = 0.8;
-
 	static float t_hensa = 0;
+	static float t_ihensa = 0;
+
 	static float t_speed = 0;
 
 	switch(tail_mode){
@@ -369,22 +379,25 @@ void taildown(){
 		case(RN_TAILLOOKUP_0):
 			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
+
 		case(RN_TAILLOOKUP_1):
-			t_hensa = ANGLEOFDOWN -20 - ecrobot_get_motor_rev(NXT_PORT_A);
+			t_hensa = ANGLEOFDOWN -5 - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
 
 		case(RN_TAILLOOKUP_2):
-			t_hensa = ANGLEOFDOWN -30 - ecrobot_get_motor_rev(NXT_PORT_A);
+			t_hensa = ANGLEOFDOWN -15 - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
 
 		case(RN_TAILLOOKUP_3):
-			t_hensa = ANGLEOFDOWN -40 - ecrobot_get_motor_rev(NXT_PORT_A);
+			t_hensa = ANGLEOFDOWN -25 - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
 		default:
 			break;
 	}
 
-	t_speed = t_Kp*t_hensa;
+	t_ihensa = t_ihensa+(t_hensa*0.0004);
+
+	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);
 
 		if (t_speed < -100)
 			t_speed = -100;
@@ -477,14 +490,15 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count >= 300)
+			if(wait_count >= 150)
 			{
 				gyro_offset -= 140;
 				tail_mode = RN_TAILLOOKUP_0;
-				systick_wait_ms(30);
+				systick_wait_ms(50);
 				setting_mode = RN_LOOKUPDOWN;
 				runner_mode_change(2);
 				wait_count = 0;
+				cmd_forward = 0;
 			}
 
 			break;
@@ -495,27 +509,57 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count == 400)
+			if(wait_count == 800)
 				tail_mode = RN_TAILLOOKUP_1;
-			else if(wait_count == 800)
-				tail_mode = RN_TAILLOOKUP_2;
 			else if(wait_count == 1200)
-				tail_mode = RN_TAILLOOKUP_3;
+				tail_mode = RN_TAILLOOKUP_2;
 			else if(wait_count == 1600)
+				tail_mode = RN_TAILLOOKUP_3;
+			else if(wait_count == 2000)
+			{
 				setting_mode = RN_LOOKUPMOVE;
+				wait_count = 0;
+			}
 
 			break;
 
 		case (RN_LOOKUPMOVE):
-			RA_speed(20,1);
-			cmd_turn = RA_wheels(cmd_turn);
+			nxt_motor_set_speed(NXT_PORT_C, cmd_forward, 1);
+			nxt_motor_set_speed(NXT_PORT_B, cmd_forward, 1);
+			
+			RA_speed(30,1);
+
+			wait_count++;
+
+			if(wait_count == 800)
+			{
+				setting_mode = RN_LOOKUPUP;
+				wait_count = 0;
+			}
+
+			break;
+
+		case (RN_LOOKUPUP):
+			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+
+			wait_count++;
+
+			tailpower(9.0);
+
+			if(wait_count == 800)
+				tail_mode = RN_TAILLOOKUP_2;
+			else if(wait_count == 1200)
+				tail_mode = RN_TAILLOOKUP_1;
+			else if(wait_count == 1600)
+				tail_mode = RN_TAILDOWN;
+
 			break;
 
 		default:
 			break;
 	}
 }
-
 
 //キャリブレーション
 void RN_calibrate()
