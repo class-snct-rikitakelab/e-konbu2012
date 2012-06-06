@@ -1,8 +1,8 @@
 /*
  *  kernel_id.h
- *  Fri Jun 01 17:00:28 2012
+ *  Wed Jun 06 17:00:24 2012
  *  SG Version 2.00
- *  sg.exe DetectLineOut.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
+ *  sg.exe prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */
 #ifndef KERNEL_ID_H
 #define KERNEL_ID_H

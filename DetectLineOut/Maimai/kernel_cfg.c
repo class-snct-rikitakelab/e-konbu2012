@@ -1,8 +1,8 @@
 /*
  *  kernel_cfg.c
- *  Fri Jun 01 17:00:28 2012
+ *  Wed Jun 06 17:00:24 2012
  *  SG Version 2.00
- *  sg.exe DetectLineOut.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
+ *  sg.exe prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */
 #include "osek_kernel.h"
 #include "kernel_id.h"
@@ -14,7 +14,7 @@
 #define __STK_UNIT VP
 #define __TCOUNT_STK_UNIT(sz) (((sz) + sizeof(__STK_UNIT) - 1) / sizeof(__STK_UNIT))
 
-#define TNUM_ALARM     4
+#define TNUM_ALARM     5
 #define TNUM_COUNTER   1
 #define TNUM_ISR2      0
 #define TNUM_RESOURCE  1
@@ -82,6 +82,7 @@ const AlarmType cyclic_alarm1 = 0;
 const AlarmType cyclic_alarm2 = 1;
 const AlarmType cyclic_alarm3 = 2;
 const AlarmType cyclic_alarm4 = 3;
+const AlarmType counttimer = 4;
 
 DeclareTask(ActionTask);
 static void _activate_alarm_cyclic_alarm1( void );
@@ -103,11 +104,13 @@ static void _activate_alarm_cyclic_alarm4( void );
 static void _activate_alarm_cyclic_alarm4( void )
 { (void)ActivateTask( LogTask ); }
 
-const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, 0, };
-const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, _activate_alarm_cyclic_alarm4, };
-const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, 0x00000001, };
-const TickType alminib_almval[TNUM_ALARM] = { 1, 1, 1, 1, };
-const TickType alminib_cycle[TNUM_ALARM] = { 4, 5, 20, 50, };
+extern void ALARMCALLBACKNAME( CountTimer )(void);
+
+const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, 0, 0, };
+const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, _activate_alarm_cyclic_alarm4, ALARMCALLBACKNAME( CountTimer ), };
+const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, 0x00000001, 0x00000001, };
+const TickType alminib_almval[TNUM_ALARM] = { 1, 2, 1, 1, 1000, };
+const TickType alminib_cycle[TNUM_ALARM] = { 4, 4, 20, 50, 10, };
 
 AlarmType almcb_next[TNUM_ALARM];
 AlarmType almcb_prev[TNUM_ALARM];
