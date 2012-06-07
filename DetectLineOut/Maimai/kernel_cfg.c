@@ -1,6 +1,6 @@
 /*
  *  kernel_cfg.c
- *  Wed Jun 06 17:00:24 2012
+ *  Thu Jun 07 15:32:00 2012
  *  SG Version 2.00
  *  sg.exe prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */
@@ -110,7 +110,7 @@ const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, 0, 0, };
 const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, _activate_alarm_cyclic_alarm4, ALARMCALLBACKNAME( CountTimer ), };
 const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, 0x00000001, 0x00000001, };
 const TickType alminib_almval[TNUM_ALARM] = { 1, 2, 1, 1, 1000, };
-const TickType alminib_cycle[TNUM_ALARM] = { 4, 4, 20, 50, 10, };
+const TickType alminib_cycle[TNUM_ALARM] = { 4, 4, 20, 4, 10, };
 
 AlarmType almcb_next[TNUM_ALARM];
 AlarmType almcb_prev[TNUM_ALARM];

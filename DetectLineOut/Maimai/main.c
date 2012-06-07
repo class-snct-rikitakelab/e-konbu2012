@@ -471,8 +471,12 @@ void RN_run_state_change()
 			//í èÌëñçs
 		case (RN_RUN):
 			RA_linetrace_PID(20); //í èÌëñçsópä÷êî
-			checkVariation();
-			
+			monitorVariation();
+			if(getDetectLineState() == OutOfLine ){
+				ecrobot_sound_tone(880, 512, 10);
+				systick_wait_ms(2);
+
+			}
 			/*
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);

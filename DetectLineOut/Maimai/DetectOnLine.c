@@ -16,6 +16,10 @@ void setDetectLineState(DetectLineState state)
 {
 	detectLineState= state;
 }
+DetectLineState getDetectLineState()
+{
+	return detectLineState;
+}
  
 void calLightSensorVarieation()
 {
@@ -25,20 +29,19 @@ void calLightSensorVarieation()
 	BufLightSensorVal = (float)ecrobot_get_light_sensor(NXT_PORT_S3); //一回前のライトセンサの変化量の保存
 }
  
-void checkVariation()
+void monitorVariation()
 {
-	calLightSensorVarieation();
-	float temp;
-	if(lightSensorVarieation>=0){
-	temp = lightSensorVarieation;
-	}
-	else{
-		temp = -lightSensorVarieation;
-	
-	}
+	static int counter;
 
-	if(temp/*lightSensorVarieation*/ > DETECTLINOUT_THRESHOLD ) {
-		
+	
+	++counter;
+if(counter==240/4){//約20ms
+	
+	calLightSensorVarieation();
+
+	//ラインアウトしたら
+	if(lightSensorVarieation < DETECTLINEOUT_THRESHOLD ) {		
+
 		switch (detectLineState) {
 		
 		case OnLine :
@@ -48,8 +51,27 @@ void checkVariation()
 		break;
 		
 		case OutOfLine :
+		setDetectLineState(OutOfLine);
+		break;
+
+		default : 
+		//none
+		break;
+		}
+
+	}
+	//ラインを検知したら
+	else if(lightSensorVarieation > DETECTLINE_IN_THRESHOLD ) {		
+
+		switch (detectLineState) {
+		
+		case OnLine :
 		setDetectLineState(OnLine);
-		ecrobot_sound_tone(880, 512, 30);
+		break;
+		
+		case OutOfLine :
+		setDetectLineState(OnLine);
+		ecrobot_sound_tone(440, 512, 30);
 		systick_wait_ms(500);
 		break;
 
@@ -60,6 +82,8 @@ void checkVariation()
 
 	}
 
+counter = 0;
+}
 }
 
 float getLightSensorVarieation()
