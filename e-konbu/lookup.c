@@ -15,7 +15,7 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static int counter = 0;
 
 //尻尾設定角度
-#define ANGLEOFDOWN 105				//降下目標角度
+#define ANGLEOFDOWN 100				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 
@@ -42,8 +42,12 @@ static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
 
-static float t_Kp = 0.9;
-static float t_Ki = 0;
+static float t_Kp = 1.85;
+static float t_Ki = 2.6;
+
+static int t_angle = 0;
+
+static int t_count = 0;
 
 static int wait_count = 0;
 
@@ -319,7 +323,7 @@ int online(void) {
 
 void sonarcheck(void)
 {
-	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= 20)
+	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= 21)
 	{
 		sonarflag = 1;
 	}
@@ -363,6 +367,8 @@ void taildown(){
 
 	static float t_speed = 0;
 
+	t_count++;
+
 	switch(tail_mode){
 		case(RN_TAILDOWN):
 			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);
@@ -381,16 +387,36 @@ void taildown(){
 			break;
 
 		case(RN_TAILLOOKUP_1):
-			t_hensa = ANGLEOFDOWN -5 - ecrobot_get_motor_rev(NXT_PORT_A);
+			if(t_angle <= 45)
+			{
+				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= 10)
+				{
+					t_angle += 1;
+					t_count = 0;
+				}
+			}
+			else
+				t_angle = 45;
+
 			break;
 
 		case(RN_TAILLOOKUP_2):
-			t_hensa = ANGLEOFDOWN -15 - ecrobot_get_motor_rev(NXT_PORT_A);
-			break;
+			if(t_angle >= 0)
+			{
+				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= 10)
+				{
+					t_angle -= 1;
+					t_count = 0;
+				}
+			}
+			else
+				t_angle = 0;
 
-		case(RN_TAILLOOKUP_3):
-			t_hensa = ANGLEOFDOWN -25 - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
+		case(RN_TAILLOOKUP_3):
+			t_hensa = ANGLEOFDOWN -45 - ecrobot_get_motor_rev(NXT_PORT_A);
 		default:
 			break;
 	}
@@ -485,12 +511,12 @@ void RN_setting()
 			break;
 
 		case (RN_LOOKUP):
-			RA_speed(0,1);
+			RA_speed(0,3);
 			cmd_turn = RA_wheels(cmd_turn);
 
 			wait_count++;
 
-			if(wait_count >= 150)
+			if(cmd_forward <= 0)
 			{
 				gyro_offset -= 140;
 				tail_mode = RN_TAILLOOKUP_0;
@@ -509,13 +535,12 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count == 800)
+			if(wait_count == 1200)
+			{
 				tail_mode = RN_TAILLOOKUP_1;
-			else if(wait_count == 1200)
-				tail_mode = RN_TAILLOOKUP_2;
-			else if(wait_count == 1600)
-				tail_mode = RN_TAILLOOKUP_3;
-			else if(wait_count == 2000)
+			}
+
+			else if(t_angle == 45)
 			{
 				setting_mode = RN_LOOKUPMOVE;
 				wait_count = 0;
@@ -532,7 +557,8 @@ void RN_setting()
 			wait_count++;
 
 			if(wait_count == 800)
-			{
+			{	
+				//tailpower(10.0);
 				setting_mode = RN_LOOKUPUP;
 				wait_count = 0;
 			}
@@ -545,14 +571,14 @@ void RN_setting()
 
 			wait_count++;
 
-			tailpower(9.0);
-
-			if(wait_count == 800)
+			//if(wait_count == 200)
 				tail_mode = RN_TAILLOOKUP_2;
-			else if(wait_count == 1200)
-				tail_mode = RN_TAILLOOKUP_1;
-			else if(wait_count == 1600)
+
+			if(t_angle == 0)
+			{
 				tail_mode = RN_TAILDOWN;
+				setting_mode = RN_RUN;
+			}
 
 			break;
 
@@ -569,7 +595,7 @@ void RN_calibrate()
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			ecrobot_sound_tone(880, 512, 30);
+			ecrobot_sound_tone(880, 512, 10);
 			BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
 			systick_wait_ms(500);
 			break;
@@ -580,7 +606,7 @@ void RN_calibrate()
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			ecrobot_sound_tone(906, 512, 30);
+			ecrobot_sound_tone(906, 512, 10);
 			WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
 			systick_wait_ms(500);
 			break;
@@ -594,7 +620,7 @@ void RN_calibrate()
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			ecrobot_sound_tone(932, 512, 30);
+			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
 			systick_wait_ms(500);
 			break;
@@ -617,7 +643,7 @@ void RN_calibrate()
 		//タッチセンサスタート
 		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			ecrobot_sound_tone(982,512,30);
+			ecrobot_sound_tone(982,512,10);
 
 			while(1){
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
@@ -698,8 +724,8 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),0,
-			0,ecrobot_get_gyro_sensor(NXT_PORT_S1));
+	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),t_count,
+			t_angle,ecrobot_get_gyro_sensor(NXT_PORT_S1));
 
 	sonarcheck();
 
