@@ -141,6 +141,12 @@ void initialze_PID_param();
 //ライン外れるための関数
 void RN_mandatory_line_out(U8 port_B_speed,U8 port_C_speed);
 
+
+//検証用関数プロトタイプ宣言　要リファクタリング
+ unsigned int getWhiteValue();
+ unsigned int getLineMokuhyouValue();
+///////////////////////////////////////////
+
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
 
@@ -685,6 +691,15 @@ void rapid_speed_up(){
 
 
 }
+unsigned int getWhiteValue(){
+
+	return white_value;
+}
+unsigned int getLineMokuhyouValue(){
+
+	return line_mokuhyou_value;
+}
+
 
 //走行方法管理(4ms)
 TASK(ActionTask)

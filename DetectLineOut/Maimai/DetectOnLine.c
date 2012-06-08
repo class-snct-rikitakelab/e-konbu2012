@@ -5,6 +5,8 @@
 #include "balancer.h" /* 倒立振子制御用ヘッダファイル */
 #include "DetectOnLine.h"
 
+extern unsigned int getWhiteValue();
+extern unsigned int getLineMokuhyouValue();
 
 
 static	float lightSensorVarieation;
@@ -22,9 +24,7 @@ DetectLineState getDetectLineState()
 }
  
 void calLightSensorVarieation()
-{
-	
-		
+{		
 	lightSensorVarieation = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - BufLightSensorVal; //変化量の計算
 	BufLightSensorVal = (float)ecrobot_get_light_sensor(NXT_PORT_S3); //一回前のライトセンサの変化量の保存
 }
@@ -39,6 +39,50 @@ if(counter==240/4){//約20ms
 	
 	calLightSensorVarieation();
 
+	switch (detectLineState) {
+		
+		case OnLine :
+		//ラインアウトしたら
+		if(lightSensorVarieation < DETECTLINEOUT_THRESHOLD ) {
+		setDetectLineState(OutOfLine);
+		ecrobot_sound_tone(880, 512, 30);
+		systick_wait_ms(500);
+		}
+		else if(lightSensorVarieation > DETECTLINE_IN_THRESHOLD) {
+		setDetectLineState(OnLine);
+		}
+		//OnLine状態なのに、光センサの値が白色付近だったら。
+		else if((ecrobot_get_light_sensor(NXT_PORT_S3)  > getWhiteValue() -20  && ecrobot_get_light_sensor(NXT_PORT_S3) < getWhiteValue() +20 )) {
+  		setDetectLineState(OnLine);
+		ecrobot_sound_tone(440, 512, 30);
+		systick_wait_ms(500);
+		}
+		break;
+
+		case OutOfLine :
+		//ラインに乗ったら
+		if(lightSensorVarieation > DETECTLINE_IN_THRESHOLD) {
+		setDetectLineState(OnLine);
+		ecrobot_sound_tone(440, 512, 30);
+		systick_wait_ms(500);
+		}
+		else if(lightSensorVarieation < DETECTLINEOUT_THRESHOLD ) {
+		setDetectLineState(OutOfLine);
+		}
+		//OutOfLine状態なのに値が目標値付近だったら
+		else if((ecrobot_get_light_sensor(NXT_PORT_S3)  > getLineMokuhyouValue() -20  && ecrobot_get_light_sensor(NXT_PORT_S3) < getLineMokuhyouValue() +20 )) {
+  		setDetectLineState(OnLine);
+		ecrobot_sound_tone(440, 512, 30);
+		systick_wait_ms(500);
+		}
+		break;
+
+		default : 
+		//none
+		break;
+	}
+
+	/*
 	//ラインアウトしたら
 	if(lightSensorVarieation < DETECTLINEOUT_THRESHOLD ) {		
 
@@ -81,7 +125,28 @@ if(counter==240/4){//約20ms
 		}
 
 	}
+	else if (ecrobot_get_light_sensor(NXT_PORT_S3) -20 > mokuhyouti && ecrobot_get_light_sensor(NXT_PORT_S3)+20 < mokuhyouti) {
+		
+		switch (detectLineState) {
+		
+		case OnLine :
+		setDetectLineState(OnLine);
+		break;
+		
+		case OutOfLine :
+		setDetectLineState(OnLine);
+		ecrobot_sound_tone(440, 512, 30);
+		systick_wait_ms(500);
+		break;
 
+		default : 
+		//none
+		break;
+		}
+
+
+	}
+	*/
 counter = 0;
 }
 }

@@ -7,6 +7,7 @@
 
 
  
+
 extern	void setDetectLineState(DetectLineState State);
 extern	void calLightSensorVarieation();
 extern 	void monitorVariation();
