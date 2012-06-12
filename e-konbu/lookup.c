@@ -18,6 +18,7 @@ static int counter = 0;
 #define ANGLEOFDOWN 100				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
+#define ANGLEOFLOOKUP 46
 
 //速度調節係数
 #define SPEED_COUNT 20
@@ -42,12 +43,16 @@ static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
 
-static float t_Kp = 1.85;
+static float t_Kp = 1.0;
 static float t_Ki = 2.6;
 
 static int t_angle = 0;
 
 static int t_count = 0;
+
+static int t_value = 0;
+
+static int t_count_limit = 0;
 
 static int wait_count = 0;
 
@@ -126,6 +131,7 @@ void sonarcheck(void);
 void runner_mode_change(int flag);
 int getsonarflag(void);
 void tailpower(float value);
+void tail_mode_change(int mode,int value,int limit);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -155,6 +161,7 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	tail_mode_change(0,ANGLEOFDOWN,1);
 }
 
 
@@ -362,6 +369,9 @@ void tailpower(float value)
 //尻尾角度維持
 void taildown(){
 
+	//X-ecrobot_get_motor_rev(NXT_PORT_S4) のX = 目標値
+	//目標は目標値を1ずつ調節
+
 	static float t_hensa = 0;
 	static float t_ihensa = 0;
 
@@ -371,53 +381,84 @@ void taildown(){
 
 	switch(tail_mode){
 		case(RN_TAILDOWN):
-			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);
+			if(t_angle <= t_value)
+			{
+				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= t_count_limit)
+				{
+					t_angle++;
+					t_count = 0;
+				}
+			}
+			else
+				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
 
 		case(RN_TAILUP):
-			t_hensa = ANGLEOFUP - ecrobot_get_motor_rev(NXT_PORT_A);
-			break;
-
-		case(RN_TAILPUSH):
-			t_hensa = ANGLEOFPUSH - ecrobot_get_motor_rev(NXT_PORT_A);
-			break;
-
-		case(RN_TAILLOOKUP_0):
-			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);
-			break;
-
-		case(RN_TAILLOOKUP_1):
-			if(t_angle <= 45)
+			if(t_angle >= t_value)
 			{
-				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
-				if(t_count >= 10)
+				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= t_count_limit)
 				{
-					t_angle += 1;
+					t_angle--;
 					t_count = 0;
 				}
 			}
 			else
-				t_angle = 45;
+			{
+				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
+			}
+				break;
 
+		case(RN_TAILLOOKUP_0):
+			
+			if(t_angle <= ANGLEOFDOWN)
+			{
+				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= 1)
+				{
+					t_angle++;
+					t_count = 0;
+				}
+			}
+			else
+				t_angle = ANGLEOFDOWN;
+				
+			break;
+			
+		case(RN_TAILLOOKUP_1):
+
+			if((ANGLEOFDOWN - t_angle) >= ANGLEOFLOOKUP)
+			{
+				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);	//ANGLEOFDOWN - t_angle : 現在の角度に対する目標値(110→46)
+				if(t_count >= 10)
+				{
+					t_angle++;
+					t_count = 0;
+				}
+			}
+			else
+				t_angle = ANGLEOFDOWN - ANGLEOFLOOKUP;	//目標値を
+				//t_hensa = ANGLEOFLOOKUP - ecrobot_get_motor_rev(NXT_PORT_A);
 			break;
 
 		case(RN_TAILLOOKUP_2):
-			if(t_angle >= 0)
+			if((ANGLEOFLOOKUP + t_angle) <= ANGLEOFDOWN)
 			{
-				t_hensa = ANGLEOFDOWN - t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				t_hensa =ANGLEOFLOOKUP + t_angle - ecrobot_get_motor_rev(NXT_PORT_A);	//(110→0) :t_angleが
 				if(t_count >= 10)
 				{
-					t_angle -= 1;
+					t_angle++;
 					t_count = 0;
 				}
 			}
 			else
-				t_angle = 0;
+				t_angle = ANGLEOFDOWN - ANGLEOFLOOKUP;
+				//t_hensa = 0 - ecrobot_get_motor_rev(NXT_PORT_A);
 
 			break;
-		case(RN_TAILLOOKUP_3):
-			t_hensa = ANGLEOFDOWN -45 - ecrobot_get_motor_rev(NXT_PORT_A);
-		default:
+
+			default:
 			break;
 	}
 
@@ -431,6 +472,39 @@ void taildown(){
 			t_speed = 100;
 
 	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);
+
+}
+
+void tail_mode_change(int mode,int value,int limit)
+{
+	switch(mode){
+		case 0:
+			tail_mode = RN_TAILDOWN;
+			break;
+		case 1:
+			tail_mode = RN_TAILUP;
+			break;
+		case 2:
+			tail_mode = RN_TAILLOOKUP_0;
+			break;
+		case 3:
+			tail_mode = RN_TAILLOOKUP_1;
+			break;
+		case 4:
+			tail_mode = RN_TAILLOOKUP_2;
+			break;
+		case 5:
+			tail_mode = RN_TAILLOOKUP_3;
+			break;
+		default:
+			break;
+	}
+
+	t_value = value;
+
+	t_angle = ecrobot_get_motor_rev(NXT_PORT_S4);
+
+	t_count_limit = limit;
 
 }
 
@@ -483,10 +557,10 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定(メイン)
 void RN_setting()
 {
-	static float beforestop = 0;
 
 	switch (setting_mode){
 			//キャリブレーションf
+
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();
 			break;
@@ -516,10 +590,10 @@ void RN_setting()
 
 			wait_count++;
 
-			if(cmd_forward <= 0)
+			if(cmd_forward <= 0 && wait_count == 400)
 			{
 				gyro_offset -= 140;
-				tail_mode = RN_TAILLOOKUP_0;
+				tail_mode_change(0,ANGLEOFDOWN,1);
 				systick_wait_ms(50);
 				setting_mode = RN_LOOKUPDOWN;
 				runner_mode_change(2);
@@ -533,17 +607,19 @@ void RN_setting()
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 
-			wait_count++;
+			if(t_angle == ANGLEOFDOWN)
+				wait_count++;
 
 			if(wait_count == 1200)
 			{
-				tail_mode = RN_TAILLOOKUP_1;
+				tailpower(8.0);
+				tail_mode_change(1,ANGLEOFLOOKUP,10);
 			}
 
-			else if(t_angle == 45)
+			else if(t_angle == ANGLEOFLOOKUP)
 			{
-				setting_mode = RN_LOOKUPMOVE;
-				wait_count = 0;
+				//setting_mode = RN_LOOKUPMOVE;
+				//wait_count = 0;
 			}
 
 			break;
@@ -556,9 +632,9 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count == 800)
+			if(wait_count == 730)
 			{	
-				//tailpower(10.0);
+				tailpower(15.0);
 				setting_mode = RN_LOOKUPUP;
 				wait_count = 0;
 			}
@@ -576,8 +652,9 @@ void RN_setting()
 
 			if(t_angle == 0)
 			{
-				tail_mode = RN_TAILDOWN;
-				setting_mode = RN_RUN;
+				//tailpower(1.85);
+				//tail_mode = RN_TAILDOWN;
+				//setting_mode = RN_RUN;
 			}
 
 			break;
@@ -634,7 +711,7 @@ void RN_calibrate()
 		if(remote_start()==1)
 		{
 			ecrobot_sound_tone(982,512,30);
-			tail_mode = RN_TAILUP;
+			tail_mode_change(1,ANGLEOFUP,1);
 			setting_mode = RN_RUN;
 			runner_mode = RN_MODE_CONTROL;
 			break;
@@ -650,7 +727,8 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_CONTROL;
-						tail_mode = RN_TAILUP;
+						//tail_mode = RN_TAILUP;
+						tail_mode_change(1,ANGLEOFUP,10);
 						break;
 					}
 				}
@@ -724,7 +802,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),t_count,
+	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),t_value,
 			t_angle,ecrobot_get_gyro_sensor(NXT_PORT_S1));
 
 	sonarcheck();
