@@ -601,11 +601,11 @@ void RN_setting()
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
-				setting_mode = RN_LOOKUPDOWN;
 				gyro_offset -= 280;
-				runner_mode_change(2);
+				setting_mode = RN_LOOKUPDOWN;
 				wait_count = 0;
 				cmd_forward = 0;
+				runner_mode_change(2);
 			}
 
 			break;
