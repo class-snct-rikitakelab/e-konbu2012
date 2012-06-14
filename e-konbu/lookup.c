@@ -595,9 +595,9 @@ void RN_setting()
 			if(cmd_forward <= 0 && wait_count == 400)
 			{
 				tail_mode_change(0,ANGLEOFDOWN,0,1);
-				while(wait_count >= 800 || t_angle == ANGLEOFDOWN)
+				while(wait_count <= 800 || t_angle <= ANGLEOFDOWN)
 				{
-					RA_speed(0,3);
+					RA_speed(-15,3);
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
