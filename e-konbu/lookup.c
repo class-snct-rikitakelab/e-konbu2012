@@ -423,7 +423,32 @@ void taildown(){
 	static float t_speed = 0;	//尻尾モータに送る速度
 
 	t_count++;					//速度制御用カウンタ
+	/*
+	if(t_angle < t_value)
+	{
+		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+		if(t_count >= t_count_limit)	//カウンタで尻尾を下げる速度を調整
+		{
+			t_angle+=t_up;			//角度を上げる
+			t_count = 0;
+		}
+	}
 
+	else if(t_angle > t_value)
+	{
+		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+		if(t_count >= t_count_limit)	//カウンタで尻尾を上げる速度を調整
+		{
+			t_angle-=t_up;			//角度を下げる
+			t_count = 0;
+		}
+	}
+
+	else
+	{
+		t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
+	}
+	*/
 	switch(tail_mode){
 		case(RN_TAILDOWN):				//尻尾を下げる
 			if(t_angle <= t_value)		//現在の角度が目標値以下かどうか
@@ -461,8 +486,9 @@ void taildown(){
 
 		default:
 			break;
+			
 	}
-
+	
 	t_ihensa = t_ihensa+(t_hensa*0.0004);		//I制御用偏差
 
 	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);	//偏差を元に速度調節
@@ -477,7 +503,7 @@ void taildown(){
 }
 
 //尻尾モード変更関数
-void tail_mode_change(int mode,int value,int limit,int up)
+void tail_mode_change(int mode,int value,int limit,int up)	//mode(0:尻尾を下ろす、1:尻尾を上げる) value(目標値) limit(上げるほど遅延） up（上げるほど加速）1
 {
 
 	static int flag;					//尻尾モードフラグ
