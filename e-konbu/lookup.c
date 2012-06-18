@@ -694,7 +694,7 @@ void RN_setting()
 
 			wait_count++;
 			
-			if(wait_count == 330)
+			if(wait_count == 430)
 			{	
 				tailpower(15.0);
 				setting_mode = RN_LOOKUPUP;
@@ -712,16 +712,16 @@ void RN_setting()
 
 			if(wait_count == 200)
 				tail_mode_change(0,ANGLEOFDOWN,10,1);
-			/*
+			
 			if(t_angle == ANGLEOFDOWN && wait_count >= 1200)
 			{
+				runner_mode_change(1);
 				tailpower(1.85);
 				tail_mode_change(1,ANGLEOFUP,1,2);
 				gyro_offset += 280;
-				runner_mode_change(1);
 				setting_mode = RN_RUN;
 			}
-			*/
+			
 			break;
 
 		default:
@@ -784,6 +784,8 @@ void RN_calibrate()
 
 	//灰色値計算
 	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
+
+	tail_mode_change(0,ANGLEOFDOWN,0,2);
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
