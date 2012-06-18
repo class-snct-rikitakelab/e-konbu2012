@@ -8,15 +8,15 @@
 
 
 /*
- *	各種定義	
+ *	各種定義
 */
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 100				//降下目標角度
+#define ANGLEOFDOWN 110				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 50
+#define ANGLEOFLOOKUP 58
 
 //速度調節係数
 #define SPEED_COUNT 20
@@ -38,6 +38,9 @@
 static unsigned int BLACK_VALUE;	//黒値
 static unsigned int WHITE_VALUE;	//白値
 static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
+static unsigned int LOOKUP_BLACK_VALUE;
+static unsigned int LOOKUP_WHITE_VALUE;
+static unsigned int LOOKUP_GRAY_VALUE;	//元の灰色値
 
 //カウンタ
 static int counter = 0;
@@ -160,6 +163,7 @@ void runner_mode_change(int flag);
 int getsonarflag(int target_sonar);
 void tailpower(float value);
 void tail_mode_change(int mode,int value,int limit,int t_up);
+void RA_linetrace_PID_balanceoff(int forward_speed);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -301,6 +305,29 @@ void RA_linetrace_PID(int forward_speed) {
 	//nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
 	//nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 
+}
+
+void RA_linetrace_PID_balanceoff(int forward_speed){
+	RA_speed(forward_speed,2);	//速度を段階的に変化
+
+	if(forward_speed > 0)
+		hensa = (float)LOOKUP_GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
+	else
+		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)LOOKUP_GRAY_VALUE;
+
+	i_hensa = i_hensa+(hensa*0.0005);
+	d_hensa = (hensa - bf_hensa)/0.0005;
+	bf_hensa = hensa;
+
+	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	if (-100 > cmd_turn) {
+		cmd_turn = -100;
+	} else if (100 < cmd_turn) {
+		cmd_turn = 100;
+	}
+
+	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 }
 
 //ライントレース制御の偏差値リセット関数
@@ -601,7 +628,7 @@ void RN_setting()
 			if(wait_count >= 200)					//スタート時に反応するのを防ぐ（テスト用）
 			{
 
-				if(getsonarflag(21) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(22) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -645,7 +672,7 @@ void RN_setting()
 
 			if(wait_count >= 800)
 			{
-				tailpower(8.0);
+				tailpower(10.0);
 				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
 				if(t_angle == ANGLEOFLOOKUP)
 					{
@@ -658,20 +685,22 @@ void RN_setting()
 
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
-			nxt_motor_set_speed(NXT_PORT_C, cmd_forward, 1);
-			nxt_motor_set_speed(NXT_PORT_B, cmd_forward, 1);
+			//nxt_motor_set_speed(NXT_PORT_C, cmd_forward, 1);
+			//nxt_motor_set_speed(NXT_PORT_B, cmd_forward, 1);
 			
-			RA_speed(30,1);
+			//RA_speed(30,1);
+
+			RA_linetrace_PID_balanceoff(30);
 
 			wait_count++;
-
-			if(wait_count == 930)
+			
+			if(wait_count == 330)
 			{	
 				tailpower(15.0);
 				setting_mode = RN_LOOKUPUP;
 				wait_count = 0;
 			}
-
+			
 			break;
 
 			//ルックアップゲート走行、前進後倒立状態へ復帰
@@ -728,6 +757,33 @@ void RN_calibrate()
 
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
+
+	tail_mode_change(1,ANGLEOFLOOKUP,0,2);
+
+		//黒値
+	while(1){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
+			ecrobot_sound_tone(880, 512, 10);
+			LOOKUP_BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
+			systick_wait_ms(500);
+			break;
+		}
+	}
+
+	//白値
+	while(1){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
+			ecrobot_sound_tone(906, 512, 10);
+			LOOKUP_WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
+			systick_wait_ms(500);
+			break;
+		}
+	}
+
+	//灰色値計算
+	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
@@ -844,7 +900,7 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,wait_count,t_value,		//Bluetoothを用いてデータ送信
-			t_angle,t_count);
+			LOOKUP_GRAY_VALUE,GRAY_VALUE);
 
 	sonarcheck();															//超音波センサ状態管理
 
