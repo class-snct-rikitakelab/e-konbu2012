@@ -1,10 +1,11 @@
-/*
- * logtrace.c
- * ライントレース及び段差検知プログラム
- */
+
+ /* 
+  * stepup.c
+  * ライントレース及び段差検知プログラム
+  */
 
 
-#include "logtrace.h"
+#include "stepup.h"
 
 
 //ライントレース用目標値
@@ -46,8 +47,6 @@ static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
 
 static int wait_count = 0;
-
-static int mode_count = 0;
 
 static double min_vol;
 

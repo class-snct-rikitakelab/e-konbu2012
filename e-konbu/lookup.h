@@ -1,5 +1,5 @@
-#ifndef _LOGTRACE_H_
-#define _LOGTRACE_H_
+#ifndef _LOOKUP_H_
+#define _LOOKUP_H_
 
 #include "kernel.h"
 #include "kernel_id.h"

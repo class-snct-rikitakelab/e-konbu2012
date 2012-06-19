@@ -1,5 +1,5 @@
 # Target specific macros
-TARGET = lookup
+TARGET = stepup
 
 NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
 
@@ -13,7 +13,7 @@ USER_LIB = nxtway_gs_balancer
 # User application source
 TARGET_SOURCES := \
 	balancer_param.c \
-	logtrace.c 
+	stepup.c 
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

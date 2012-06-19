@@ -1,10 +1,10 @@
 /*
- * logtrace.c
- * ライントレース及び段差検知プログラム
+ * lookup.c
+ * ルックアップゲート通過プログラム
  */
 
 
-#include "logtrace.h"
+#include "lookup.h"
 
 
 /*
@@ -18,7 +18,7 @@
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 #define ANGLEOFLOOKUP 58
 
-//速度調節係数
+//速度カウンタの上限値
 #define SPEED_COUNT 20
 
 //ジャイロ振幅値
@@ -38,12 +38,13 @@
 static unsigned int BLACK_VALUE;	//黒値
 static unsigned int WHITE_VALUE;	//白値
 static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
-static unsigned int LOOKUP_BLACK_VALUE;
-static unsigned int LOOKUP_WHITE_VALUE;
-static unsigned int LOOKUP_GRAY_VALUE;	//元の灰色値
+static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
+static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
+static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
 
-//カウンタ
-static int counter = 0;
+//速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
+static int speed_counter = 0;
+
 
 //PID制御用偏差値
 static float hensa;					//P制御用
@@ -57,9 +58,9 @@ static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;			//D制御用
 
-//尻尾PID制御用係数
+//尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用
-static float t_Ki = 0;			//I制御用
+static float t_Ki = 0;				//I制御用
 
 //尻尾制御用変数
 static int t_angle = 0;				//現在の角度
@@ -68,7 +69,7 @@ static int t_value = 0;				//角度目標値
 static int t_count_limit = 0;		//カウンタ最大値
 static int t_up = 0;				//増減値
 
-//全体用カウンタ
+//全体用カウンタ（時間稼ぎ用）
 static int wait_count = 0;
 
 //超音波センサ目標値
@@ -101,8 +102,8 @@ int revR = 0;
 //システム全体の状態
 typedef enum{
 	RN_MODE_INIT, 					//初期状態
-	RN_MODE_CONTROL,				//倒立制御ON
-	RN_MODE_BALANCEOFF
+	RN_MODE_BALANCE,				//倒立制御ON
+	RN_MODE_BALANCEOFF				//倒立制御OF
 } RN_MODE;
 
 
@@ -110,35 +111,22 @@ typedef enum{
 typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_RUN,						//基本走行（ライントレース）
-	RN_LOOKUP,
-	RN_LOOKUPDOWN,						//停止
-	RN_LOOKUPMOVE,
-	RN_LOOKUPUP
+	RN_LOOKUP,					//ルックアップゲート準備
+	RN_LOOKUPDOWN,				//走行体降下
+	RN_LOOKUPMOVE,				//走行体前進
+	RN_LOOKUPUP					//走行体復帰
 } RN_SETTINGMODE;
 
 //尻尾の状態
 typedef enum{
 	RN_TAILDOWN,				//尻尾降下
 	RN_TAILUP,					//尻尾上昇
-	RN_TAILPUSH,				//尻尾押出
-	RN_TAILLOOKUP_0,
-	RN_TAILLOOKUP_1,
-	RN_TAILLOOKUP_2,
-	RN_TAILLOOKUP_3
 } RN_TAILMODE;
-
-typedef enum{
-	RN_SONAR_NEAR,
-	RN_SONAR_FAR
-} RN_SONAR_MODE;
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 RN_TAILMODE tail_mode = RN_TAILUP;
-RN_SONAR_MODE sonar_mode = RN_SONAR_FAR;
-
-
 
 /*
  *	各種プライベート関数定義
@@ -263,22 +251,6 @@ void RA_linetrace(int forward_speed, int turn_speed) {
 }
 
 
-//P制御ライントレース関数
-void RA_linetrace_P(int forward_speed){
-
-	cmd_forward = forward_speed;
-
-	hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
-
-	cmd_turn = -(1.4 * hensa);
-	if (-100 > cmd_turn) {
-		cmd_turn = -100;
-	} else if (100 < cmd_turn) {
-		cmd_turn = 100;
-	}
-}
-
-
 //PID制御ライントレース関数
 void RA_linetrace_PID(int forward_speed) {
 
@@ -307,6 +279,7 @@ void RA_linetrace_PID(int forward_speed) {
 
 }
 
+//PID制御ライントレース関数（バランサーOFF用）
 void RA_linetrace_PID_balanceoff(int forward_speed){
 	RA_speed(forward_speed,2);	//速度を段階的に変化
 
@@ -330,42 +303,33 @@ void RA_linetrace_PID_balanceoff(int forward_speed){
 	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 }
 
-//ライントレース制御の偏差値リセット関数
-void RA_hensareset(void)
-{
-	hensa = 0;
-	i_hensa = 0;
-	d_hensa = 0;
-	bf_hensa = 0;
-}
-
 //段階的加速用関数
 void RA_speed(int limit,int s_Kp){
 
 	static int forward_speed;
 
-	counter++;						//速度調節用カウンタ
+	speed_counter++;						//速度調節用カウンタ
 
-	if(counter >= SPEED_COUNT)		//カウンタが最大で速度変更へ
+	if(speed_counter >= SPEED_COUNT)		//カウンタが最大で速度変更へ
 	{
 
 		forward_speed = cmd_forward;
 
 		if(limit-forward_speed >= 0){
-			forward_speed += s_Kp;	//指定量だけ速度上昇
+			forward_speed += s_Kp;		//指定量だけ速度上昇
 
 			if(forward_speed > limit)
 				forward_speed = limit;
 		}
 		else{
-			forward_speed -= s_Kp;	//指定量だけ速度減少
+			forward_speed -= s_Kp;		//指定量だけ速度減少
 
 			if(forward_speed < limit)
 				forward_speed = limit;
 		}
 
 		cmd_forward = forward_speed;
-		counter =0;					//カウンタリセット1
+		speed_counter = 0;					//カウンタリセット
 	}
 }
 
@@ -379,6 +343,7 @@ int RA_wheels(int turn){
 
 	return turn;
 }
+
 
 //ON-OFF制御用ライン判定関数
 int online(void) {
@@ -412,6 +377,7 @@ int getsonarflag(int target)
 	return sonarflag;					//指定した値に近づいているかどうかを返す（1:範囲内）
 }
 
+
 //走行体モード変更関数（主にバランサーのON/OFF）
 void runner_mode_change(int flag)
 {
@@ -420,7 +386,7 @@ void runner_mode_change(int flag)
 		runner_mode = RN_MODE_INIT;			//走行体初期状態
 		break;
 	case 1:
-		runner_mode = RN_MODE_CONTROL;		//バランサーON
+		runner_mode = RN_MODE_BALANCE;		//バランサーON
 		break;
 	case 2:
 		runner_mode = RN_MODE_BALANCEOFF;	//バランサーOFF
@@ -450,7 +416,9 @@ void taildown(){
 	static float t_speed = 0;	//尻尾モータに送る速度
 
 	t_count++;					//速度制御用カウンタ
-	/*
+
+
+	/*	一つの状態でできないかどうか思案中
 	if(t_angle < t_value)
 	{
 		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
@@ -476,6 +444,8 @@ void taildown(){
 		t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
 	}
 	*/
+
+
 	switch(tail_mode){
 		case(RN_TAILDOWN):				//尻尾を下げる
 			if(t_angle <= t_value)		//現在の角度が目標値以下かどうか
@@ -520,10 +490,10 @@ void taildown(){
 
 	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);	//偏差を元に速度調節
 
-		if (t_speed < -100)
-			t_speed = -100;
-		else if (t_speed > 100)
-			t_speed = 100;
+	if (t_speed < -100)
+		t_speed = -100;
+	else if (t_speed > 100)
+		t_speed = 100;
 
 	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);	//モータに速度を送る
 
@@ -548,15 +518,13 @@ void tail_mode_change(int mode,int value,int limit,int up)	//mode(0:尻尾を下ろす
 			break;
 	}
 
-	t_value = value;
-
-	//複数回呼び出す場合も初期値をキープするため
-	if(mode != flag)
+	//目標値が変わった時のみ、角度を決める（複数回呼び出す場合も初期値をキープするため）
+	if(t_value != value)
 		t_angle = ecrobot_get_motor_rev(NXT_PORT_A);
 
-	t_count_limit = limit;
-
-	t_up = up;
+	t_value = value;			//目標値設定
+	t_count_limit = limit;		//カウンタ最大値設定
+	t_up = up;					//角度増減値設定
 
 }
 
@@ -685,10 +653,6 @@ void RN_setting()
 
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
-			//nxt_motor_set_speed(NXT_PORT_C, cmd_forward, 1);
-			//nxt_motor_set_speed(NXT_PORT_B, cmd_forward, 1);
-			
-			//RA_speed(30,1);
 
 			RA_linetrace_PID_balanceoff(30);
 
@@ -758,9 +722,10 @@ void RN_calibrate()
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
+	//尻尾をルックアップゲート時の角度に
 	tail_mode_change(1,ANGLEOFLOOKUP,0,2);
 
-		//黒値
+	//ルックアップゲート用黒値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -771,7 +736,7 @@ void RN_calibrate()
 		}
 	}
 
-	//白値
+	//ルックアップゲート用白値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -782,9 +747,10 @@ void RN_calibrate()
 		}
 	}
 
-	//灰色値計算
+	//ルックアップゲート用灰色値計算
 	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
 
+	//尻尾を直立停止状態の角度に
 	tail_mode_change(0,ANGLEOFDOWN,0,2);
 
 	//ジャイロオフセット及びバッテリ電圧値
@@ -799,15 +765,15 @@ void RN_calibrate()
 	}
 
 	//走行開始合図
-	while(1){
-
+	while(1)
+	{
 		//リモートスタート
 		if(remote_start()==1)
 		{
 			ecrobot_sound_tone(982,512,30);
 			tail_mode_change(1,ANGLEOFUP,0,2);
 			setting_mode = RN_RUN;
-			runner_mode = RN_MODE_CONTROL;
+			runner_mode = RN_MODE_BALANCE;
 			break;
 		}
 
@@ -815,23 +781,23 @@ void RN_calibrate()
 		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(982,512,10);
-
-			while(1){
+			while(1)
+			{
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_CONTROL;
+						runner_mode = RN_MODE_BALANCE;
 						tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
-				}
+			}
 			break;
 		}
+
 	}
 
-	//キャリブレーション終了
-
 }
+
 
 //走行体状態設定関数
 void RN_modesetting()
@@ -845,7 +811,7 @@ void RN_modesetting()
 			break;
 
 			//バランサー
-		case (RN_MODE_CONTROL):
+		case (RN_MODE_BALANCE):
 			balance_control(
 				(F32)cmd_forward,
 				(F32)cmd_turn,
