@@ -16,7 +16,7 @@
 #define ANGLEOFDOWN 100				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 48
+#define ANGLEOFLOOKUP 50
 
 //速度調節係数
 #define SPEED_COUNT 20
@@ -423,7 +423,32 @@ void taildown(){
 	static float t_speed = 0;	//尻尾モータに送る速度
 
 	t_count++;					//速度制御用カウンタ
+	/*
+	if(t_angle < t_value)
+	{
+		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+		if(t_count >= t_count_limit)	//カウンタで尻尾を下げる速度を調整
+		{
+			t_angle+=t_up;			//角度を上げる
+			t_count = 0;
+		}
+	}
 
+	else if(t_angle > t_value)
+	{
+		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+		if(t_count >= t_count_limit)	//カウンタで尻尾を上げる速度を調整
+		{
+			t_angle-=t_up;			//角度を下げる
+			t_count = 0;
+		}
+	}
+
+	else
+	{
+		t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
+	}
+	*/
 	switch(tail_mode){
 		case(RN_TAILDOWN):				//尻尾を下げる
 			if(t_angle <= t_value)		//現在の角度が目標値以下かどうか
@@ -437,8 +462,7 @@ void taildown(){
 			}
 			else
 			{
-				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
-				//ecrobot_sound_tone(900,512,20);
+				t_angle = t_value;
 			}
 			
 			break;
@@ -455,16 +479,16 @@ void taildown(){
 			}
 			else
 			{
-				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
-				//ecrobot_sound_tone(700,512,20);
+				t_angle = t_value;
 			}
 			
 			break;
 
 		default:
 			break;
+			
 	}
-
+	
 	t_ihensa = t_ihensa+(t_hensa*0.0004);		//I制御用偏差
 
 	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);	//偏差を元に速度調節
@@ -479,7 +503,7 @@ void taildown(){
 }
 
 //尻尾モード変更関数
-void tail_mode_change(int mode,int value,int limit,int up)
+void tail_mode_change(int mode,int value,int limit,int up)	//mode(0:尻尾を下ろす、1:尻尾を上げる) value(目標値) limit(上げるほど遅延） up（上げるほど加速）1
 {
 
 	static int flag;					//尻尾モードフラグ
@@ -577,7 +601,7 @@ void RN_setting()
 			if(wait_count >= 200)					//スタート時に反応するのを防ぐ（テスト用）
 			{
 
-				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(21) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -596,19 +620,18 @@ void RN_setting()
 
 			if(cmd_forward <= 0 && wait_count == 400)
 			{
-				gyro_offset -= 180;
 				tail_mode_change(0,ANGLEOFDOWN,0,1);
-//				tailpower(2.0);
-				while(wait_count != 900 || t_angle == ANGLEOFDOWN)
+				while(wait_count <= 800 || t_angle <= ANGLEOFDOWN)
 				{
-					RA_speed(0,3);
+					RA_speed(-15,3);
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
+				gyro_offset -= 280;
 				setting_mode = RN_LOOKUPDOWN;
-				runner_mode_change(2);
 				wait_count = 0;
 				cmd_forward = 0;
+				runner_mode_change(2);
 			}
 
 			break;
@@ -620,7 +643,7 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count >= 1200)
+			if(wait_count >= 800)
 			{
 				tailpower(8.0);
 				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
@@ -642,7 +665,7 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count == 830)
+			if(wait_count == 930)
 			{	
 				tailpower(15.0);
 				setting_mode = RN_LOOKUPUP;
@@ -660,14 +683,16 @@ void RN_setting()
 
 			if(wait_count == 200)
 				tail_mode_change(0,ANGLEOFDOWN,10,1);
-
+			/*
 			if(t_angle == ANGLEOFDOWN && wait_count >= 1200)
 			{
 				tailpower(1.85);
 				tail_mode_change(1,ANGLEOFUP,1,2);
-				//setting_mode = RN_RUN;
+				gyro_offset += 280;
+				runner_mode_change(1);
+				setting_mode = RN_RUN;
 			}
-
+			*/
 			break;
 
 		default:
@@ -818,7 +843,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),t_value,		//Bluetoothを用いてデータ送信
+	logSend(cmd_forward,cmd_turn,wait_count,t_value,		//Bluetoothを用いてデータ送信
 			t_angle,t_count);
 
 	sonarcheck();															//超音波センサ状態管理
