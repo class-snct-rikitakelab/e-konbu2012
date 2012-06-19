@@ -18,7 +18,6 @@ static int counter = 0;
 //尻尾設定角度
 #define ANGLEOFDOWN 115				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
-#define ANGLEOFPUSH 210				//押上目標角度（未使用）
 
 //速度調節係数
 #define SPEED_COUNT 20
