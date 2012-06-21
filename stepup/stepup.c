@@ -45,6 +45,7 @@ static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
 
+
 static int wait_count = 0;
 
 static double min_vol;
@@ -80,17 +81,16 @@ typedef enum{
 	RN_MODE_INIT, 					//初期状態
 	RN_MODE_CONTROL,				//倒立制御ON
 	RN_MODE_STOP,					//倒立制御OFF
-	RN_MODE_CONTROL_2				//倒立制御ON_2
 } RN_MODE;
 
 
-//キャリブレーションの状態
 typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_RUN,						//基本走行（ライントレース）
 	RN_SLOW_RUN,				//低速走行
 	RN_STOP,						//停止
 	RN_STOP_WAIT,
+	RN_RUPID_SPEED_UP,
 } RN_SETTINGMODE;
 
 
@@ -107,6 +107,10 @@ RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
+//段差検知関連　マクロ、プロトタイプ
+#define RUPID_SPEED_UP_SIGNAL 3
+static int RN_rupid_speed_up_signal_recevie(void);
+
 //各種プライベート関数
 void RN_calibrate();
 void RN_setting();
@@ -121,7 +125,7 @@ void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
-
+void rupid_speed_up(int target_forward_speed);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -225,9 +229,7 @@ void RA_linetrace_P(int forward_speed){
 //PID制御ライントレース
 void RA_linetrace_PID(int forward_speed) {
 
-	if(stepflag == 0){
-		shock();
-	}
+	
 
 	RA_speed(forward_speed,2);	//速度を段階的に変化
 
@@ -322,7 +324,8 @@ void shock(void){
 
 		distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
 
-		setting_mode = RN_SLOW_RUN;
+		setting_mode = RN_SLOW_RUN; 
+		
 		stepflag = 1;
 		min_vol = battery_value;			//最小値リセット
 	}
@@ -438,7 +441,18 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(45);
+			RA_linetrace_PID(25);
+			
+			
+			if(1==RN_rupid_speed_up_signal_recevie()){
+			ecrobot_sound_tone(880, 512, 30);
+			systick_wait_ms(500);
+			setting_mode = RN_RUPID_SPEED_UP;
+			}
+			if(stepflag == 0){
+			//shock();
+			}
+			
 			break;
 
 			//一定距離分ブレーキ
@@ -511,13 +525,128 @@ void RN_setting()
 
 			//強制停止
 		case(RN_STOP):
+			
+			/*
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			break;
+			*/
+			cmd_turn=0;
+			cmd_forward=0;
 
+			if(1==RN_rupid_speed_up_signal_recevie()){
+			ecrobot_sound_tone(880, 512, 30);
+			systick_wait_ms(500);
+			setting_mode = RN_RUPID_SPEED_UP;
+			}
+			break;
+		case (RN_RUPID_SPEED_UP):
+			rupid_speed_up(80);
+			ecrobot_sound_tone(880,512,30);
 		default:
 			break;
 	}
+}
+
+//急加速用関数
+void rupid_speed_up(int target_forward_speed){
+	static int rupid_speed_up_counter=0;
+	int gyro_offset_operation = 5;
+
+	rupid_speed_up_counter++;
+	
+
+	if(rupid_speed_up_counter<10){
+		cmd_forward++;
+		gyro_offset = gyro_offset - 0.5;
+	}
+	else {
+	rupid_speed_up_counter=0;
+	gyro_offset = gyro_offset+5;
+		setting_mode = RN_STOP;
+	}
+	
+//	RA_linetrace_PID(target_forward_speed);
+
+
+	/*
+	int forward_hensa;
+
+	forward_hensa = target_forward_speed - cmd_forward;
+	
+
+	cmd_forward = Kp*forward_hensa;
+
+	if (cmd_forward < -100) {
+		cmd_forward = -100;
+	}
+	else if (cmd_forward > 100) {
+		cmd_forward = 100;
+	}
+	*/
+
+
+	/*
+	limit が目標値
+	s_Kpは一回あたりに加減する操作量？
+	static int forward_speed;
+
+	counter += 1;
+
+	if(counter == SPEED_COUNT)
+	{
+
+		forward_speed = cmd_forward;
+
+		if(limit-forward_speed >= 0){
+			forward_speed += s_Kp;
+
+			if(forward_speed > limit)
+				forward_speed = limit;
+		}
+		else{
+			forward_speed -= s_Kp;
+
+			if(forward_speed < limit)
+				forward_speed = limit;
+		}
+
+		cmd_forward = forward_speed;
+		counter =0;
+	}
+	*/
+
+}
+
+static int RN_rupid_speed_up_signal_recevie(void)
+{
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
+
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
+	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == RUPID_SPEED_UP_SIGNAL)
+		{
+			start = 1;
+		}
+		
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+	}
+	else if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+	{
+		
+			start = 1; 
+
+	}
+
+	return start;
 }
 
 
@@ -610,22 +739,6 @@ void RN_modesetting()
 
 			//バランサー
 		case (RN_MODE_CONTROL):
-			balance_control(
-				(F32)cmd_forward,
-				(F32)cmd_turn,
-				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)gyro_offset,
-				(F32)nxt_motor_get_count(NXT_PORT_C),
-		 		(F32)nxt_motor_get_count(NXT_PORT_B),
-				(F32)ecrobot_get_battery_voltage(),
-				&pwm_l,
-				&pwm_r);
-			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
-			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
-			break;
-
-			//バランサーモード2（段差検知後用）
-		case (RN_MODE_CONTROL_2):
 			balance_control(
 				(F32)cmd_forward,
 				(F32)cmd_turn,
