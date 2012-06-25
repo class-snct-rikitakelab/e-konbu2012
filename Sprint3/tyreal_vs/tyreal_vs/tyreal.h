@@ -1,0 +1,18 @@
+#define VOL 20
+#define SET_PARAM_SPEED 100
+
+#define INT_EXPRESS_RENGE 11
+#define FLOAT_EXPRESS_RENGE 5
+
+#define TYRE_ANGLE_CHAR_NUM 8
+#define ADJUST_INT_STEP 1
+#define ADJUST_FLOAT_STEP 0.001
+
+typedef enum {
+	ADJUST_FORWARD, ADJUST_TURN, ADJUST_TAIL_ANGLE,ADJUST_Kp_VAL,ADJUST_Ki_VAL
+} ADJUST_PARAM_STATE;
+static ADJUST_PARAM_STATE adjust_param_state;
+
+
+
+extern void do_tyreal();

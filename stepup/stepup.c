@@ -530,9 +530,13 @@ void RN_setting()
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 			*/
+			RA_linetrace_PID(3);
+			cmd_turn = RA_wheels(cmd_turn);
+
+			/*
 			cmd_turn=0;
 			cmd_forward=0;
-
+			*/
 			if(1==RN_rupid_speed_up_signal_recevie()){
 			ecrobot_sound_tone(880, 512, 30);
 			systick_wait_ms(500);
@@ -541,7 +545,7 @@ void RN_setting()
 			break;
 		case (RN_RUPID_SPEED_UP):
 			rupid_speed_up(80);
-			ecrobot_sound_tone(880,512,30);
+			ecrobot_sound_tone(880,512,15);
 		default:
 			break;
 	}
@@ -550,23 +554,35 @@ void RN_setting()
 //ã}â¡ë¨ópä÷êî
 void rupid_speed_up(int target_forward_speed){
 	static int rupid_speed_up_counter=0;
-	int gyro_offset_operation = 5;
-
+	int gyro_offset_operation = 10;
+	
 	rupid_speed_up_counter++;
-	
+	cmd_turn = RA_wheels(cmd_turn);
 
-	if(rupid_speed_up_counter<10){
-		cmd_forward++;
-		gyro_offset = gyro_offset - 0.5;
+	if(rupid_speed_up_counter<2){
+	gyro_offset = gyro_offset + gyro_offset_operation;
+	//	cmd_forward++;
+		//gyro_offset = gyro_offset - 0.5;
 	}
-	else {
+	else if(rupid_speed_up_counter==100){
+	//rupid_speed_up_counter=0;
+	gyro_offset = gyro_offset-gyro_offset_operation;
+		//setting_mode = RN_STOP;
+	}
+	if(rupid_speed_up_counter>2 && rupid_speed_up_counter<150 ) {
+	RA_linetrace_PID(25);
+	
+	}
+	//RA_linetrace_PID(25/*target_forward_speed*/);
+	if(rupid_speed_up_counter>150) {
+	RA_linetrace_PID(50/*target_forward_speed*/);
+	
+	}
+	if(rupid_speed_up_counter>200) {
+	RA_linetrace_PID(50/*target_forward_speed*/);
 	rupid_speed_up_counter=0;
-	gyro_offset = gyro_offset+5;
-		setting_mode = RN_STOP;
+	setting_mode = RN_STOP;
 	}
-	
-//	RA_linetrace_PID(target_forward_speed);
-
 
 	/*
 	int forward_hensa;
