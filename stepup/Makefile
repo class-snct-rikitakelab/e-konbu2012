@@ -1,5 +1,5 @@
 # Target specific macros
-TARGET = stepup
+TARGET = StepUp
 
 NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
 
