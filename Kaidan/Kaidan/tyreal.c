@@ -1,8 +1,6 @@
-﻿#include <stdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "kernel.h"
-#include "kernel_id.h"
 #include "ecrobot_interface.h"
 #include "balancer.h"
 #include "tyreal.h"
@@ -77,7 +75,7 @@ float change_float_param(float param){
 	static int temp =0;
 	
 	
-	//�O��擾������]�p�Ƃ̍���p���Ēl�𐧌�
+	//?O??��??????]?p??????p????l???
 if((int)nxt_motor_get_count(NXT_PORT_C) - temp>0){
 	param=param+ADJUST_FLOAT_STEP/*0.001*/;	
 //	param=(param+0.1)/*(float)ADJUST_FLOAT_STEP*/;

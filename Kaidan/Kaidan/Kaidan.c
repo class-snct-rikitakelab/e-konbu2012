@@ -1,61 +1,54 @@
-ï»¿
- /* 
-  * Kaidan.c
-  * ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹åŠã³æ®µå·®æ¤œçŸ¥ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
-  */
 
 
 #include "kernel.h"
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
-#include "balancer.h"
-#include "math.h"
+#include "balancer.h" 
 #include "logSend.h"
-#include "tyreal.h"
+#include <math.h>
+
+
 /*
- *	å„ç¨®å¤‰æ•°å®šç¾©
+ *	Šeí•Ï”’è‹`
  */
 
-//ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹ç”¨ç›®æ¨™å€¤
-static unsigned int BLACK_VALUE;	//é»’å€¤
-static unsigned int WHITE_VALUE;	//ç™½å€¤
-static unsigned int GRAY_VALUE;		//ç°è‰²å€¤ï¼ˆç¾åœ¨ã¯é»’ã¨ç™½ã®å¹³å‡å€¤ï¼‰
+//ƒ‰ƒCƒ“ƒgƒŒ[ƒX—p–Ú•W’l
+static unsigned int BLACK_VALUE;	//•’l
+static unsigned int WHITE_VALUE;	//”’’l
+static unsigned int GRAY_VALUE;		//ŠDF’liŒ»İ‚Í•‚Æ”’‚Ì•½‹Ï’lj
 
 static int counter = 0;
 
 
+//K”öİ’èŠp“x
+#define ANGLEOFDOWN 110				//~‰º–Ú•WŠp“x
+#define ANGLEOFUP 0					//ã¸–Ú•WŠp“x
 
-
-
-//å°»å°¾è¨­å®šè§’åº¦
-#define ANGLEOFDOWN 110				//é™ä¸‹ç›®æ¨™è§’åº¦
-#define ANGLEOFUP 0					//ä¸Šæ˜‡ç›®æ¨™è§’åº¦
-
-//é€Ÿåº¦èª¿ç¯€ä¿‚æ•°
+//‘¬“x’²ßŒW”
 #define SPEED_COUNT 20
 
-//ãƒãƒƒãƒ†ãƒªé™ä¸‹å€¤
-#define DOWN_BATTERY 450			//ãƒãƒƒãƒ†ãƒªé™ä¸‹å€¤
+//ƒoƒbƒeƒŠ~‰º’l
+#define DOWN_BATTERY 450			//ƒoƒbƒeƒŠ~‰º’l
 
-//ã‚¸ãƒ£ã‚¤ãƒ­æŒ¯å¹…å€¤
+//ƒWƒƒƒCƒU•’l
 #define PM_GYRO 65
 
-//è»Šè¼ªã®å††å‘¨[cm]
-#define CIRCUMFERENCE 25.8			//è»Šè¼ªã®å††å‘¨
+//Ô—Ö‚Ì‰~ü[cm]
+#define CIRCUMFERENCE 25.8			//Ô—Ö‚Ì‰~ü
 
-#define CMD_START '1'    			//ãƒªãƒ¢ãƒ¼ãƒˆã‚¹ã‚¿ãƒ¼ãƒˆã‚³ãƒãƒ³ãƒ‰(å¤‰æ›´ç¦æ­¢)
+#define CMD_START '1'    			//ƒŠƒ‚[ƒgƒXƒ^[ƒgƒRƒ}ƒ“ƒh(•ÏX‹Ö~)
 
-//PIDåˆ¶å¾¡ç”¨åå·®å€¤
-static float hensa;					//Påˆ¶å¾¡ç”¨
-static float i_hensa = 0;			//Iåˆ¶å¾¡ç”¨
-static float d_hensa = 0;			//Dåˆ¶å¾¡ç”¨
+//PID§Œä—p•Î·’l
+static float hensa;					//P§Œä—p
+static float i_hensa = 0;			//I§Œä—p
+static float d_hensa = 0;			//D§Œä—p
 static float bf_hensa = 0;
 
 
-//ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹æ™‚PIDåˆ¶å¾¡ç”¨ä¿‚æ•°
-static float Kp = 1.85;				//Påˆ¶å¾¡ç”¨
-static float Ki = 2.6;				//Iåˆ¶å¾¡ç”¨
-static float Kd = 0.003;				//Dåˆ¶å¾¡ç”¨
+//ƒ‰ƒCƒ“ƒgƒŒ[ƒXPID§Œä—pŒW”
+static float Kp = 1.85;				//P§Œä—p
+static float Ki = 2.6;				//I§Œä—p
+static float Kd = 0.003;				//D§Œä—p
 
 
 static int wait_count = 0;
@@ -63,21 +56,21 @@ static int wait_count = 0;
 static double min_vol;
 static int stepflag=0;
 
-//ã‚¸ãƒ£ã‚¤ãƒ­ã‚»ãƒ³ã‚µã‚ªãƒ•ã‚»ãƒƒãƒˆè¨ˆç®—ç”¨å¤‰æ•°
+//ƒWƒƒƒCƒƒZƒ“ƒTƒIƒtƒZƒbƒgŒvZ—p•Ï”
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
 
-//ãƒãƒƒãƒ†ãƒªé›»åœ§å€¤çŠ¶æ…‹
+//ƒoƒbƒeƒŠ“dˆ³’ló‘Ô
 static U32	battery_value;
 
 char rx_buf[BT_MAX_RX_BUF_SIZE];
 
-/* ãƒãƒ©ãƒ³ã‚¹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã¸æ¸¡ã™ã‚³ãƒãƒ³ãƒ‰ç”¨å¤‰æ•° */
+/* ƒoƒ‰ƒ“ƒXƒRƒ“ƒgƒ[ƒ‹‚Ö“n‚·ƒRƒ}ƒ“ƒh—p•Ï” */
 S8  cmd_forward, cmd_turn;
-/* ãƒãƒ©ãƒ³ã‚¹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã‹ã‚‰è¿”ã•ã‚Œã‚‹ãƒ¢ãƒ¼ã‚¿åˆ¶å¾¡ç”¨å¤‰æ•° */
+/* ƒoƒ‰ƒ“ƒXƒRƒ“ƒgƒ[ƒ‹‚©‚ç•Ô‚³‚ê‚éƒ‚[ƒ^§Œä—p•Ï” */
 S8	pwm_l, pwm_r;
 
 
-//è·é›¢è¨ˆæ¸¬ç”¨å¤‰æ•°
+//‹——£Œv‘ª—p•Ï”
 int revL = 0;
 int revR = 0;
 float distance_before_step = 0;
@@ -86,53 +79,53 @@ float distance_step_stop = 0;
 
 
 /*
- *	çŠ¶æ…‹å®šç¾©
+ *	ó‘Ô’è‹`
  */
 
-//ã‚·ã‚¹ãƒ†ãƒ å…¨ä½“ã®çŠ¶æ…‹
+//ƒVƒXƒeƒ€‘S‘Ì‚Ìó‘Ô
 typedef enum{
-	RN_MODE_INIT, 					//åˆæœŸçŠ¶æ…‹
-	RN_MODE_CONTROL,				//å€’ç«‹åˆ¶å¾¡ON
-	RN_MODE_STOP,					//å€’ç«‹åˆ¶å¾¡OFF
-	RN_MODE_BALANCE,				//å€’ç«‹åˆ¶å¾¡ON
-	RN_MODE_BALANCEOFF,					//å€’ç«‹åˆ¶å¾¡OFF
+	RN_MODE_INIT, 					//‰Šúó‘Ô
+	RN_MODE_CONTROL,				//“|—§§ŒäON
+	RN_MODE_STOP,					//“|—§§ŒäOFF
+	RN_MODE_BALANCE,				//“|—§§ŒäON
+	RN_MODE_BALANCEOFF,					//“|—§§ŒäOFF
 } RN_MODE;
 
 
 typedef enum{
-	RN_SETTINGMODE_START,		//åˆæœŸçŠ¶æ…‹
-	RN_RUN,						//åŸºæœ¬èµ°è¡Œï¼ˆãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹ï¼‰
-	RN_SLOW_RUN,				//ä½é€Ÿèµ°è¡Œ
-	RN_STOP,						//åœæ­¢
+	RN_SETTINGMODE_START,		//‰Šúó‘Ô
+	RN_RUN,						//Šî–{‘–siƒ‰ƒCƒ“ƒgƒŒ[ƒXj
+	RN_SLOW_RUN,				//’á‘¬‘–s
+	RN_STOP,						//’â~
 	RN_STOP_WAIT,
 	RN_RUPID_SPEED_UP,
-	RN_STEP_BRAKE,				//ãƒ–ãƒ¬ãƒ¼ã‚­
-	RN_STEP_STOP,				//åœæ­¢
+	RN_STEP_BRAKE,				//ƒuƒŒ[ƒL
+	RN_STEP_STOP,				//’â~
 } RN_SETTINGMODE;
 
 
-//å°»å°¾ã®çŠ¶æ…‹
+//K”ö‚Ìó‘Ô
 typedef enum{
-	RN_TAILDOWN,				//å°»å°¾é™ä¸‹
-	RN_TAILUP,					//å°»å°¾ä¸Šæ˜‡
+	RN_TAILDOWN,				//K”ö~‰º
+	RN_TAILUP,					//K”öã¸
 } RN_TAILMODE;
 
 
-//åˆæœŸçŠ¶æ…‹
+//‰Šúó‘Ô
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
-//æ®µå·®æ¤œçŸ¥é–¢é€£ã€€ãƒã‚¯ãƒ­ã€ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—
+//’i·ŒŸ’mŠÖ˜Aƒ}ƒNƒAƒvƒƒgƒ^ƒCƒv
 #define RUPID_SPEED_UP_SIGNAL 3
 static int RN_rupid_speed_up_signal_recevie(void);
 
 /*	
- *	å„ç¨®é–¢æ•°å®šç¾©
+ *	ŠeíŠÖ”’è‹`
  */
 
-//å„ç¨®ãƒ—ãƒ©ã‚¤ãƒ™ãƒ¼ãƒˆé–¢æ•°
+//Šeíƒvƒ‰ƒCƒx[ƒgŠÖ”
 void RN_calibrate();
 void RN_setting();
 int online();
@@ -148,11 +141,11 @@ void RN_modesetting();
 static int remote_start(void);
 void rupid_speed_up(int target_forward_speed);
 
-//ã‚«ã‚¦ãƒ³ã‚¿ã®å®£è¨€
+//ƒJƒEƒ“ƒ^‚ÌéŒ¾
 DeclareCounter(SysTimerCnt);
 
 
-//ã‚¿ã‚¹ã‚¯ã®å®£è¨€
+//ƒ^ƒXƒN‚ÌéŒ¾
 /*
 DeclareTask(ActionTask);
 DeclareTask(ActionTask2);
@@ -160,16 +153,16 @@ DeclareTask(DisplayTask);
 DeclareTask(LogTask);
 */
 
-//æ¶²æ™¶ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã«è¡¨ç¤ºã™ã‚‹ã‚·ã‚¹ãƒ†ãƒ åè¨­å®š
+//‰t»ƒfƒBƒXƒvƒŒƒC‚É•\¦‚·‚éƒVƒXƒeƒ€–¼İ’è
 const char target_subsystem_name[] = "Logtrace";
 
 
 
 /*
- *	å„ç¨®é–¢æ•°
+ *	ŠeíŠÖ”
  */
 
-//åˆæœŸå‡¦ç†
+//‰Šúˆ—
 void ecrobot_device_initialize(void)
 {
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);
@@ -184,7 +177,7 @@ void ecrobot_device_initialize(void)
 }
 
 
-//å¾Œå§‹æœ«å‡¦ç†
+//Œãn––ˆ—
 void ecrobot_device_terminate(void)
 {
 	tail_mode = RN_TAILUP;
@@ -197,7 +190,7 @@ void ecrobot_device_terminate(void)
 }
 
 
-//OSEKãƒ•ãƒƒã‚¯é–¢æ•°
+//OSEKƒtƒbƒNŠÖ”
 void StartupHook(void){}
 void ShutdownHook(StatusType ercd){}
 void PreTaskHook(void){}
@@ -205,7 +198,7 @@ void PostTaskHook(void){}
 void ErrorHook(StatusType ercd){}
 
 
-//ãƒ•ãƒƒã‚¯é–¢æ•°
+//ƒtƒbƒNŠÖ”
 void user_1ms_isr_type2(void){
 	StatusType ercd;
 	/*
@@ -218,7 +211,7 @@ void user_1ms_isr_type2(void){
 }
 
 
-//ON-OFFåˆ¶å¾¡ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹é–¢æ•°
+//ON-OFF§Œäƒ‰ƒCƒ“ƒgƒŒ[ƒXŠÖ”
 void RA_linetrace(int forward_speed, int turn_speed) {
 
 	cmd_forward = forward_speed;
@@ -234,7 +227,7 @@ void RA_linetrace(int forward_speed, int turn_speed) {
 }
 
 
-//Påˆ¶å¾¡ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹é–¢æ•°
+//P§Œäƒ‰ƒCƒ“ƒgƒŒ[ƒXŠÖ”
 void RA_linetrace_P(int forward_speed){
 
 	cmd_forward = forward_speed;
@@ -250,11 +243,11 @@ void RA_linetrace_P(int forward_speed){
 }
 
 
-//PIDåˆ¶å¾¡ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹é–¢æ•°
+//PID§Œäƒ‰ƒCƒ“ƒgƒŒ[ƒXŠÖ”
 void RA_linetrace_PID(int forward_speed) {
 
 
-	RA_speed(forward_speed,2);	//é€Ÿåº¦ã‚’æ®µéšçš„ã«å¤‰åŒ–
+	RA_speed(forward_speed,2);	//‘¬“x‚ğ’iŠK“I‚É•Ï‰»
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -273,13 +266,13 @@ void RA_linetrace_PID(int forward_speed) {
 	}
 
 
-	/*å€’ç«‹åˆ¶å¾¡OFFæ™‚*/
+	/*“|—§§ŒäOFF*/
 	//nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
 	//nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 
 }
 
-//PIDåˆ¶å¾¡ç”¨åå·®ãƒªã‚»ãƒƒãƒˆé–¢æ•°
+//PID§Œä—p•Î·ƒŠƒZƒbƒgŠÖ”
 void RA_hensareset(void)
 {
 	hensa = 0;
@@ -288,7 +281,7 @@ void RA_hensareset(void)
 	bf_hensa = 0;
 }
 
-//æ®µéšçš„åŠ é€Ÿç”¨é–¢æ•°ï¼ˆæŒ‡å®šé‡ã ã‘é€Ÿåº¦ã‚’å¾ã€…ã«ä¸Šæ˜‡ï¼‰
+//’iŠK“I‰Á‘¬—pŠÖ”iw’è—Ê‚¾‚¯‘¬“x‚ğ™X‚Éã¸j
 void RA_speed(int limit,int s_Kp){
 
 	static int forward_speed;
@@ -320,7 +313,7 @@ void RA_speed(int limit,int s_Kp){
 }
 
 
-//è»Šè¼ªå›è»¢é‡å·®èª¿ç¯€é–¢æ•°ï¼ˆPIDåˆ¶å¾¡ï¼‰
+//Ô—Ö‰ñ“]—Ê·’²ßŠÖ”iPID§Œäj
 int RA_wheels(int turn){
 	float w_kp = 1.4;
 
@@ -331,13 +324,13 @@ int RA_wheels(int turn){
 }
 
 
-//è¡æ’ƒæ¤œçŸ¥é–¢æ•°
+//ÕŒ‚ŒŸ’mŠÖ”
 void shock(void){
-	//é›»åœ§é™ä¸‹ã®æœ€å°å€¤ã‚’æ›´æ–°
+	//“dˆ³~‰º‚ÌÅ¬’l‚ğXV
 	if(min_vol>ecrobot_get_battery_voltage())
 		min_vol=ecrobot_get_battery_voltage();
 
-	//ã‚¸ãƒ£ã‚¤ãƒ­åŠã³é›»åœ§é™ä¸‹ã‹ã‚‰è¡æ’ƒæ¤œçŸ¥
+	//ƒWƒƒƒCƒ‹y‚Ñ“dˆ³~‰º‚©‚çÕŒ‚ŒŸ’m
 	if((ecrobot_get_gyro_sensor(NXT_PORT_S1) <= gyro_offset-PM_GYRO ||ecrobot_get_gyro_sensor(NXT_PORT_S1) >= gyro_offset+PM_GYRO) 
 		&& min_vol <= battery_value-DOWN_BATTERY)
 	{
@@ -346,21 +339,21 @@ void shock(void){
 		revL = nxt_motor_get_count(NXT_PORT_C);
 		revR = nxt_motor_get_count(NXT_PORT_B);
 
-		distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//æ®µå·®çªå…¥æ™‚ã®è·é›¢ã‚’æ¸¬å®š
+		distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//’i·“Ë“ü‚Ì‹——£‚ğ‘ª’è
 
 
 		setting_mode = RN_SLOW_RUN; 
 		
 		stepflag = 1;
 
-		setting_mode = RN_STEP_BRAKE;		//éšæ®µã¸å‘ã‹ã„ãƒ–ãƒ¬ãƒ¼ã‚­ã‚’ã‹ã‘ã‚‹
+		setting_mode = RN_STEP_BRAKE;		//ŠK’i‚ÖŒü‚©‚¢ƒuƒŒ[ƒL‚ğ‚©‚¯‚é
 
-		min_vol = battery_value;			//æœ€å°å€¤ãƒªã‚»ãƒƒãƒˆ
+		min_vol = battery_value;			//Å¬’lƒŠƒZƒbƒg
 	}
 }
 
 
-//ON-OFFåˆ¶å¾¡ç”¨ãƒ©ã‚¤ãƒ³åˆ¤å®šé–¢æ•°
+//ON-OFF§Œä—pƒ‰ƒCƒ“”»’èŠÖ”
 int online(void) {
 
 	int light_value;
@@ -378,7 +371,7 @@ int online(void) {
 }
 
 
-//å°»å°¾è§’åº¦ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«é–¢æ•°
+//K”öŠp“xƒRƒ“ƒgƒ[ƒ‹ŠÖ”
 void tailcontrol(){
 
 	static const float t_Kp = 0.7;
@@ -388,11 +381,11 @@ void tailcontrol(){
 
 	switch(tail_mode){
 		case(RN_TAILDOWN):
-			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);		//å°»å°¾ã‚’ä¸‹ã’ã‚‹
+			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);		//K”ö‚ğ‰º‚°‚é
 			break;
 
 		case(RN_TAILUP):
-			t_hensa = ANGLEOFUP - ecrobot_get_motor_rev(NXT_PORT_A);		//å°»å°¾ã‚’ä¸Šã’ã‚‹
+			t_hensa = ANGLEOFUP - ecrobot_get_motor_rev(NXT_PORT_A);		//K”ö‚ğã‚°‚é
 			break;
 
 		default:
@@ -410,7 +403,7 @@ void tailcontrol(){
 
 }
 
-//ãƒªãƒ¢ãƒ¼ãƒˆã‚¹ã‚¿ãƒ¼ãƒˆé–¢æ•°
+//ƒŠƒ‚[ƒgƒXƒ^[ƒgŠÖ”
 static int remote_start(void)
 {
 	int i;
@@ -419,18 +412,18 @@ static int remote_start(void)
 
 	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
 	{
-		rx_buf[i] = 0; /* å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢ */
+		rx_buf[i] = 0; /* óMƒoƒbƒtƒ@‚ğƒNƒŠƒA */
 	}
 
 	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
 	if (rx_len > 0)
 	{
-		/* å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚ã‚Š */
+		/* óMƒf[ƒ^‚ ‚è */
 		if (rx_buf[0] == CMD_START)
 		{
-			start = 1; /* èµ°è¡Œé–‹å§‹ */
+			start = 1; /* ‘–sŠJn */
 		}
-		ecrobot_send_bt(rx_buf, 0, rx_len); /* å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¨ã‚³ãƒ¼ãƒãƒƒã‚¯ */
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* óMƒf[ƒ^‚ğƒGƒR[ƒoƒbƒN */
 	}
 
 	return start;
@@ -438,18 +431,18 @@ static int remote_start(void)
 
 
 
-//èµ°è¡Œè¨­å®šé–¢æ•°
+//‘–sİ’èŠÖ”
 void RN_setting()
 {
 	static float beforestop = 0;
 
 	switch (setting_mode){
-			//èµ°è¡Œé–‹å§‹å‰
+			//‘–sŠJn‘O
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();				//ã‚­ãƒ£ãƒªãƒ–ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³
+			RN_calibrate();				//ƒLƒƒƒŠƒuƒŒ[ƒVƒ‡ƒ“
 			break;
 
-			//é€šå¸¸èµ°è¡Œ
+			//’Êí‘–s
 		case (RN_RUN):
 
 			RA_linetrace_PID(25);			
@@ -463,43 +456,43 @@ void RN_setting()
 			}
 			
 
-			RA_linetrace_PID(45);		//ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹
-			shock();					//æ®µå·®æ¤œçŸ¥
+			RA_linetrace_PID(45);		//ƒ‰ƒCƒ“ƒgƒŒ[ƒX
+			shock();					//’i·ŒŸ’m
 			break;
 
-			//ä¸€å®šè·é›¢åˆ†ãƒ–ãƒ¬ãƒ¼ã‚­
+			//ˆê’è‹——£•ªƒuƒŒ[ƒL
 		case(RN_STEP_BRAKE):
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 
-			distance_step_brake = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//ç¾åœ¨ã®èµ°è¡Œè·é›¢ã‚’è¨ˆæ¸¬
+			distance_step_brake = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//Œ»İ‚Ì‘–s‹——£‚ğŒv‘ª
 
-			RA_speed(-30,1);								//å¾ã€…ã«ãƒ–ãƒ¬ãƒ¼ã‚­ã‚’å¼·ãã—ã¦ã„ãï¼ˆå‰ã®çŠ¶æ…‹ã®é€Ÿåº¦ã®ã¾ã¾ã§ã¯æ­¢ã¾ã£ã¦æ¬²ã—ã„ä½ç½®ã§æ­¢ã¾ã£ã¦ãã‚Œãªã„ãŸã‚ã€ãƒ–ãƒ¬ãƒ¼ã‚­ã‚’å¼·ãã™ã‚‹ï¼‰
-			cmd_turn = RA_wheels(cmd_turn);					//ä¸¡è»Šè¼ªã®å›è»¢é‡ã‚’åŒã˜ã«ã—ã¦ã€æ–¹å‘ãŒä½™è¨ˆã«ãšã‚Œã‚‹ã®ã‚’é˜²ã
+			RA_speed(-30,1);								//™X‚ÉƒuƒŒ[ƒL‚ğ‹­‚­‚µ‚Ä‚¢‚­i‘O‚Ìó‘Ô‚Ì‘¬“x‚Ì‚Ü‚Ü‚Å‚Í~‚Ü‚Á‚Ä—~‚µ‚¢ˆÊ’u‚Å~‚Ü‚Á‚Ä‚­‚ê‚È‚¢‚½‚ßAƒuƒŒ[ƒL‚ğ‹­‚­‚·‚éj
+			cmd_turn = RA_wheels(cmd_turn);					//—¼Ô—Ö‚Ì‰ñ“]—Ê‚ğ“¯‚¶‚É‚µ‚ÄA•ûŒü‚ª—]Œv‚É‚¸‚ê‚é‚Ì‚ğ–h‚®
 
-			//ä¸€å®šè·é›¢æ¤œçŸ¥å¾Œã€åœæ­¢ãƒ¢ãƒ¼ãƒ‰ã¸
-			if((distance_before_step - distance_step_brake <= -10))	//-10ã¯NXT Communicatorã®ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰åˆ¤æ–­
+			//ˆê’è‹——£ŒŸ’mŒãA’â~ƒ‚[ƒh‚Ö
+			if((distance_before_step - distance_step_brake <= -10))	//-10‚ÍNXT Communicator‚Ìƒf[ƒ^‚©‚ç”»’f
 			{
-				balance_init();										//ãƒãƒ©ãƒ³ã‚µãƒ¼ã‚’åˆæœŸåŒ–
-				nxt_motor_set_count(NXT_PORT_B,0);					//ãƒ¢ãƒ¼ã‚¿ã®å›è»¢é‡ã‚’åˆæœŸåŒ–
+				balance_init();										//ƒoƒ‰ƒ“ƒT[‚ğ‰Šú‰»
+				nxt_motor_set_count(NXT_PORT_B,0);					//ƒ‚[ƒ^‚Ì‰ñ“]—Ê‚ğ‰Šú‰»
 				nxt_motor_set_count(NXT_PORT_C,0);
-				setting_mode = RN_STEP_STOP;						//åœæ­¢çŠ¶æ…‹ã¸
+				setting_mode = RN_STEP_STOP;						//’â~ó‘Ô‚Ö
 			}
 
 			break;
 
 
-			//åœæ­¢çŠ¶æ…‹
+			//’â~ó‘Ô
 		case(RN_STEP_STOP):
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
-			distance_step_stop = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//ç¾åœ¨ã®èµ°è¡Œè·é›¢æ¸¬å®š
+			distance_step_stop = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//Œ»İ‚Ì‘–s‹——£‘ª’è
 
-			wait_count++;			//æ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
-			RA_linetrace(0,2);		//ON/OFFåˆ¶å¾¡ã®é€Ÿåº¦0ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹ã§ä½ç½®ã‚’æ•´ãˆã‚‹
+			wait_count++;			//ŠÔƒJƒEƒ“ƒg
+			RA_linetrace(0,2);		//ON/OFF§Œä‚Ì‘¬“x0ƒ‰ƒCƒ“ƒgƒŒ[ƒX‚ÅˆÊ’u‚ğ®‚¦‚é
 
 			/*
-			//ä¸€å®šè·é›¢èµ°è¡Œå¾Œã€é€šå¸¸èµ°è¡Œã¸
+			//ˆê’è‹——£‘–sŒãA’Êí‘–s‚Ö
 			if(distance_step_stop-distance_step_brake < 0)
 			{
 				balance_init();
@@ -512,21 +505,21 @@ void RN_setting()
 			}
 			*/
 
-			//ä¸€å®šæ™‚é–“çµŒéå¾Œé€šå¸¸èµ°è¡Œã¸
+			//ˆê’èŠÔŒo‰ßŒã’Êí‘–s‚Ö
 			if(wait_count >= 550)
 			{
-				balance_init();						//ãƒãƒ©ãƒ³ã‚µãƒ¼åˆæœŸåŒ–
-				nxt_motor_set_count(NXT_PORT_B,0);	//ãƒ¢ãƒ¼ã‚¿ã®å›è»¢é‡åˆæœŸåŒ–
+				balance_init();						//ƒoƒ‰ƒ“ƒT[‰Šú‰»
+				nxt_motor_set_count(NXT_PORT_B,0);	//ƒ‚[ƒ^‚Ì‰ñ“]—Ê‰Šú‰»
 				nxt_motor_set_count(NXT_PORT_C,0);
-				RA_hensareset();					//ãƒ©ã‚¤ãƒ³ãƒˆãƒ¬ãƒ¼ã‚¹ã®åå·®åˆæœŸåŒ–
-				wait_count = 0;						//ã‚«ã‚¦ãƒ³ã‚¿åˆæœŸåŒ–
-				setting_mode = RN_RUN;				//é€šå¸¸èµ°è¡Œã«ç§»è¡Œ
-				tail_mode = RN_TAILUP;				//å°»å°¾ã‚’ä¸Šã’ã‚‹
+				RA_hensareset();					//ƒ‰ƒCƒ“ƒgƒŒ[ƒX‚Ì•Î·‰Šú‰»
+				wait_count = 0;						//ƒJƒEƒ“ƒ^‰Šú‰»
+				setting_mode = RN_RUN;				//’Êí‘–s‚ÉˆÚs
+				tail_mode = RN_TAILUP;				//K”ö‚ğã‚°‚é
 			}
 
 			break;
 
-			//å¼·åˆ¶åœæ­¢
+			//‹­§’â~
 		case(RN_STOP):
 			
 			/*
@@ -554,7 +547,7 @@ void RN_setting()
 	}
 }
 
-//æ€¥åŠ é€Ÿç”¨é–¢æ•°
+//‹}‰Á‘¬—pŠÖ”
 void rupid_speed_up(int target_forward_speed){
 	static int rupid_speed_up_counter=0;
 	int gyro_offset_operation = 10;
@@ -605,8 +598,8 @@ void rupid_speed_up(int target_forward_speed){
 
 
 	/*
-	limit ãŒç›®æ¨™å€¤
-	s_Kpã¯ä¸€å›ã‚ãŸã‚Šã«åŠ æ¸›ã™ã‚‹æ“ä½œé‡ï¼Ÿ
+	limit ‚ª–Ú•W’l
+	s_Kp‚Íˆê‰ñ‚ ‚½‚è‚É‰ÁŒ¸‚·‚é‘€ì—ÊH
 	static int forward_speed;
 
 	counter += 1;
@@ -644,19 +637,19 @@ static int RN_rupid_speed_up_signal_recevie(void)
 
 	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
 	{
-		rx_buf[i] = 0; /* å—ä¿¡ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢ */
+		rx_buf[i] = 0; /* óMƒoƒbƒtƒ@‚ğƒNƒŠƒA */
 	}
 
 	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
 	if (rx_len > 0)
 	{
-		/* å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚ã‚Š */
+		/* óMƒf[ƒ^‚ ‚è */
 		if (rx_buf[0] == RUPID_SPEED_UP_SIGNAL)
 		{
 			start = 1;
 		}
 		
-		ecrobot_send_bt(rx_buf, 0, rx_len); /* å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¨ã‚³ãƒ¼ãƒãƒƒã‚¯ */
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* óMƒf[ƒ^‚ğƒGƒR[ƒoƒbƒN */
 	}
 	else if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 	{
@@ -669,11 +662,11 @@ static int RN_rupid_speed_up_signal_recevie(void)
 }
 
 
-//ã‚­ãƒ£ãƒªãƒ–ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³é–¢æ•°
+//ƒLƒƒƒŠƒuƒŒ[ƒVƒ‡ƒ“ŠÖ”
 void RN_calibrate()
 {
 
-	//é»’å€¤
+	//•’l
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -684,7 +677,7 @@ void RN_calibrate()
 		}
 	}
 
-	//ç™½å€¤
+	//”’’l
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -695,10 +688,10 @@ void RN_calibrate()
 		}
 	}
 
-	//ç°è‰²å€¤è¨ˆç®—
+	//ŠDF’lŒvZ
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
-	//ã‚¸ãƒ£ã‚¤ãƒ­ã‚ªãƒ•ã‚»ãƒƒãƒˆåŠã³ãƒãƒƒãƒ†ãƒªé›»åœ§å€¤
+	//ƒWƒƒƒCƒƒIƒtƒZƒbƒg‹y‚ÑƒoƒbƒeƒŠ“dˆ³’l
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -711,10 +704,10 @@ void RN_calibrate()
 		}
 	}
 
-	//èµ°è¡Œé–‹å§‹åˆå›³
+	//‘–sŠJn‡}
 	while(1){
 
-		//ãƒªãƒ¢ãƒ¼ãƒˆã‚¹ã‚¿ãƒ¼ãƒˆ
+		//ƒŠƒ‚[ƒgƒXƒ^[ƒg
 		if(remote_start()==1)
 		{
 			ecrobot_sound_tone(982,512,10);
@@ -724,7 +717,7 @@ void RN_calibrate()
 			break;
 		}
 
-		//ã‚¿ãƒƒãƒã‚»ãƒ³ã‚µã‚¹ã‚¿ãƒ¼ãƒˆ
+		//ƒ^ƒbƒ`ƒZƒ“ƒTƒXƒ^[ƒg
 		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(982,512,10);
@@ -745,18 +738,18 @@ void RN_calibrate()
 }
 
 
-//èµ°è¡Œä½“çŠ¶æ…‹è¨­å®šé–¢æ•°
+//‘–s‘Ìó‘Ôİ’èŠÖ”
 void RN_modesetting()
 {
 	switch (runner_mode){
 
-			//åˆæœŸçŠ¶æ…‹
+			//‰Šúó‘Ô
 		case (RN_MODE_INIT):
 			cmd_forward = 0;
 			cmd_turn = 0;
 			break;
 
-			//ãƒãƒ©ãƒ³ã‚µãƒ¼ON
+			//ƒoƒ‰ƒ“ƒT[ON
 		case (RN_MODE_BALANCE):
 			balance_control(
 				(F32)cmd_forward,
@@ -774,7 +767,7 @@ void RN_modesetting()
 
 
 		case (RN_MODE_STOP):
-			//ãƒãƒ©ãƒ³ã‚µãƒ¼OFF
+			//ƒoƒ‰ƒ“ƒT[OFF
 		case (RN_MODE_BALANCEOFF):
 			break;
 
@@ -786,36 +779,36 @@ void RN_modesetting()
 }
 
 /*
- *	å„ç¨®ã‚¿ã‚¹ã‚¯
+ *	Šeíƒ^ƒXƒN
  */
 
-//èµ°è¡Œæ–¹æ³•ç®¡ç†(4ms)
+//‘–s•û–@ŠÇ—(4ms)
 TASK(ActionTask)
 {
-	RN_modesetting();	//èµ°è¡Œä½“çŠ¶æ…‹
-	tailcontrol();			//å°»å°¾ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«
+	RN_modesetting();	//‘–s‘Ìó‘Ô
+	tailcontrol();			//K”öƒRƒ“ƒgƒ[ƒ‹
 	TerminateTask();
 }
 
-//èµ°è¡ŒçŠ¶æ…‹ç®¡ç†(5ms)
+//‘–só‘ÔŠÇ—(5ms)
 TASK(ActionTask2)
 {
-	RN_setting();		//èµ°è¡ŒçŠ¶æ…‹
+	RN_setting();		//‘–só‘Ô
 	TerminateTask();
 }
 
-//çŠ¶æ…‹è¡¨ç¤ºç®¡ç†(20ms)
+//ó‘Ô•\¦ŠÇ—(20ms)
 TASK(DisplayTask)
 {
-	ecrobot_status_monitor(target_subsystem_name);	//ãƒ¢ãƒ‹ã‚¿å‡ºåŠ›
+	ecrobot_status_monitor(target_subsystem_name);	//ƒ‚ƒjƒ^o—Í
 	TerminateTask();
 }
 
-//ãƒ­ã‚°é€ä¿¡ç®¡ç†(50ms)
+//ƒƒO‘—MŠÇ—(50ms)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),0/*min_vol*/,
-			0/*distance_before_step - distance_slow*/,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ãƒ­ã‚°å–ã‚Š
+			0/*distance_before_step - distance_slow*/,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ƒƒOæ‚è
 	TerminateTask();
 }
 
