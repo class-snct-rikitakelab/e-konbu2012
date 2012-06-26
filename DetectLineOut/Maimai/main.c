@@ -10,7 +10,6 @@
 #include "logSend.h"
 #include "TimerUnit.h"
 #include "DetectOnLine.h"
-
 //ライン外れた検出用変数
 
 
