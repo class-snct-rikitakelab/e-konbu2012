@@ -14,10 +14,10 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 100 				//降下目標角度
+#define ANGLEOFDOWN 104 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 52
+#define ANGLEOFLOOKUP 51
 
 #define PI 3.141592
 
@@ -687,7 +687,7 @@ void RN_setting()
 			break;
 
 		case (RN_SPEEDZERO):
-			RA_speed(0,0);
+			cmd_forward = 0;
 			cmd_turn = RA_wheels(cmd_turn);
 			wait_count++;
 			if(wait_count >= 200)
@@ -706,7 +706,7 @@ void RN_setting()
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
 
-				if(getsonarflag(21) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -733,7 +733,6 @@ void RN_setting()
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
-				
 				setting_mode = RN_LOOKUPDOWN;
 				wait_count = 0;
 				runner_mode_change(2);
@@ -750,7 +749,7 @@ void RN_setting()
 
 			if(wait_count >= 200)
 			{
-				tailpower(25.0);
+				tailpower(15.0);
 				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
 				if(ecrobot_get_motor_rev(NXT_PORT_A) == ANGLEOFLOOKUP)
 					{
@@ -767,7 +766,7 @@ void RN_setting()
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
 
-			RA_linetrace(35,50);
+			RA_linetrace(35,30);
 
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
@@ -783,17 +782,19 @@ void RN_setting()
 
 			//ルックアップゲート走行、前進後倒立状態へ復帰
 		case (RN_LOOKUPUP):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-
+			if(wait_count < 200)
+			{
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
 			wait_count++;
 
 			if(wait_count == 200)
 			{
 				tail_mode_change(0,ANGLEOFDOWN,10,2);
-
-				ecrobot_set_motor_speed(NXT_PORT_B, -5);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, -5);	//モータに速度を送る
+				
+				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
+				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
 			}
 
 			if(t_angle == ANGLEOFDOWN)
@@ -806,7 +807,7 @@ void RN_setting()
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,0,4);
+				tail_mode_change(1,ANGLEOFUP,0,10);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);
@@ -817,6 +818,7 @@ void RN_setting()
 				RA_hensareset();
 				balance_init();
 				wait_count=0;
+				cmd_forward=0;
 				setting_mode = RN_SPEEDZERO;
 			}
 			
