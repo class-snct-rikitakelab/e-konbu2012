@@ -21,6 +21,7 @@ typedef enum {
 
 static ADJUST_PARAM_STATE adjust_param_state;
 
+
 void display_show_string(char* string,int x,int y){
 
 	display_goto_xy(x, y);
@@ -135,7 +136,18 @@ void make_printf_string(char* val_string,char* text_msg,char *string){
 	sprintf(string,"%s%s",text_msg,val_string);
 }
 	
-	
+int tyreal_trigger(){
+	int result=0;
+
+	if (ecrobot_is_RUN_button_pressed() == 1) {
+				systick_wait_ms(100);
+				result = 1;
+			}
+	return result;
+}
+
+
+
 void do_tyreal(){
 
 
@@ -201,7 +213,3 @@ void do_tyreal(){
    	make_printf_string(float_string,"Ki:",print_string);
    	display_show_string(print_string,0,4);
 }
-	
-
-
-

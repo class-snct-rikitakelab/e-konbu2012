@@ -1,10 +1,8 @@
 
 
-#include "kernel.h"
-#include "kernel_id.h"
-#include "ecrobot_interface.h"
-#include "balancer.h" 
+#include "Kaidan.h"
 #include "logSend.h"
+#include "tyreal.h"
 #include <math.h>
 
 
@@ -21,7 +19,7 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 110				//降下目標角度
+#define ANGLEOFDOWN 125			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
@@ -101,6 +99,7 @@ typedef enum{
 	RN_RUPID_SPEED_UP,
 	RN_STEP_BRAKE,				//ブレーキ
 	RN_STEP_STOP,				//停止
+	TYREAL,
 } RN_SETTINGMODE;
 
 
@@ -132,7 +131,7 @@ int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
 
-void shock();
+int shock();
 void tailcontrol();
 void RA_linetrace_P(int forward_speed);
 void RA_speed(int limit,int s_Kp);
@@ -258,7 +257,7 @@ void RA_linetrace_PID(int forward_speed) {
 	d_hensa = (hensa - bf_hensa)/0.0005;
 	bf_hensa = hensa;
 
-	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	cmd_turn = (Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -325,7 +324,8 @@ int RA_wheels(int turn){
 
 
 //衝撃検知関数
-void shock(void){
+int shock(void){
+	int result=0;
 	//電圧降下の最小値を更新
 	if(min_vol>ecrobot_get_battery_voltage())
 		min_vol=ecrobot_get_battery_voltage();
@@ -342,14 +342,15 @@ void shock(void){
 		distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
 
 
-		setting_mode = RN_SLOW_RUN; 
+	//	setting_mode = RN_SLOW_RUN; 
 		
 		stepflag = 1;
-
-		setting_mode = RN_STEP_BRAKE;		//階段へ向かいブレーキをかける
+		result = 1;
+		//setting_mode = RN_STEP_BRAKE;		//階段へ向かいブレーキをかける
 
 		min_vol = battery_value;			//最小値リセット
 	}
+	return result;
 }
 
 
@@ -451,13 +452,31 @@ void RN_setting()
 			systick_wait_ms(500);
 			setting_mode = RN_RUPID_SPEED_UP;
 			}
+
+			//一回だけ段差検知
 			if(stepflag == 0){
-			//shock();
+			if(shock()==1){
+				ecrobot_sound_tone(180, 512, 30);
+			systick_wait_ms(500);
+			
+				setting_mode = RN_STOP;
+			}
 			}
 			
+			if ( tyreal_trigger() == 1) {
+				ecrobot_sound_tone(932, 512, VOL);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, VOL);
+				systick_wait_ms(10);
+				setting_mode = TYREAL;
+			}
+
+
+			/*
 
 			RA_linetrace_PID(45);		//ライントレース
 			shock();					//段差検知
+			*/
 			break;
 
 			//一定距離分ブレーキ
@@ -521,7 +540,10 @@ void RN_setting()
 
 			//強制停止
 		case(RN_STOP):
-			
+		
+			tailcontrol();
+			 tail_mode = RN_TAILDOWN;
+			 
 			/*
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
@@ -542,6 +564,10 @@ void RN_setting()
 		case (RN_RUPID_SPEED_UP):
 			rupid_speed_up(80);
 			ecrobot_sound_tone(880,512,15);
+		case(TYREAL):
+			do_tyreal();
+			break;
+
 		default:
 			break;
 	}

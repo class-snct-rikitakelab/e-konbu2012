@@ -1,11 +1,28 @@
-build/DetectLineOut.o: DetectLineOut.c \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/kernel.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/lego_nxt/sys_defs.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/cpu_defs.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/osek.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/t_stddef.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/tool_defs.h \
-  kernel_id.h \
+build/tyreal.o: tyreal.c \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/stdlib.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/newlib.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/config.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/machine/ieeefp.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/stddef.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/reent.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/_types.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/lock.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/machine/stdlib.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/alloca.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/stdio.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/stdarg.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/types.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/machine/_types.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/limits.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/syslimits.h \
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/javavm/limits.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/machine/types.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/features.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/stdio.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/string.h \
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/string.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/interrupts.h \
@@ -44,10 +61,7 @@ build/DetectLineOut.o: DetectLineOut.c \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rtwtypes.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/limits.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/syslimits.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/javavm/limits.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rt_SATURATE.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer_types.h \
-  logSend.h TimerUnit.h
+  tyreal.h

@@ -1,4 +1,4 @@
-build/Kaidan.o: Kaidan.c \
+build/Kaidan.o: Kaidan.c Kaidan.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/kernel.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/lego_nxt/sys_defs.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/cpu_defs.h \
@@ -50,7 +50,7 @@ build/Kaidan.o: Kaidan.c \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rt_SATURATE.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer_types.h \
-  logSend.h \
+  logSend.h tyreal.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/math.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/reent.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \

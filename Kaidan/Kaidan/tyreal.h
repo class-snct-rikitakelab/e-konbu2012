@@ -8,3 +8,4 @@
 
 
 extern void do_tyreal();
+extern int tyreal_trigger();
