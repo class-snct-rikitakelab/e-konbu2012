@@ -807,7 +807,7 @@ void RN_setting()
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,0,10);
+				tail_mode_change(1,ANGLEOFUP,0,2);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);
