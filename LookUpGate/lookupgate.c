@@ -5,6 +5,7 @@
 
 
 #include "lookupgate.h"
+#include "math.h"
 
 
 /*
@@ -13,10 +14,12 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 110				//降下目標角度
+#define ANGLEOFDOWN 104 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 58
+#define ANGLEOFLOOKUP 51
+
+#define PI 3.141592
 
 //速度カウンタの上限値
 #define SPEED_COUNT 20
@@ -29,6 +32,9 @@
 
 #define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
 
+/* 車輪半径、走行体幅*/
+#define WHEEL_R		41	//[mm]
+#define MACHINE_W	162	//[mm]
 
 /*
  *	グローバル変数
@@ -41,6 +47,8 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
 static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
 static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
+
+static unsigned int LOOKUP_SONAR_VALUE;
 
 //速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
 static int speed_counter = 0;
@@ -78,8 +86,34 @@ static int target_sonar = 20;
 //超音波センサ用フラグ
 static int sonarflag;
 
+static int sonarvalue;
+
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
+
+/* 自己位置同定用変数 */
+float d_theta_r;			//1ステップ当たりの右車輪回転角度
+float d_theta_l;			//1ステップ当たりの左車輪回転角度
+
+static float d_theta_r_t = 0;		//前回のステップの右車輪回転角度
+static float d_theta_l_t = 0;		//前回のステップの左車輪回転角度
+
+static double omega_r;			//右車輪の回転角速度
+static double omega_l;			//左車輪の回転角速度
+
+float v_r;				//右車輪の回転速度
+float v_l;				//左車輪の回転速度
+
+float v;					//走行体の走行速度
+float omega;				//走行体の回転角速度
+
+static float x_r = 0;		//車体のX座標
+static float y_r = 0;		//車体のY座標
+static float theta_R = 0;	//車体の角度
+
+static float x_r_zero = 0;	//X座標初期値
+static float y_r_zero = 0;	//Y座標初期値
+static float theta_R_zero = 0;	//車体角度初期値
 
 char rx_buf[BT_MAX_RX_BUF_SIZE];
 
@@ -92,6 +126,9 @@ S8	pwm_l, pwm_r;
 //距離計測用変数
 int revL = 0;
 int revR = 0;
+
+int distance_before_gate;	//ルックアップゲート通過前距離
+int distance_after_gate;	//ルックアップゲート通過中距離
 
 
 /*
@@ -110,6 +147,7 @@ typedef enum{
 //キャリブレーションの状態
 typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
+	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
 	RN_LOOKUP,					//ルックアップゲート準備
 	RN_LOOKUPDOWN,				//走行体降下
@@ -152,6 +190,12 @@ int getsonarflag(int target_sonar);
 void tailpower(float value);
 void tail_mode_change(int mode,int value,int limit,int t_up);
 void RA_linetrace_PID_balanceoff(int forward_speed);
+void getsonarvalue(void);
+
+void RA_hensareset(void);
+
+
+void self_location(void);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -178,7 +222,6 @@ const char target_subsystem_name[] = "lookup";
 //初期処理関数（プログラムの最初に呼び出し）
 void ecrobot_device_initialize(void)
 {
-
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);	//光センサ起動
 	ecrobot_init_bt_slave("LEJOS-OSEK");			//Bluetooth起動
 	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
@@ -248,13 +291,15 @@ void RA_linetrace(int forward_speed, int turn_speed) {
 		cmd_turn = (-1)*turn_speed;
 	}
 
+	nxt_motor_set_speed(NXT_PORT_C, forward_speed - cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_B, forward_speed + cmd_turn/2, 1);
 }
 
 
 //PID制御ライントレース関数
 void RA_linetrace_PID(int forward_speed) {
 
-	RA_speed(forward_speed,2);	//速度を段階的に変化
+	RA_speed(forward_speed,1);	//速度を段階的に変化
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -281,7 +326,7 @@ void RA_linetrace_PID(int forward_speed) {
 
 //PID制御ライントレース関数（バランサーOFF用）
 void RA_linetrace_PID_balanceoff(int forward_speed){
-	RA_speed(forward_speed,2);	//速度を段階的に変化
+	RA_speed(forward_speed,1);		//速度を段階的に変化
 
 	if(forward_speed > 0)
 		hensa = (float)LOOKUP_GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -358,6 +403,14 @@ int online(void) {
 
 }
 
+void RA_hensareset(void)
+{
+	hensa = 0;
+	i_hensa = 0;
+	d_hensa = 0;
+	bf_hensa = 0;
+}
+
 //超音波センサ状態検出関数
 void sonarcheck(void)
 {
@@ -377,6 +430,10 @@ int getsonarflag(int target)
 	return sonarflag;					//指定した値に近づいているかどうかを返す（1:範囲内）
 }
 
+void getsonarvalue(void)
+{
+	sonarvalue = ecrobot_get_sonar_sensor(NXT_PORT_S2);
+}
 
 //走行体モード変更関数（主にバランサーのON/OFF）
 void runner_mode_change(int flag)
@@ -419,7 +476,7 @@ void taildown(){
 
 
 	/*	一つの状態でできないかどうか思案中
-	if(t_angle < t_value)
+	if(ecrobot_get_motor_rev(NXT_PORT_A) < t_value)
 	{
 		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
 		if(t_count >= t_count_limit)	//カウンタで尻尾を下げる速度を調整
@@ -429,7 +486,7 @@ void taildown(){
 		}
 	}
 
-	else if(t_angle > t_value)
+	else if(ecrobot_get_motor_rev(NXT_PORT_A) > t_value)
 	{
 		t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
 		if(t_count >= t_count_limit)	//カウンタで尻尾を上げる速度を調整
@@ -443,8 +500,51 @@ void taildown(){
 	{
 		t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
 	}
-	*/
+	
+	
+	
+	switch(tail_mode){
+		case(RN_TAILDOWN):				//尻尾を下げる
+			if(ecrobot_get_motor_rev(NXT_PORT_A) < t_value)		//現在の角度が目標値以下かどうか
+			{
+				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= t_count_limit)	//カウンタで尻尾を下げる速度を調整
+				{
+					t_angle += t_up;			//角度を上げる
+					t_count = 0;
+				}
+			}
+			else// if(ecrobot_get_motor_rev(NXT_PORT_A) == t_value)
+			{
+//				t_angle = t_value;
+				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
+			}
+			
+			break;
 
+		case(RN_TAILUP):										//尻尾を上げる
+			if(ecrobot_get_motor_rev(NXT_PORT_A) > t_value)		//現在の角度が目標値以上かどうか
+			{
+				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
+				if(t_count >= t_count_limit)					//カウンタで尻尾を上げる速度を調整
+				{
+					t_angle -= t_up;							//角度を下げる
+					t_count = 0;
+				}
+			}
+			else
+			{
+//				t_angle = t_value;
+				t_hensa = t_value - ecrobot_get_motor_rev(NXT_PORT_A);
+			}
+			
+			break;
+
+		default:
+			break;
+			
+	}
+	*/
 
 	switch(tail_mode){
 		case(RN_TAILDOWN):				//尻尾を下げる
@@ -461,7 +561,7 @@ void taildown(){
 			{
 				t_angle = t_value;
 			}
-			
+
 			break;
 
 		case(RN_TAILUP):				//尻尾を上げる
@@ -478,14 +578,14 @@ void taildown(){
 			{
 				t_angle = t_value;
 			}
-			
+
 			break;
 
 		default:
 			break;
-			
+
 	}
-	
+
 	t_ihensa = t_ihensa+(t_hensa*0.0004);		//I制御用偏差
 
 	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);	//偏差を元に速度調節
@@ -583,20 +683,30 @@ void RN_setting()
 
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
-			tail_mode_change(0,ANGLEOFDOWN,1,2);
 			RN_calibrate();
 			break;
 
+		case (RN_SPEEDZERO):
+			cmd_forward = 0;
+			cmd_turn = RA_wheels(cmd_turn);
+			wait_count++;
+			if(wait_count >= 200)
+			{
+				setting_mode = RN_RUN;
+				wait_count = 0;
+			}
+			break;
+		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(30);
-
+			RA_linetrace_PID(20);
+			
 			wait_count++;
 
-			if(wait_count >= 200)					//スタート時に反応するのを防ぐ（テスト用）
+			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
 
-				if(getsonarflag(22) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -608,24 +718,23 @@ void RN_setting()
 
 			//ルックアップゲート走行準備状態
 		case (RN_LOOKUP):
-			RA_speed(0,3);
+			RA_linetrace_PID(0);
 			cmd_turn = RA_wheels(cmd_turn);
 
 			wait_count++;
 
-			if(cmd_forward <= 0 && wait_count == 400)
+			if(wait_count == 200)
 			{
-				tail_mode_change(0,ANGLEOFDOWN,0,1);
-				while(wait_count <= 800 || t_angle <= ANGLEOFDOWN)
+				tail_mode_change(0,ANGLEOFDOWN,1,1);
+				
+				while(wait_count <= 1200 || t_angle <= ANGLEOFDOWN)
 				{
-					RA_speed(-15,3);
+					RA_speed(-20,5);
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
-				gyro_offset -= 280;
 				setting_mode = RN_LOOKUPDOWN;
 				wait_count = 0;
-				cmd_forward = 0;
 				runner_mode_change(2);
 			}
 
@@ -638,14 +747,17 @@ void RN_setting()
 
 			wait_count++;
 
-			if(wait_count >= 800)
+			if(wait_count >= 200)
 			{
-				tailpower(10.0);
+				tailpower(15.0);
 				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
-				if(t_angle == ANGLEOFLOOKUP)
+				if(ecrobot_get_motor_rev(NXT_PORT_A) == ANGLEOFLOOKUP)
 					{
 						setting_mode = RN_LOOKUPMOVE;
 						wait_count = 0;
+						revL = nxt_motor_get_count(NXT_PORT_C);
+						revR = nxt_motor_get_count(NXT_PORT_B);
+						distance_before_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 					}
 			}
 
@@ -654,36 +766,60 @@ void RN_setting()
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
 
-			RA_linetrace_PID_balanceoff(30);
+			RA_linetrace(35,30);
 
-			wait_count++;
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			
-			if(wait_count == 430)
+			if(distance_after_gate - distance_before_gate > 35)
 			{	
-				tailpower(15.0);
+				//tailpower(20.0);
 				setting_mode = RN_LOOKUPUP;
-				wait_count = 0;
 			}
 			
 			break;
 
 			//ルックアップゲート走行、前進後倒立状態へ復帰
 		case (RN_LOOKUPUP):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-
+			if(wait_count < 200)
+			{
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
 			wait_count++;
 
 			if(wait_count == 200)
-				tail_mode_change(0,ANGLEOFDOWN,10,1);
-			
+			{
+				tail_mode_change(0,ANGLEOFDOWN,10,2);
+				
+				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
+				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
+			}
+
+			if(t_angle == ANGLEOFDOWN)
+			{
+				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
+				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
+			}
+
 			if(t_angle == ANGLEOFDOWN && wait_count >= 1200)
 			{
+				tailpower(1.85);			
+
+				tail_mode_change(1,ANGLEOFUP,0,10);
+
+				ecrobot_set_motor_rev(NXT_PORT_B,0);
+				ecrobot_set_motor_rev(NXT_PORT_C,0);
+				ecrobot_set_motor_speed(NXT_PORT_B,0);
+				ecrobot_set_motor_speed(NXT_PORT_C,0);
+
 				runner_mode_change(1);
-				tailpower(1.85);
-				tail_mode_change(1,ANGLEOFUP,1,2);
-				gyro_offset += 280;
-				setting_mode = RN_RUN;
+				RA_hensareset();
+				balance_init();
+				wait_count=0;
+				cmd_forward=0;
+				setting_mode = RN_SPEEDZERO;
 			}
 			
 			break;
@@ -696,6 +832,8 @@ void RN_setting()
 //キャリブレーション関数
 void RN_calibrate()
 {
+
+	tail_mode_change(0,ANGLEOFDOWN,1,2);
 
 	//黒値
 	while(1){
@@ -723,7 +861,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//尻尾をルックアップゲート時の角度に
-	tail_mode_change(1,ANGLEOFLOOKUP,0,2);
+	tail_mode_change(1,ANGLEOFLOOKUP,0,1);
 
 	//ルックアップゲート用黒値
 	while(1){
@@ -772,7 +910,7 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(982,512,30);
 			tail_mode_change(1,ANGLEOFUP,0,2);
-			setting_mode = RN_RUN;
+			setting_mode = RN_SPEEDZERO;
 			runner_mode = RN_MODE_BALANCE;
 			break;
 		}
@@ -785,8 +923,8 @@ void RN_calibrate()
 			{
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
-						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
+						setting_mode = RN_SPEEDZERO;
+						runner_mode_change(1);
 						tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
@@ -798,6 +936,29 @@ void RN_calibrate()
 
 }
 
+//自己位置同定関数
+void self_location()
+{
+	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * PI / 180.0;
+	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * PI / 180.0;
+
+	omega_l = (d_theta_l - d_theta_l_t)/0.004;
+	omega_r = (d_theta_r - d_theta_r_t)/0.004;
+
+	v_l = (WHEEL_R * 0.1) * omega_l;
+	v_r = (WHEEL_R * 0.1) * omega_r;
+
+	v = (v_r + v_l) / 2.0;
+	omega = (v_r - v_l) / (MACHINE_W * 0.1);
+
+	d_theta_l_t = d_theta_l;
+	d_theta_r_t = d_theta_r;
+
+	theta_R += omega * 0.004 + theta_R_zero;
+	x_r += v * cos(theta_R) * 0.004 + x_r_zero;
+	y_r += v * sin(theta_R) * 0.004 + y_r_zero;
+	
+}
 
 //走行体状態設定関数
 void RN_modesetting()
@@ -847,6 +1008,7 @@ TASK(ActionTask)
 {
 	RN_modesetting();	//走行体状態設定
 	taildown();			//尻尾制御
+	self_location();	//自己位置同定
 	TerminateTask();
 }
 
@@ -868,12 +1030,14 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,wait_count,t_value,		//Bluetoothを用いてデータ送信
-			LOOKUP_GRAY_VALUE,GRAY_VALUE);
+			x_r,y_r);
 
 	sonarcheck();															//超音波センサ状態管理
+	getsonarvalue();
 
 	TerminateTask();
 }
+
 
 
 /******************************** END OF FILE ********************************/
