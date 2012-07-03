@@ -2,8 +2,8 @@
 
 #include "Kaidan.h"
 #include "logSend.h"
-#include "tyreal.h"
-#include <math.h>
+//#include "tyreal.h"
+#include "math.h"
 
 
 /*
@@ -19,7 +19,7 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 125			//降下目標角度
+#define ANGLEOFDOWN 104			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
@@ -36,6 +36,13 @@ static int counter = 0;
 
 #define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
 
+#define POSITION_X0 0
+#define POSITION_Y0 0
+#define THETA_0 0
+
+#define WHEEL_R		41
+#define MACHINE_W	162
+
 //PID制御用偏差値
 static float hensa;					//P制御用
 static float i_hensa = 0;			//I制御用
@@ -46,7 +53,7 @@ static float bf_hensa = 0;
 //ライントレース時PID制御用係数
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;				//D制御用
+static float Kd = 0;				//D制御用
 
 
 static int wait_count = 0;
@@ -75,6 +82,25 @@ float distance_before_step = 0;
 float distance_step_brake = 0;
 float distance_step_stop = 0;
 
+
+/* 自己位置同定用　変数宣言 */
+float d_theta_r;					/* 現在の右モータ回転角度 [rad] */
+float d_theta_l;					/* 現在の左モータ回転角度 [rad] */
+static float d_theta_r_t;			/* 1 ステップ前の右モータ回転角度 [rad] */
+static float d_theta_l_t;			/* 1 ステップ前の左モータ回転角度 [rad] */
+float velocity_r;					/* 右車輪移動速度 [cm/s] */
+float velocity_l;					/* 左車輪移動速度 [cm/s] */
+float velocity;						/* ロボットの移動速度 [cm/s] */
+float omega;						/* ロボットの回転角角度 [rad/s] */
+static float position_x = POSITION_X0; /* ロボットの x 座標 */
+static float position_y = POSITION_Y0; /* ロボットの y 座標 */
+static float theta = THETA_0;		/* ロボットの姿勢角 */
+unsigned short int l_val;			/* 光センサ値 */
+int temp_x;							/* ロボットの x 座標（出力処理用） */
+int temp_y;							/* ロボットの y 座標（出力処理用） */
+static double omega_r;			//右車輪の回転角速度
+static double omega_l;			//左車輪の回転角速度
+unsigned char tx_buf[BT_MAX_TX_BUF_SIZE]; /* 送信バッファ */
 
 /*
  *	状態定義
@@ -139,6 +165,7 @@ int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
 void rupid_speed_up(int target_forward_speed);
+void self_location(void);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -153,7 +180,7 @@ DeclareTask(LogTask);
 */
 
 //液晶ディスプレイに表示するシステム名設定
-const char target_subsystem_name[] = "Logtrace";
+const char target_subsystem_name[] = "Kaidan";
 
 
 
@@ -435,7 +462,7 @@ static int remote_start(void)
 //走行設定関数
 void RN_setting()
 {
-	static float beforestop = 0;
+//	static float beforestop = 0;
 
 	switch (setting_mode){
 			//走行開始前
@@ -462,7 +489,7 @@ void RN_setting()
 				setting_mode = RN_STOP;
 			}
 			}
-			
+			/*
 			if ( tyreal_trigger() == 1) {
 				ecrobot_sound_tone(932, 512, VOL);
 				systick_wait_ms(100);
@@ -470,7 +497,7 @@ void RN_setting()
 				systick_wait_ms(10);
 				setting_mode = TYREAL;
 			}
-
+			*/
 
 			/*
 
@@ -564,10 +591,11 @@ void RN_setting()
 		case (RN_RUPID_SPEED_UP):
 			rupid_speed_up(80);
 			ecrobot_sound_tone(880,512,15);
+			/*
 		case(TYREAL):
 			do_tyreal();
 			break;
-
+			*/
 		default:
 			break;
 	}
@@ -804,6 +832,29 @@ void RN_modesetting()
 	}
 }
 
+void self_location()
+{
+	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * M_PI / 180.0;
+	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * M_PI / 180.0;
+
+	omega_l = (d_theta_l - d_theta_l_t)/0.004;
+	omega_r = (d_theta_r - d_theta_r_t)/0.004;
+
+	velocity_l = (WHEEL_R * 0.1) * omega_l;
+	velocity_r = (WHEEL_R * 0.1) * omega_r;
+
+	velocity = (velocity_r + velocity_l) / 2.0;
+	omega = (velocity_r - velocity_l) / (MACHINE_W * 0.1);
+
+	d_theta_l_t = d_theta_l;
+	d_theta_r_t = d_theta_r;
+
+	theta += omega * 0.004 + THETA_0;
+	position_x += velocity * cos(theta) * 0.004 + POSITION_X0;
+	position_y += velocity * sin(theta) * 0.004 + POSITION_Y0;
+	
+}
+
 /*
  *	各種タスク
  */
@@ -813,6 +864,7 @@ TASK(ActionTask)
 {
 	RN_modesetting();	//走行体状態
 	tailcontrol();			//尻尾コントロール
+//	self_location();	//自己位置同定
 	TerminateTask();
 }
 
@@ -834,7 +886,7 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),0/*min_vol*/,
-			0/*distance_before_step - distance_slow*/,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
+			velocity,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
 	TerminateTask();
 }
 

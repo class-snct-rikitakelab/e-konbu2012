@@ -26,18 +26,20 @@
 
 MEMORY
 {
-        rom : ORIGIN = 1M + 32K, LENGTH =256k - 32k
+ header_ram : ORIGIN = 2M-16, LENGTH = 16
          vector_ram : ORIGIN = 2M, LENGTH = 64
                 ram : ORIGIN = 2M + 64, LENGTH = 64K - 64
 }
 
- ROM_BASE = 1M + 32k;
- ROM_SIZE = 256k - 32k;
 RAM_BASE = 2M;
 RAM_SIZE = 64k;
 
 SECTIONS {
 
+ .header : {
+     KEEP(*nxt_binary_header.o (*.text *.text.*))
+     . = ALIGN(16);
+ } > header_ram
 
 /* Samba needs space reserved up to 8k */
 
@@ -49,13 +51,16 @@ SECTIONS {
     KEEP(vectors.o (*.text *.text.*))
     . = ALIGN(16);
 } > vector_ram
- AT> rom
 
 __vectors_ram_start__  = ADDR(.vectors);
 __vectors_ram_end__    = (ADDR(.vectors) + SIZEOF(.vectors));
 __vectors_load_start__ = LOADADDR(.vectors);
 __vectors_load_end__ = (LOADADDR(.vectors) + SIZEOF(.vectors));
 
+ .entry : {
+     KEEP(*nxt_entry_point.o (*.text *.text.*))
+     . = ALIGN(16);
+ } > ram
 
 /*
  * The initialisation code goes first, followed by the text.
@@ -65,7 +70,7 @@ __vectors_load_end__ = (LOADADDR(.vectors) + SIZEOF(.vectors));
     KEEP(*ecrobot_init.o (*.text *.text.*))
     . = ALIGN(16);
 } 
- > rom
+ > ram
 /*
  * data is initialised data. This has two addresses:
  * VMA: run-time address
@@ -92,7 +97,6 @@ __vectors_load_end__ = (LOADADDR(.vectors) + SIZEOF(.vectors));
     *.oram(*.rodata *.rodata.*)
     . = ALIGN(16);
 } > ram
- AT> rom
 
 __ramtext_ram_start__ = ADDR(.ram_text);
 __ramtext_ram_end__   = ADDR(.ram_text) + SIZEOF(.ram_text);
@@ -104,27 +108,26 @@ __ramtext_load_end__ = __ramtext_load_start__ + SIZEOF(.ram_text) ;
     . = ALIGN(16);
 }
 
- > rom
+ > ram
 
 .bmp_data : {
     *.obmp (*.data *.data.*)
     . = ALIGN(16);
 }
 
- > rom
+ > ram
 
 .spr_data : {
     *.ospr (*.data *.data.*)
     . = ALIGN(16);
 }
 
- > rom
+ > ram
 
 .data : {
     * (*.data *.data.*)
     . = ALIGN(16);
 } > ram 
- AT> rom
 
 /* LOADADDR is the same as the ADDR if it is a ram build */
 __data_ram_start__ = ADDR(.data);
@@ -151,7 +154,7 @@ __data_load_end__ = __data_load_start__ + SIZEOF(.data) ;
     . = ALIGN(16);
 }
 
- > rom
+ > ram
 
 .tors : {
     . = ALIGN(16);
@@ -165,10 +168,9 @@ __data_load_end__ = __data_load_start__ + SIZEOF(.data) ;
     . = ALIGN(16);
 }
 
- > rom
+ > ram
 
 /* ROM_ONLY __rom_end__ = ADDR(.text) + SIZEOF(.text) ; */
- __rom_end__ = __dtor_end ;
 
 /* bss is zero initialised data */
 .bss : {
