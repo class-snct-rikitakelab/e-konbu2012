@@ -699,8 +699,8 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(20);
-			
+			RA_linetrace_PID(25);
+			/*
 			wait_count++;
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
@@ -713,7 +713,7 @@ void RN_setting()
 					wait_count = 0;
 				}
 			}
-			
+			*/
 			break;
 
 			//ルックアップゲート走行準備状態

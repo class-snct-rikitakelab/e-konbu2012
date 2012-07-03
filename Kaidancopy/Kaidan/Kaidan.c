@@ -23,7 +23,7 @@ static int counter = 0;
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
-#define SPEED_COUNT 20
+#define SPEED_COUNT 50
 
 //バッテリ降下値
 #define DOWN_BATTERY 450			//バッテリ降下値
@@ -51,9 +51,10 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
+
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0;				//D制御用
+static float Kd = 0.003;				//D制御用
 
 
 static int wait_count = 0;
@@ -284,13 +285,12 @@ void RA_linetrace_PID(int forward_speed) {
 	d_hensa = (hensa - bf_hensa)/0.0005;
 	bf_hensa = hensa;
 
-	cmd_turn = (Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
 		cmd_turn = 100;
 	}
-
 
 	/*倒立制御OFF時*/
 	//nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
@@ -314,8 +314,7 @@ void RA_speed(int limit,int s_Kp){
 
 	counter ++;
 
-
-	if(counter == SPEED_COUNT)
+	if(counter >= SPEED_COUNT)
 	{
 
 		forward_speed = cmd_forward;
@@ -335,6 +334,8 @@ void RA_speed(int limit,int s_Kp){
 
 		cmd_forward = forward_speed;
 		counter =0;
+
+
 	}
 }
 
@@ -472,8 +473,38 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+			RA_linetrace_PID(25);
+			wait_count = 0;
+			if(remote_start()==1)
+			{
+				gyro_offset += 17;				
+				/*while(1)
+				{
+					RA_linetrace_PID(25);
+					wait_count++;
+					if(wait_count == 400){
+						gyro_offset -= 100;
+						tail_mode = RN_TAILDOWN;
+					}
+					if(wait_count > 500)
+					{
+						setting_mode = RN_STOP;
+						tail_mode = RN_TAILDOWN;
+						runner_mode = RN_MODE_BALANCEOFF;
+						break;
+					}
+				}
+				*/
+			}
 
-			RA_linetrace_PID(25);			
+
+
+			/*
+			if(cmd_forward < 50)
+				RA_speed(50,1);
+			cmd_turn = RA_wheels(cmd_turn);
+			*/
+			/*
 			if(1==RN_rupid_speed_up_signal_recevie()){
 			ecrobot_sound_tone(880, 512, 30);
 			systick_wait_ms(500);
@@ -489,6 +520,7 @@ void RN_setting()
 				setting_mode = RN_STOP;
 			}
 			}
+			*/
 			/*
 			if ( tyreal_trigger() == 1) {
 				ecrobot_sound_tone(932, 512, VOL);
@@ -567,26 +599,28 @@ void RN_setting()
 
 			//強制停止
 		case(RN_STOP):
-		
+		/*
 			tailcontrol();
 			 tail_mode = RN_TAILDOWN;
-			 
-			/*
+			*/ 
+			
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			*/
+			/*
 			RA_linetrace_PID(3);
 			cmd_turn = RA_wheels(cmd_turn);
-
+			*/
 			/*
 			cmd_turn=0;
 			cmd_forward=0;
 			*/
+			/*
 			if(1==RN_rupid_speed_up_signal_recevie()){
 			ecrobot_sound_tone(880, 512, 30);
 			systick_wait_ms(500);
 			setting_mode = RN_RUPID_SPEED_UP;
 			}
+			*/
 			break;
 		case (RN_RUPID_SPEED_UP):
 			rupid_speed_up(80);
@@ -863,8 +897,8 @@ void self_location()
 TASK(ActionTask)
 {
 	RN_modesetting();	//走行体状態
-	tailcontrol();			//尻尾コントロール
-//	self_location();	//自己位置同定
+	tailcontrol();		//尻尾コントロール
+	self_location();	//自己位置同定
 	TerminateTask();
 }
 
@@ -885,7 +919,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),0/*min_vol*/,
+	logSend(cmd_forward,cmd_turn,position_x,position_y/*min_vol*/,
 			velocity,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
 	TerminateTask();
 }
