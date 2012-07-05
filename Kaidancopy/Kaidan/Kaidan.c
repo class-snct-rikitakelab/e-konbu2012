@@ -26,7 +26,8 @@ static int counter = 0;
 #define SPEED_COUNT 50
 
 //バッテリ降下値
-#define DOWN_BATTERY 450			//バッテリ降下値
+#define STEP_BATTERY 300
+#define STOP_BATTERY 400
 
 //ジャイロ振幅値
 #define PM_GYRO 65
@@ -35,6 +36,7 @@ static int counter = 0;
 #define CIRCUMFERENCE 25.8			//車輪の円周
 
 #define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
+#define RUPID_SPEED_UP_SIGNAL '3'
 
 #define POSITION_X0 0
 #define POSITION_Y0 0
@@ -60,7 +62,7 @@ static float Kd = 0.003;				//D制御用
 static int wait_count = 0;
 
 static double min_vol;
-static int stepflag=0;
+static int stepflag = 0;
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
@@ -82,6 +84,8 @@ int revR = 0;
 float distance_before_step = 0;
 float distance_step_brake = 0;
 float distance_step_stop = 0;
+float distance_gyro_up = 0;
+float distance_over_forty = 0;
 
 
 /* 自己位置同定用　変数宣言 */
@@ -102,6 +106,14 @@ int temp_y;							/* ロボットの y 座標（出力処理用） */
 static double omega_r;			//右車輪の回転角速度
 static double omega_l;			//左車輪の回転角速度
 unsigned char tx_buf[BT_MAX_TX_BUF_SIZE]; /* 送信バッファ */
+
+//バッテリ平均計算
+int battery_average;
+static int now_battery = 0;
+static int bt_counter = 0;
+static int before_battery =0;
+static int average_flag;
+
 
 /*
  *	状態定義
@@ -144,7 +156,6 @@ RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
 //段差検知関連マクロ、プロトタイプ
-#define RUPID_SPEED_UP_SIGNAL 3
 static int RN_rupid_speed_up_signal_recevie(void);
 
 /*	
@@ -158,7 +169,7 @@ int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
 
-int shock();
+int shock(int target);
 void tailcontrol();
 void RA_linetrace_P(int forward_speed);
 void RA_speed(int limit,int s_Kp);
@@ -167,6 +178,7 @@ void RN_modesetting();
 static int remote_start(void);
 void rupid_speed_up(int target_forward_speed);
 void self_location(void);
+void battery_average_check(void);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -352,32 +364,22 @@ int RA_wheels(int turn){
 
 
 //衝撃検知関数
-int shock(void){
+int shock(int target){
+
 	int result=0;
+
 	//電圧降下の最小値を更新
 	if(min_vol>ecrobot_get_battery_voltage())
 		min_vol=ecrobot_get_battery_voltage();
 
 	//ジャイロ及び電圧降下から衝撃検知
-	if((ecrobot_get_gyro_sensor(NXT_PORT_S1) <= gyro_offset-PM_GYRO ||ecrobot_get_gyro_sensor(NXT_PORT_S1) >= gyro_offset+PM_GYRO) 
-		&& min_vol <= battery_value-DOWN_BATTERY)
+	if(target <= battery_value-min_vol)
 	{
-		ecrobot_sound_tone(880,512,30);
-
-		revL = nxt_motor_get_count(NXT_PORT_C);
-		revR = nxt_motor_get_count(NXT_PORT_B);
-
-		distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
-
-
-	//	setting_mode = RN_SLOW_RUN; 
-		
-		stepflag = 1;
 		result = 1;
-		//setting_mode = RN_STEP_BRAKE;		//階段へ向かいブレーキをかける
-
-		min_vol = battery_value;			//最小値リセット
 	}
+	else
+		result = 0;
+
 	return result;
 }
 
@@ -390,7 +392,7 @@ int online(void) {
 
 	if (GRAY_VALUE > light_value) {
 		if ((GRAY_VALUE) > light_value) {
-			return FALSE;
+			return FALSE; 
 		}
 		else {
 			return TRUE;
@@ -432,33 +434,28 @@ void tailcontrol(){
 
 }
 
-//リモートスタート関数
-static int remote_start(void)
+void battery_average_check(void)
 {
-	int i;
-	unsigned int rx_len;
-	unsigned char start = 0;
-
-	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	if(bt_counter == 40)
 	{
-		rx_buf[i] = 0; /* 受信バッファをクリア */
-	}
+		battery_average = now_battery/40;
 
-	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
-	if (rx_len > 0)
+		if(battery_average > before_battery)
+			average_flag = 1;
+		else
+			average_flag = 0;
+
+		before_battery = battery_average;
+		
+		now_battery = 0;
+		bt_counter = 0;
+	}
+	else
 	{
-		/* 受信データあり */
-		if (rx_buf[0] == CMD_START)
-		{
-			start = 1; /* 走行開始 */
-		}
-		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+		now_battery += ecrobot_get_gyro_sensor(NXT_PORT_S1);
+		bt_counter++;
 	}
-
-	return start;
 }
-
-
 
 //走行設定関数
 void RN_setting()
@@ -473,31 +470,42 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+			wait_count++;
 			RA_linetrace_PID(25);
-			wait_count = 0;
-			if(remote_start()==1)
+
+			if(RN_rupid_speed_up_signal_recevie() == 1)
 			{
-				gyro_offset += 17;				
-				/*while(1)
-				{
-					RA_linetrace_PID(25);
-					wait_count++;
-					if(wait_count == 400){
-						gyro_offset -= 100;
-						tail_mode = RN_TAILDOWN;
-					}
-					if(wait_count > 500)
-					{
-						setting_mode = RN_STOP;
-						tail_mode = RN_TAILDOWN;
-						runner_mode = RN_MODE_BALANCEOFF;
-						break;
-					}
-				}
+				gyro_offset += 17;
+				/*
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_gyro_up = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//現在の走行距離を計測
 				*/
 			}
 
-
+			if(wait_count > 1000 && stepflag == 0)
+			{
+				if(shock(STEP_BATTERY) == 1)
+				{
+					stepflag = 1;
+					min_vol = battery_value;
+					gyro_offset -= 34;
+					wait_count = 0;
+				}
+			}
+			
+			if(stepflag == 1)
+			{
+				
+				if(wait_count > 60)
+				{
+					tail_mode = RN_TAILDOWN;
+					setting_mode = RN_STOP;
+					runner_mode = RN_MODE_BALANCEOFF;
+				}
+				
+				//RA_linetrace_PID(-20);
+			}
 
 			/*
 			if(cmd_forward < 50)
@@ -729,6 +737,7 @@ static int RN_rupid_speed_up_signal_recevie(void)
 	}
 
 	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	
 	if (rx_len > 0)
 	{
 		/* 受信データあり */
@@ -739,15 +748,39 @@ static int RN_rupid_speed_up_signal_recevie(void)
 		
 		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
 	}
-	else if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-	{
-		
-			start = 1; 
 
+	else if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		start = 1; 
+
+	return start;
+}
+
+//リモートスタート関数
+static int remote_start(void)
+{
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
+
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
+	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == CMD_START)
+		{
+			start = 1; /* 走行開始 */
+		}
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
 	}
 
 	return start;
 }
+
 
 
 //キャリブレーション関数
@@ -906,6 +939,7 @@ TASK(ActionTask)
 TASK(ActionTask2)
 {
 	RN_setting();		//走行状態
+	battery_average_check();
 	TerminateTask();
 }
 
@@ -919,8 +953,8 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,position_x,position_y/*min_vol*/,
-			velocity,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
+	logSend(shock(STEP_BATTERY),shock(STOP_BATTERY),average_flag,ecrobot_get_battery_voltage(),
+			velocity,battery_average);		//ログ取り
 	TerminateTask();
 }
 
