@@ -362,7 +362,6 @@ int RA_wheels(int turn){
 	return turn;
 }
 
-
 //衝撃検知関数
 int shock(int target){
 
@@ -382,7 +381,6 @@ int shock(int target){
 
 	return result;
 }
-
 
 //ON-OFF制御用ライン判定関数
 int online(void) {
@@ -434,6 +432,7 @@ void tailcontrol(){
 
 }
 
+//電圧値チェック関数（使わない）
 void battery_average_check(void)
 {
 	if(bt_counter == 40)
@@ -471,16 +470,12 @@ void RN_setting()
 			//通常走行
 		case (RN_RUN):
 			wait_count++;
+			if(stepflag ==0)
 			RA_linetrace_PID(25);
 
 			if(RN_rupid_speed_up_signal_recevie() == 1)
 			{
 				gyro_offset += 17;
-				/*
-				revL = nxt_motor_get_count(NXT_PORT_C);
-				revR = nxt_motor_get_count(NXT_PORT_B);
-				distance_gyro_up = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//現在の走行距離を計測
-				*/
 			}
 
 			if(wait_count > 1000 && stepflag == 0)
@@ -495,16 +490,22 @@ void RN_setting()
 			}
 			
 			if(stepflag == 1)
-			{
-				
-				if(wait_count > 60)
+			{	
+				if(wait_count >= 80)
 				{
+					/*
 					tail_mode = RN_TAILDOWN;
 					setting_mode = RN_STOP;
 					runner_mode = RN_MODE_BALANCEOFF;
+					*/
+					if(wait_count == 80)
+						gyro_offset += 17;
+					RA_linetrace_PID(0);
+					cmd_turn = RA_wheels(cmd_turn);
+					
 				}
 				
-				//RA_linetrace_PID(-20);
+				// RA_speed(-50,30);
 			}
 
 			/*
@@ -653,8 +654,6 @@ void rupid_speed_up(int target_forward_speed){
 
 	if(rupid_speed_up_counter<2){
 	gyro_offset = gyro_offset + gyro_offset_operation;
-	//	cmd_forward++;
-		//gyro_offset = gyro_offset - 0.5;
 	}
 	else if(rupid_speed_up_counter==100){
 	//rupid_speed_up_counter=0;
