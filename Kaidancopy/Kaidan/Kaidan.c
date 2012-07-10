@@ -476,7 +476,7 @@ void RN_setting()
 		case (RN_STEP_RAPID):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(17) == 1)
-			gyro_offset += 17;
+			gyro_offset += 18;
 			wait_count = 0;
 			setting_mode = RN_STEP_SHOCK;
 			break;
@@ -520,7 +520,7 @@ void RN_setting()
 			if(wait_count >= 85)
 			{
 				if(wait_count == 85)
-					gyro_offset += 18;
+					gyro_offset += 17;
 				RA_linetrace_PID(0);
 				cmd_turn = RA_wheels(cmd_turn);
 			}
