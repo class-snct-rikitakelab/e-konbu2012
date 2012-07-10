@@ -28,7 +28,7 @@ static int counter = 0;
 #define SPEED_COUNT 50
 
 //バッテリ降下値
-#define STEP_BATTERY 300
+#define STEP_BATTERY 400
 #define STOP_BATTERY 400
 
 //ジャイロ振幅値
@@ -137,7 +137,8 @@ typedef enum{
 	RN_STEP_RAPID,
 	RN_STEP_SHOCK,
 	RN_STEP_SLOW,
-	RN_STEP_STAY
+	RN_STEP_STAY,
+	RN_STEP_SECOND
 } RN_SETTINGMODE;
 
 
@@ -458,9 +459,16 @@ void RN_setting()
 			//通常走行
 		case (RN_RUN):
 			RA_linetrace_PID(25);
+			//cmd_turn = RA_wheels(cmd_turn);
 
 			if(RN_rapid_speed_up_signal_recevie() == 1)
+			{
 				setting_mode = RN_STEP_RAPID;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+
+				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
+			}
 
 			break;
 
@@ -468,26 +476,39 @@ void RN_setting()
 		case (RN_STEP_RAPID):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(17) == 1)
-			gyro_offset += 25;
-				setting_mode = RN_STEP_SHOCK;
+			gyro_offset += 17;
+			wait_count = 0;
+			setting_mode = RN_STEP_SHOCK;
 			break;
 
 			//段差検知
 		case (RN_STEP_SHOCK):
 			RA_linetrace_PID(25);
-			if(shock(STEP_BATTERY) == 1)
+			wait_count++;
+
+			if(wait_count > 100)
 			{
-				min_vol = battery_value;
-				setting_mode = RN_STEP_SLOW;
+				if(shock(STEP_BATTERY) == 1)
+				{
+					min_vol = battery_value;
+					setting_mode = RN_STEP_SLOW;
+				}
 			}
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+
+			distance_gyro_up = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
+
 			break;
 
 			//減速
 		case (RN_STEP_SLOW):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(-34) == 1)
-			gyro_offset -= 40;
-				setting_mode = RN_STEP_STAY;
+			gyro_offset -= 36;
+			ecrobot_sound_tone(880, 512, 30);
+			setting_mode = RN_STEP_STAY;
 			wait_count = 0;
 			break;
 
@@ -496,15 +517,32 @@ void RN_setting()
 			RA_linetrace_PID(25);
 			wait_count++;
 
-			if(wait_count >= 80)
+			if(wait_count >= 85)
 			{
-				if(wait_count == 80)
-				//rapid_speed_up(17);
-				gyro_offset += 25;
+				if(wait_count == 85)
+					gyro_offset += 18;
 				RA_linetrace_PID(0);
 				cmd_turn = RA_wheels(cmd_turn);
 			}
+
+			if(wait_count >= 600)
+			{
+				wait_count = 0;
+				setting_mode = RN_STEP_SECOND;
+			}
+
 			break;
+
+		case (RN_STEP_SECOND):
+			RA_linetrace_PID(25);
+			cmd_turn = RA_wheels(cmd_turn);
+			if(RN_rapid_speed_up_signal_recevie() == 1)
+			{
+//				gyro_offset += 2;
+				setting_mode = RN_STEP_RAPID;
+			}
+			break;
+
 
 			//強制停止
 		case(RN_STOP):
@@ -766,7 +804,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(velocity,shock(STEP_BATTERY),average_flag,stepflag,
+	logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
 			position_x,position_y);		//ログ取り
 	TerminateTask();
 }
