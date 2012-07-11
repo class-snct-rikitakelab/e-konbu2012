@@ -518,7 +518,7 @@ void RN_setting()
 			wait_count++;
 
 			if(wait_count == 85)
-				gyro_offset += 17;
+				gyro_offset += 16;
 			
 			if(wait_count >= 300)
 			{
