@@ -506,7 +506,7 @@ void RN_setting()
 		case (RN_STEP_SLOW):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(-34) == 1)
-			gyro_offset -= 36;
+			gyro_offset -= 34;
 			ecrobot_sound_tone(880, 512, 30);
 			setting_mode = RN_STEP_STAY;
 			wait_count = 0;
@@ -514,16 +514,24 @@ void RN_setting()
 
 			//—¯‚Ü‚é
 		case (RN_STEP_STAY):
-			RA_linetrace_PID(25);
+			RA_linetrace_PID(0);
+			cmd_turn = RA_wheels(cmd_turn);
 			wait_count++;
 
-			if(wait_count == 85)
-				gyro_offset += 17;
-			
-			if(wait_count >= 300)
+			if(wait_count >= 45)
 			{
-				setting_mode = RN_STEP_SECOND;
-				wait_count = 0;
+				if(wait_count == 45)
+					gyro_offset += 15;
+				RA_linetrace_PID(0);
+				cmd_turn = RA_wheels(cmd_turn);
+			}
+			
+			if(wait_count >= 500)
+			{
+				setting_mode = RN_STOP;
+				runner_mode = RN_MODE_BALANCEOFF;
+				tail_mode = RN_TAILDOWN;
+				//setting_mode = RN_STEP_SECOND;
 			}
 			
 			break;
@@ -531,9 +539,10 @@ void RN_setting()
 			//“ñ’i–Ú
 		case (RN_STEP_SECOND):
 			RA_linetrace_PID(25);
-
+			cmd_turn = RA_wheels(cmd_turn);
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
+//				gyro_offset += 2;
 				setting_mode = RN_STEP_RAPID;
 			}
 			break;
