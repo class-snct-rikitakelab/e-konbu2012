@@ -449,6 +449,8 @@ void battery_average_check(void)
 //走行設定関数
 void RN_setting()
 {
+	static int step_count = 0;
+
 	switch (setting_mode){
 
 			//走行開始前
@@ -476,7 +478,7 @@ void RN_setting()
 		case (RN_STEP_RAPID):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(17) == 1)
-			gyro_offset += 18;
+			gyro_offset += 17;
 			wait_count = 0;
 			setting_mode = RN_STEP_SHOCK;
 			break;
@@ -506,7 +508,7 @@ void RN_setting()
 		case (RN_STEP_SLOW):
 			RA_linetrace_PID(25);
 			//if(rapid_speed_up(-34) == 1)
-			gyro_offset -= 36;
+			gyro_offset -= 34;
 			ecrobot_sound_tone(880, 512, 30);
 			setting_mode = RN_STEP_STAY;
 			wait_count = 0;
@@ -523,6 +525,7 @@ void RN_setting()
 			if(wait_count >= 300)
 			{
 				setting_mode = RN_STEP_SECOND;
+
 				wait_count = 0;
 			}
 			
@@ -530,10 +533,18 @@ void RN_setting()
 
 			//二段目
 		case (RN_STEP_SECOND):
-			RA_linetrace_PID(25);
+			if(step_count == 0)
+				RA_linetrace_PID(25);
+
+			else if(step_count == 1)
+			{
+				RA_linetrace_PID(0);
+				cmd_turn = RA_wheels(cmd_turn);
+			}
 
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
+				step_count = 1;
 				setting_mode = RN_STEP_RAPID;
 			}
 			break;
