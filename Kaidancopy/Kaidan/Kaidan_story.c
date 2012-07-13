@@ -21,7 +21,7 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 104			//降下目標角度
+#define ANGLEOFDOWN 106			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
@@ -72,7 +72,12 @@ static U32	gyro_offset = 0;    /* gyro sensor offset value */
 //バッテリ電圧値状態
 static U32	battery_value;
 
+
 char rx_buf[BT_MAX_RX_BUF_SIZE];
+
+
+#define BT_RCV_BUF_SIZE (32) /* it must be 32bytes with NXT GamePad */
+static U8 bt_receive_buf[BT_RCV_BUF_SIZE]; /* Bluetooth receive buffer(32bytes) */
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -449,27 +454,26 @@ void battery_average_check(void)
 //走行設定関数
 void RN_setting()
 {
+	int i;
 	switch (setting_mode){
 
 			//走行開始前
 		case (RN_SETTINGMODE_START):
+			for(i=0;i<BT_RCV_BUF_SIZE;i++)
+				bt_receive_buf[i] = 0;
 			RN_calibrate();				//キャリブレーション
+			
 			break;
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(25);
-			//cmd_turn = RA_wheels(cmd_turn);
+			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
+			cmd_forward = -(S8)bt_receive_buf[0]; /* reverse the direction */
+			cmd_turn = (S8)bt_receive_buf[1];
 
-			if(RN_rapid_speed_up_signal_recevie() == 1)
-			{
-				setting_mode = RN_STEP_RAPID;
-				revL = nxt_motor_get_count(NXT_PORT_C);
-				revR = nxt_motor_get_count(NXT_PORT_B);
-
-				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
-			}
-
+			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
+			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
+			
 			break;
 
 			//加速
@@ -505,11 +509,13 @@ void RN_setting()
 			//減速
 		case (RN_STEP_SLOW):
 			RA_linetrace_PID(25);
+			/*
 			//if(rapid_speed_up(-34) == 1)
 			gyro_offset -= 34;
 			ecrobot_sound_tone(880, 512, 30);
 			setting_mode = RN_STEP_STAY;
 			wait_count = 0;
+			*/
 			break;
 
 			//留まる
@@ -644,7 +650,10 @@ static int remote_start(void)
 //キャリブレーション関数
 void RN_calibrate()
 {
-
+	setting_mode = RN_RUN;
+	runner_mode = RN_MODE_BALANCEOFF;
+	tail_mode = RN_TAILDOWN;
+	/*
 	//黒値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
@@ -714,6 +723,7 @@ void RN_calibrate()
 			break;
 		}
 	}
+	*/
 
 }
 
@@ -807,8 +817,8 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
-			position_x,position_y);		//ログ取り
+	//logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
+	//		position_x,position_y);		//ログ取り
 	TerminateTask();
 }
 
