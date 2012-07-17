@@ -1,6 +1,6 @@
 /*
  *  kernel_cfg.c
- *  Fri Jul 13 10:48:55 2012
+ *  Tue Jul 17 05:53:53 2012
  *  SG Version 2.00
  *  sg.exe ./prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */
@@ -14,11 +14,11 @@
 #define __STK_UNIT VP
 #define __TCOUNT_STK_UNIT(sz) (((sz) + sizeof(__STK_UNIT) - 1) / sizeof(__STK_UNIT))
 
-#define TNUM_ALARM     4
+#define TNUM_ALARM     3
 #define TNUM_COUNTER   1
 #define TNUM_ISR2      0
 #define TNUM_RESOURCE  1
-#define TNUM_TASK      4
+#define TNUM_TASK      3
 #define TNUM_EXTTASK   0
 
 const UINT8 tnum_alarm    = TNUM_ALARM;
@@ -35,25 +35,22 @@ const UINT8 tnum_exttask  = TNUM_EXTTASK;
 const TaskType ActionTask = 0;
 const TaskType ActionTask2 = 1;
 const TaskType DisplayTask = 2;
-const TaskType LogTask = 3;
 
 extern void TASKNAME( ActionTask )( void );
 extern void TASKNAME( ActionTask2 )( void );
 extern void TASKNAME( DisplayTask )( void );
-extern void TASKNAME( LogTask )( void );
 
 static __STK_UNIT _stack_ActionTask[__TCOUNT_STK_UNIT(512)];
 static __STK_UNIT _stack_ActionTask2[__TCOUNT_STK_UNIT(512)];
 static __STK_UNIT _stack_DisplayTask[__TCOUNT_STK_UNIT(512)];
-static __STK_UNIT _stack_LogTask[__TCOUNT_STK_UNIT(512)];
 
-const Priority tinib_inipri[TNUM_TASK] = { TPRI_MINTASK + 4, TPRI_MINTASK + 3, TPRI_MINTASK + 1, TPRI_MINTASK + 2, };
-const Priority tinib_exepri[TNUM_TASK] = { TPRI_MINTASK + 4, TPRI_MINTASK + 3, TPRI_MINTASK + 1, TPRI_MINTASK + 2, };
-const UINT8 tinib_maxact[TNUM_TASK] = { (1) - 1, (1) - 1, (1) - 1, (2) - 1, };
-const AppModeType tinib_autoact[TNUM_TASK] = { 0x00000000, 0x00000000, 0x00000000, 0x00000000, };
-const FP tinib_task[TNUM_TASK] = { TASKNAME( ActionTask ), TASKNAME( ActionTask2 ), TASKNAME( DisplayTask ), TASKNAME( LogTask ), };
-const __STK_UNIT tinib_stk[TNUM_TASK] = { (__STK_UNIT)_stack_ActionTask, (__STK_UNIT)_stack_ActionTask2, (__STK_UNIT)_stack_DisplayTask, (__STK_UNIT)_stack_LogTask, };
-const UINT16 tinib_stksz[TNUM_TASK] = { 512, 512, 512, 512, };
+const Priority tinib_inipri[TNUM_TASK] = { TPRI_MINTASK + 4, TPRI_MINTASK + 3, TPRI_MINTASK + 1, };
+const Priority tinib_exepri[TNUM_TASK] = { TPRI_MINTASK + 4, TPRI_MINTASK + 3, TPRI_MINTASK + 1, };
+const UINT8 tinib_maxact[TNUM_TASK] = { (1) - 1, (1) - 1, (1) - 1, };
+const AppModeType tinib_autoact[TNUM_TASK] = { 0x00000000, 0x00000000, 0x00000000, };
+const FP tinib_task[TNUM_TASK] = { TASKNAME( ActionTask ), TASKNAME( ActionTask2 ), TASKNAME( DisplayTask ), };
+const __STK_UNIT tinib_stk[TNUM_TASK] = { (__STK_UNIT)_stack_ActionTask, (__STK_UNIT)_stack_ActionTask2, (__STK_UNIT)_stack_DisplayTask, };
+const UINT16 tinib_stksz[TNUM_TASK] = { 512, 512, 512, };
 
 TaskType tcb_next[TNUM_TASK];
 UINT8 tcb_tstat[TNUM_TASK];
@@ -81,7 +78,6 @@ TickType cntcb_curval[TNUM_COUNTER];
 const AlarmType cyclic_alarm1 = 0;
 const AlarmType cyclic_alarm2 = 1;
 const AlarmType cyclic_alarm3 = 2;
-const AlarmType cyclic_alarm4 = 3;
 
 DeclareTask(ActionTask);
 static void _activate_alarm_cyclic_alarm1( void );
@@ -98,16 +94,11 @@ static void _activate_alarm_cyclic_alarm3( void );
 static void _activate_alarm_cyclic_alarm3( void )
 { (void)ActivateTask( DisplayTask ); }
 
-DeclareTask(LogTask);
-static void _activate_alarm_cyclic_alarm4( void );
-static void _activate_alarm_cyclic_alarm4( void )
-{ (void)ActivateTask( LogTask ); }
-
-const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, 0, };
-const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, _activate_alarm_cyclic_alarm4, };
-const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, 0x00000001, };
-const TickType alminib_almval[TNUM_ALARM] = { 1, 1, 1, 1, };
-const TickType alminib_cycle[TNUM_ALARM] = { 4, 5, 20, 50, };
+const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, };
+const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, };
+const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, };
+const TickType alminib_almval[TNUM_ALARM] = { 1, 1, 1, };
+const TickType alminib_cycle[TNUM_ALARM] = { 4, 5, 20, };
 
 AlarmType almcb_next[TNUM_ALARM];
 AlarmType almcb_prev[TNUM_ALARM];

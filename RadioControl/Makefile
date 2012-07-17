@@ -1,5 +1,5 @@
 # Target specific macros
-TARGET = lookupgate
+TARGET = RadioControl
 
 NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
 
@@ -13,7 +13,7 @@ USER_LIB = nxtway_gs_balancer
 # User application source
 TARGET_SOURCES := \
 	balancer_param.c \
-	lookupgate.c 
+	RadioControl.c 
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

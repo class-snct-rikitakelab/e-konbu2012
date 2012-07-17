@@ -52,15 +52,6 @@ CPU ATMEL_AT91SAM7S256
 		RESOURCE = lcd;
 	};
 
- 	 TASK LogTask
-  	{
-    		AUTOSTART = FALSE;
-    		PRIORITY = 2; 
-    		ACTIVATION = 2;
-    		SCHEDULE = FULL;
-    		STACKSIZE = 512; /* Stack size */ 
-  	};
-
 	ALARM cyclic_alarm1
 	{
 		COUNTER = SysTimerCnt;
@@ -106,21 +97,6 @@ CPU ATMEL_AT91SAM7S256
 			APPMODE = appmode1;
 		};
 	};
-
-	 ALARM cyclic_alarm4
-  	{
-    		COUNTER = SysTimerCnt;
-   	 	ACTION = ACTIVATETASK
-    		{
-        		TASK = LogTask;
-    		};
-    		AUTOSTART = TRUE
-    		{
-        		ALARMTIME = 1;
-        		CYCLETIME = 50; /* Task1 is executed every 50msec */
-        		APPMODE = appmode1;
-    		};
-  	};
 
 	COUNTER SysTimerCnt
 	{
