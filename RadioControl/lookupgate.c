@@ -67,7 +67,7 @@ static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;			//D制御用
 
 //尻尾PI制御用係数
-static float t_Kp = 1.85;			//P制御用
+static float t_Kp = 3.85;			//P制御用
 static float t_Ki = 0;				//I制御用
 
 //尻尾制御用変数
@@ -708,10 +708,10 @@ void RN_setting()
 			
 			cmd_forward = -(S8)bt_receive_buf[0];
 			cmd_turn = (S8)bt_receive_buf[1];
-			/*
+			
 			nxt_motor_set_speed(NXT_PORT_C, cmd_forward/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, cmd_turn/2, 1);
-
+			/*
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
 				ecrobot_sound_tone(980,512,30);
@@ -846,9 +846,10 @@ void RN_calibrate()
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(982,512,10);
-//			tail_mode_change(0,ANGLEOFDOWN,1,2);
+			tail_mode_change(0,ANGLEOFDOWN,1,2);
 			setting_mode = RN_RUN;
-			runner_mode = RN_MODE_BALANCE;
+			runner_mode = RN_MODE_BALANCEOFF;
+//			runner_mode = RN_MODE_BALANCE;
 //			systick_wait_ms(500);
 			break;
 		}
