@@ -237,6 +237,7 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	balance_init();
 }
 
 
@@ -707,7 +708,7 @@ void RN_setting()
 			
 			cmd_forward = -(S8)bt_receive_buf[0];
 			cmd_turn = (S8)bt_receive_buf[1];
-
+			/*
 			nxt_motor_set_speed(NXT_PORT_C, cmd_forward/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, cmd_turn/2, 1);
 
@@ -719,7 +720,7 @@ void RN_setting()
 				wait_count = 0;
 				setting_mode = RN_LOOKUP;
 			}
-
+			*/
 			break;
 
 			//ルックアップゲート走行準備状態
@@ -834,10 +835,21 @@ void RN_calibrate()
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			tail_mode_change(0,ANGLEOFDOWN,1,2);
-			setting_mode = RN_RUN;
-			runner_mode = RN_MODE_BALANCEOFF;
+			ecrobot_sound_tone(932, 512, 10);
+			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
 			systick_wait_ms(500);
+			break;
+		}
+	}
+
+	while(1){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		{
+			ecrobot_sound_tone(982,512,10);
+//			tail_mode_change(0,ANGLEOFDOWN,1,2);
+			setting_mode = RN_RUN;
+			runner_mode = RN_MODE_BALANCE;
+//			systick_wait_ms(500);
 			break;
 		}
 	}
