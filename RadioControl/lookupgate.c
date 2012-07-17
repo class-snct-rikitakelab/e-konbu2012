@@ -705,7 +705,6 @@ void RN_setting()
 		case (RN_RUN):
 			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
 			
-			
 			cmd_forward = -(S8)bt_receive_buf[0];
 			cmd_turn = (S8)bt_receive_buf[1];
 
@@ -714,78 +713,28 @@ void RN_setting()
 
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
-				ecrobot_sound_tone(980,512,100);
+				ecrobot_sound_tone(980,512,30);
 				nxt_motor_set_speed(NXT_PORT_C,100,1);
 				nxt_motor_set_speed(NXT_PORT_B,-100,1);
 				wait_count = 0;
 				setting_mode = RN_LOOKUP;
 			}
 
-
-			/*
-			cmd_forward = -(S8)bt_receive_buf[0];
-			cmd_turn = (S8)bt_receive_buf[1];
-
-			if(cmd_forward < -50)
-			{
-				nxt_motor_set_speed(NXT_PORT_C, 50, 1);
-				wait_count = 0;
-				while(wait_count <= -50)
-				{
-					wait_count++;
-				}
-				//nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			}
-			else if(cmd_forward > 50)
-			{
-				nxt_motor_set_speed(NXT_PORT_C, -50, 1);
-				wait_count = 0;
-				while(wait_count <= 250)
-				{
-					wait_count++;
-				}
-				//nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			}
-
-			else
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-
-
-			if(cmd_turn > 50)
-			{
-				nxt_motor_set_speed(NXT_PORT_B, 50, 1);
-				wait_count = 0;
-				while(wait_count <= 250)
-				{
-					wait_count++;
-				}
-				//nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			}
-			else if(cmd_turn < -50)
-			{
-				nxt_motor_set_speed(NXT_PORT_B, -50, 1);
-				wait_count = 0;
-				while(wait_count <= 250)
-				{
-					wait_count++;
-				}
-				//nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			}
-			else
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-				*/
 			break;
 
 			//ルックアップゲート走行準備状態
 		case (RN_LOOKUP):
 			wait_count++;
-			x += 5;
-			if(wait_count >= 150 && x != 100)
+
+			if(wait_count >= 150)
 			{
 				tail_mode_change(1,ANGLEOFUP,1,1);
-				nxt_motor_set_speed(NXT_PORT_C,100-x,1);
-				nxt_motor_set_speed(NXT_PORT_B,-100+x,1);
+				nxt_motor_set_speed(NXT_PORT_C,0,1);
+				nxt_motor_set_speed(NXT_PORT_B,0,1);
 			}
+
+			if(wait_count == 1000)
+				setting_mode = RN_SETTINGMODE_START;
 
 			break;
 
@@ -882,65 +831,17 @@ void RN_setting()
 void RN_calibrate()
 {
 
-	tail_mode_change(0,ANGLEOFDOWN,1,2);
-	setting_mode = RN_RUN;
-	runner_mode = RN_MODE_BALANCEOFF;
-	/*
-	//黒値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
-			ecrobot_sound_tone(880, 512, 10);
-			BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
+			tail_mode_change(0,ANGLEOFDOWN,1,2);
+			setting_mode = RN_RUN;
+			runner_mode = RN_MODE_BALANCEOFF;
 			systick_wait_ms(500);
 			break;
 		}
 	}
-
-	//白値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(906, 512, 10);
-			WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//灰色値計算
-	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
-
-	//尻尾をルックアップゲート時の角度に
-	tail_mode_change(1,ANGLEOFLOOKUP,0,1);
-
-	//ルックアップゲート用黒値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(880, 512, 10);
-			LOOKUP_BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//ルックアップゲート用白値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(906, 512, 10);
-			LOOKUP_WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//ルックアップゲート用灰色値計算
-	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
-
-	//尻尾を直立停止状態の角度に
-	tail_mode_change(0,ANGLEOFDOWN,0,2);
+/*
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
@@ -1016,7 +917,6 @@ void self_location()
 void RN_modesetting()
 {
 	switch (runner_mode){
-
 			//走行体初期状態
 		case (RN_MODE_INIT):
 			cmd_forward = 0;
