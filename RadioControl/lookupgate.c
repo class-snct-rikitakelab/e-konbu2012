@@ -14,7 +14,7 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 92 				//降下目標角度
+#define ANGLEOFDOWN 113 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
 #define ANGLEOFLOOKUP 51
@@ -706,12 +706,12 @@ void RN_setting()
 		case (RN_RUN):
 			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
 			
-			cmd_forward = -(S8)bt_receive_buf[0];
-			cmd_turn = (S8)bt_receive_buf[1];
+			cmd_forward = -((S8)bt_receive_buf[0]/2);
+			cmd_turn = ((S8)bt_receive_buf[1]/2);
 			
-			nxt_motor_set_speed(NXT_PORT_C, cmd_forward/2, 1);
-			nxt_motor_set_speed(NXT_PORT_B, cmd_turn/2, 1);
-			/*
+			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
+			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
+		
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
 				ecrobot_sound_tone(980,512,30);
@@ -720,7 +720,7 @@ void RN_setting()
 				wait_count = 0;
 				setting_mode = RN_LOOKUP;
 			}
-			*/
+			
 			break;
 
 			//ルックアップゲート走行準備状態
@@ -831,7 +831,7 @@ void RN_setting()
 //キャリブレーション関数
 void RN_calibrate()
 {
-
+	/*
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -841,7 +841,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-
+	*/
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -850,7 +850,7 @@ void RN_calibrate()
 			setting_mode = RN_RUN;
 			runner_mode = RN_MODE_BALANCEOFF;
 //			runner_mode = RN_MODE_BALANCE;
-//			systick_wait_ms(500);
+			systick_wait_ms(500);
 			break;
 		}
 	}
