@@ -11,10 +11,9 @@ USER_LIB = nxtway_gs_balancer
 #USER_DEF = NXT_STD_TIRE
 
 # User application source
-TARGET_SOURCES = balancer_param.c Kaidan.c logSend.c tyreal.c
+TARGET_SOURCES = balancer_param.c Kaidan.c logSend.c
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 
 O_PATH ?= build
 
 include $(NXTOSEK_ROOT)/ecrobot/lejos_osek.tmf
-

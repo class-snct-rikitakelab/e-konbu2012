@@ -50,7 +50,7 @@ build/Kaidan.o: Kaidan.c Kaidan.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rt_SATURATE.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer_types.h \
-  logSend.h tyreal.h \
+  logSend.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/math.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/reent.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \

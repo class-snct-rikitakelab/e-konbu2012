@@ -2,11 +2,10 @@
 
 #include "Kaidan.h"
 #include "logSend.h"
-#include "tyreal.h"
 #include <math.h>
 
 
-/*
+/*	
  *	各種変数定義
  */
 
@@ -99,7 +98,6 @@ typedef enum{
 	RN_RUPID_SPEED_UP,
 	RN_STEP_BRAKE,				//ブレーキ
 	RN_STEP_STOP,				//停止
-	TYREAL,
 } RN_SETTINGMODE;
 
 
@@ -128,6 +126,7 @@ static int RN_rupid_speed_up_signal_recevie(void);
 void RN_calibrate();
 void RN_setting();
 int online();
+
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
 
@@ -226,6 +225,7 @@ void RA_linetrace(int forward_speed, int turn_speed) {
 }
 
 
+
 //P制御ライントレース関数
 void RA_linetrace_P(int forward_speed){
 
@@ -240,6 +240,7 @@ void RA_linetrace_P(int forward_speed){
 		cmd_turn = 100;
 	}
 }
+
 
 
 //PID制御ライントレース関数
@@ -457,20 +458,11 @@ void RN_setting()
 			if(stepflag == 0){
 			if(shock()==1){
 				ecrobot_sound_tone(180, 512, 30);
-			systick_wait_ms(500);
+			systick_wait_ms(1000);
 			
 				setting_mode = RN_STOP;
+				}
 			}
-			}
-			
-			if ( tyreal_trigger() == 1) {
-				ecrobot_sound_tone(932, 512, VOL);
-				systick_wait_ms(100);
-				ecrobot_sound_tone(466, 256, VOL);
-				systick_wait_ms(10);
-				setting_mode = TYREAL;
-			}
-
 
 			/*
 
@@ -542,15 +534,13 @@ void RN_setting()
 		case(RN_STOP):
 		
 			tailcontrol();
-			 tail_mode = RN_TAILDOWN;
+			// tail_mode = RN_TAILDOWN;
 			 
-			/*
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			*/
-			RA_linetrace_PID(3);
+			
+			/*nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+			nxt_motor_set_speed(NXT_PORT_B, 0, 1);*/
+			RA_linetrace_PID(0);
 			cmd_turn = RA_wheels(cmd_turn);
-
 			/*
 			cmd_turn=0;
 			cmd_forward=0;
@@ -564,10 +554,15 @@ void RN_setting()
 		case (RN_RUPID_SPEED_UP):
 			rupid_speed_up(80);
 			ecrobot_sound_tone(880,512,15);
-		case(TYREAL):
-			do_tyreal();
+			
+			if(stepflag == 0){
+			if(shock()==1){
+				ecrobot_sound_tone(180, 512, 30);
+				gyro_offset = gyro_offset-15;
+			setting_mode = RN_STOP;
+				}
+			}
 			break;
-
 		default:
 			break;
 	}
@@ -576,7 +571,7 @@ void RN_setting()
 //急加速用関数
 void rupid_speed_up(int target_forward_speed){
 	static int rupid_speed_up_counter=0;
-	int gyro_offset_operation = 10;
+	int gyro_offset_operation = 17;
 	
 	rupid_speed_up_counter++;
 	cmd_turn = RA_wheels(cmd_turn);
@@ -586,26 +581,33 @@ void rupid_speed_up(int target_forward_speed){
 	//	cmd_forward++;
 		//gyro_offset = gyro_offset - 0.5;
 	}
-	else if(rupid_speed_up_counter==100){
+	
+	else if(rupid_speed_up_counter==200){
 	//rupid_speed_up_counter=0;
-	gyro_offset = gyro_offset-gyro_offset_operation;
+	//gyro_offset = gyro_offset-gyro_offset_operation;
 		//setting_mode = RN_STOP;
 	}
+
+	/*
 	if(rupid_speed_up_counter>2 && rupid_speed_up_counter<150 ) {
 	RA_linetrace_PID(25);
 	
 	}
-	//RA_linetrace_PID(25/*target_forward_speed*/);
-	if(rupid_speed_up_counter>150) {
-	RA_linetrace_PID(50/*target_forward_speed*/);
+	//RA_linetrace_PID(25);
+	if(rupid_speed_up_counter>=200) {
+	RA_linetrace_PID(50target_forward_speed);
 	
-	}
+	}*/
+	//一回だけ段差検知
+			
+
+/*
 	if(rupid_speed_up_counter>200) {
-	RA_linetrace_PID(50/*target_forward_speed*/);
+	RA_linetrace_PID(50);
 	rupid_speed_up_counter=0;
 	setting_mode = RN_STOP;
 	}
-
+*/
 	/*
 	int forward_hensa;
 
@@ -822,6 +824,7 @@ TASK(ActionTask2)
 	RN_setting();		//走行状態
 	TerminateTask();
 }
+
 
 //状態表示管理(20ms)
 TASK(DisplayTask)
