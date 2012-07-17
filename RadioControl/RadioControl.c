@@ -11,7 +11,7 @@
 
 //尻尾設定角度
 #define ANGLEOFDOWN 105 				//降下目標角度
-#define ANGLEOFUP 0					//上昇目標角度
+#define ANGLEOFUP 0						//上昇目標角度
 
 /*
  *	グローバル変数
@@ -296,7 +296,7 @@ void RN_setting()
 //キャリブレーション関数
 void RN_calibrate()
 {
-	/*
+	/*バランサーON用
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
