@@ -11,7 +11,7 @@
 
 //尻尾設定角度
 #define ANGLEOFDOWN 105 				//降下目標角度
-#define ANGLEOFUP 0					//上昇目標角度
+#define ANGLEOFUP 0						//上昇目標角度
 
 /*
  *	グローバル変数
@@ -263,7 +263,7 @@ void RN_setting()
 		
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
-				ecrobot_sound_tone(980,512,30);
+				ecrobot_sound_tone(980,512,100);
 				nxt_motor_set_speed(NXT_PORT_C,100,1);
 				nxt_motor_set_speed(NXT_PORT_B,-100,1);
 				wait_count = 0;
@@ -296,7 +296,7 @@ void RN_setting()
 //キャリブレーション関数
 void RN_calibrate()
 {
-	/*
+	/*バランサーON用*/
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -306,7 +306,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-	*/
+	
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
