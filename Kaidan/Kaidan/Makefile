@@ -11,7 +11,11 @@ USER_LIB = nxtway_gs_balancer
 #USER_DEF = NXT_STD_TIRE
 
 # User application source
+<<<<<<< HEAD
 TARGET_SOURCES = balancer_param.c Kaidan.c logSend.c
+=======
+TARGET_SOURCES = balancer_param.c Kaidan_story.c logSend.c
+>>>>>>> 001f37a76a6e0a1fc19b43244219fd92f6516346
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 
 O_PATH ?= build
