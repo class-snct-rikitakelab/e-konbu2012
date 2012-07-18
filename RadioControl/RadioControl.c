@@ -263,7 +263,7 @@ void RN_setting()
 		
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
-				ecrobot_sound_tone(980,512,30);
+				ecrobot_sound_tone(980,512,100);
 				nxt_motor_set_speed(NXT_PORT_C,100,1);
 				nxt_motor_set_speed(NXT_PORT_B,-100,1);
 				wait_count = 0;
