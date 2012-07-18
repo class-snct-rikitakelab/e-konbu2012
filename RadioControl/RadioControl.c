@@ -255,8 +255,8 @@ void RN_setting()
 		case (RN_RUN):
 			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
 			
-			cmd_forward = -((S8)bt_receive_buf[0]/2);
-			cmd_turn = ((S8)bt_receive_buf[1]/2);
+			cmd_forward = -((S8)bt_receive_buf[0]);
+			cmd_turn = ((S8)bt_receive_buf[1]);
 			
 			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
