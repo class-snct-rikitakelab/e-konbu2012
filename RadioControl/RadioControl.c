@@ -296,7 +296,7 @@ void RN_setting()
 //キャリブレーション関数
 void RN_calibrate()
 {
-	/*バランサーON用
+	/*バランサーON用*/
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -306,7 +306,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-	*/
+	
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
