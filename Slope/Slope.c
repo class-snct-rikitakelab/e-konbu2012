@@ -14,7 +14,8 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 100 				//降下目標角度
+#define ANGLEOFSTOP 105				//直立停止状態角度
+#define ANGLEOFDOWN 95 			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define PI 3.141592
@@ -588,7 +589,7 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定関数
 void RN_setting()
 {
-
+	int forward_speed;
 	switch (setting_mode){
 
 			//キャリブレーション状態
@@ -609,7 +610,11 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(25);	
+			//RA_speed(100,10);
+			forward_speed = 60;
+			cmd_turn = RA_wheels(cmd_turn);
+			nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+			nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 			break;
 
 		default:
@@ -681,8 +686,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_SPEEDZERO;
-						runner_mode_change(1);
-						tail_mode_change(1,ANGLEOFUP,0,2);
+						runner_mode_change(2);
+						//tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
 			}
