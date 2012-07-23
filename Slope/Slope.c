@@ -15,7 +15,7 @@
 
 //尻尾設定角度
 #define ANGLEOFSTOP 105				//直立停止状態角度
-#define ANGLEOFDOWN 95 			//降下目標角度
+#define ANGLEOFDOWN 85 			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define PI 3.141592
@@ -57,9 +57,13 @@ static float bf_hensa = 0;
 
 //ライントレース時PID制御用係数
 static float Kp = 1.85;				//P制御用
-static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;			//D制御用
-
+static float Ki = 2.8;				//I制御用
+static float Kd = 0;//0.00205;			//D制御用
+/*
+static float Kp = 0.648;
+static float Ki = 1.8;
+static float Kd = 0.0405;
+	*/
 //尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用
 static float t_Ki = 0;				//I制御用
@@ -611,10 +615,13 @@ void RN_setting()
 			//通常走行状態
 		case (RN_RUN):
 			//RA_speed(100,10);
+			/*
 			forward_speed = 60;
 			cmd_turn = RA_wheels(cmd_turn);
 			nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+			*/
+			RA_linetrace_PID_balanceoff(70);
 			break;
 
 		default:
@@ -687,7 +694,7 @@ void RN_calibrate()
 					{
 						setting_mode = RN_SPEEDZERO;
 						runner_mode_change(2);
-						//tail_mode_change(1,ANGLEOFUP,0,2);
+//						tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
 			}

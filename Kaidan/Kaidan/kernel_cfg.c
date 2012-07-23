@@ -1,6 +1,6 @@
 /*
  *  kernel_cfg.c
- *  Thu Jul 19 14:17:42 2012
+ *  Fri Jul 20 14:57:42 2012
  *  SG Version 2.00
  *  sg.exe prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */

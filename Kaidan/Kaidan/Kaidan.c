@@ -460,9 +460,9 @@ void RN_setting()
 
 			//’Êí‘–s
 		case (RN_RUN):
-			//RA_linetrace_PID(25);
+			RA_linetrace_PID(25);
 			//cmd_turn = RA_wheels(cmd_turn);
-			/*
+			
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
 				setting_mode = RN_STEP_RAPID;
@@ -471,7 +471,7 @@ void RN_setting()
 
 				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//’i·“Ë“ü‚Ì‹——£‚ğ‘ª’è
 			}
-			*/
+			
 			break;
 
 			//‰Á‘¬
