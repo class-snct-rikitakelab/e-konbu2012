@@ -21,11 +21,11 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 104			//降下目標角度
+#define ANGLEOFDOWN 95			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
-#define SPEED_COUNT 50
+#define SPEED_COUNT 20
 
 //バッテリ降下値
 #define STEP_BATTERY 300
@@ -42,7 +42,7 @@ static float bf_hensa = 0;
 
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;				//D制御用
+static float Kd = 0.002;				//D制御用
 
 
 static int wait_count = 0;
@@ -98,7 +98,7 @@ typedef enum{
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILUP;
+RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
 //段差検知関連マクロ、プロトタイプ
@@ -241,8 +241,8 @@ void RA_linetrace_PID(int forward_speed) {
 	}
 
 	/*倒立制御OFF時*/
-	//nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-	//nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 
 }
 
@@ -387,7 +387,7 @@ void RN_calibrate()
 
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
-
+/*
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
@@ -401,7 +401,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-
+*/
 	//走行開始合図
 	while(1){
 
@@ -414,8 +414,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
-						tail_mode = RN_TAILUP;
+						runner_mode = RN_MODE_BALANCEOFF;
+						tail_mode = RN_TAILDOWN;
 						break;
 					}
 				}
@@ -490,8 +490,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(0,0,0,0,
-			0,0);		//ログ取り
+	logSend(0,0,0,0,0,0);		//ログ取り
 	TerminateTask();
 }
 
