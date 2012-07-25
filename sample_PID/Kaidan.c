@@ -40,7 +40,7 @@ static float bf_hensa = 0;
 
 //ライントレース時PID制御用係数
 
-static float Kp = 1.85;				//P制御用
+static float Kp = 0.84;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.002;				//D制御用
 
@@ -56,7 +56,7 @@ static U32	gyro_offset = 0;    /* gyro sensor offset value */
 //バッテリ電圧値状態
 static U32	battery_value;
 
-char rx_buf[BT_MAX_RX_BUF_SIZE];
+//char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -233,7 +233,8 @@ void RA_linetrace_PID(int forward_speed) {
 	d_hensa = (hensa - bf_hensa)/0.0005;
 	bf_hensa = hensa;
 
-	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+cmd_turn=-(Kp*hensa);
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -349,7 +350,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(25);
+			RA_linetrace_PID(100);
 			break;
 
 		default:
