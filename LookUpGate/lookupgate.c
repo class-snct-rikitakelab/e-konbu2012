@@ -726,7 +726,7 @@ void RN_setting()
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
-				if(getsonarflag(22) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -791,7 +791,7 @@ void RN_setting()
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			
-			if(distance_after_gate - distance_before_gate > 35)
+			if(distance_after_gate - distance_before_gate > 40)
 			{	
 				setting_mode = RN_LOOKUPUP;
 			}
