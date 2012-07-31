@@ -14,9 +14,9 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 103 				//降下目標角度
+#define ANGLEOFDOWN 90 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
-#define ANGLEOFPUSH 108				//押上目標角度（未使用）
+#define ANGLEOFPUSH ANGLEOFDOWN+5				//押上目標角度（未使用）
 #define ANGLEOFLOOKUP 56
 
 #define PI 3.141592
@@ -704,20 +704,20 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(30);
+			RA_linetrace_PID_balanceoff(30);
 			
 			setting_mode = RN_LOOKUP_START;
 			
 			break;
 
 		case (RN_LOOKUP_START):
-			RA_linetrace_PID(30);
+			RA_linetrace_PID_balanceoff(30);
 
 			wait_count++;
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
-				if(sonarcheck(18) == 1)				//超音波センサが反応したかどうか
+				if(sonarcheck(19) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -728,7 +728,7 @@ void RN_setting()
 
 			//ルックアップゲート走行準備状態
 		case (RN_LOOKUP):
-			RA_linetrace_PID(0);
+			RA_linetrace_PID_balanceoff(5);
 			//cmd_turn = RA_wheels(cmd_turn);
 
 			wait_count++;
@@ -776,13 +776,13 @@ void RN_setting()
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
 
-			RA_linetrace(30,20);
-
+//			RA_linetrace(30,20);
+			RA_linetrace_PID_balanceoff(30);
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			
-			if(distance_after_gate - distance_before_gate > 45)
+			if(distance_after_gate - distance_before_gate > 30)
 			{	
 				setting_mode = RN_LOOKUPUP;
 			}
@@ -812,30 +812,31 @@ void RN_setting()
 				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
 			}
-
+			/*
 			if(t_angle == ANGLEOFDOWN && wait_count >= 1000)
 			{
 				tail_mode_change(1,ANGLEOFPUSH,0,10);
 				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 			}
-
-			if(t_angle == ANGLEOFPUSH && wait_count >= 1050)
+			*/
+			if(t_angle == ANGLEOFDOWN && wait_count >= 1050)
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,0,2);
+				//tail_mode_change(1,ANGLEOFUP,0,2);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);
 				ecrobot_set_motor_speed(NXT_PORT_B,0);
 				ecrobot_set_motor_speed(NXT_PORT_C,0);
-
+				/*
 				runner_mode_change(1);
 				RA_hensareset();
 				balance_init();
 				wait_count=0;
 				cmd_forward=0;
+				*/
 				setting_mode = RN_LOOKUP_START;
 			}
 			
@@ -941,8 +942,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_SPEEDZERO;
-						runner_mode_change(1);
-						tail_mode_change(1,ANGLEOFUP,0,2);
+						runner_mode_change(2);
+						//tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
 			}

@@ -128,6 +128,11 @@ S8	pwm_l, pwm_r;
 int revL = 0;
 int revR = 0;
 
+int distance_before_slope;	//ルックアップゲート通過前距離
+int distance_now_slope;	//ルックアップゲート通過中距離
+int distance_peak_slope;
+int distance_after_slope;
+
 
 static double min_vol;
 static int stepflag = 0;
@@ -153,7 +158,10 @@ typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
+	RN_SLOPE_START,
 	RN_SLOPE_DOWN,
+	RN_SLOPE_AFTER,
+	RN_SLOPE_END,
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -643,19 +651,62 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID_balanceoff(65);
-			if(GYRO_OFFSET + 70 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			wait_count++;
+			RA_linetrace_PID_balanceoff(75);
+			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
-				setting_mode = RN_SLOPE_DOWN;
+				setting_mode = RN_SLOPE_START;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_before_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+				wait_count = 0;
 			}
 			break;
 
+		case (RN_SLOPE_START):
+			RA_linetrace_PID_balanceoff(75);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_now_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_now_slope - distance_before_slope > 30)
+			{
+				setting_mode = RN_SLOPE_DOWN;
+			}
+			
+			break;
+
 		case (RN_SLOPE_DOWN):
-			RA_linetrace_PID_balanceoff(40);
-			wait_count++;
-			if(wait_count > 800)
-				setting_mode = RN_RUN;
+			RA_linetrace_PID_balanceoff(70);
+			
+			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_AFTER;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_peak_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+			}
+			break;
+
+		case (RN_SLOPE_AFTER):
+			RA_linetrace_PID_balanceoff(70);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_after_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_after_slope - distance_peak_slope > 30)
+			{
+				setting_mode = RN_SLOPE_END;
+			}
+
+			break;
+
+		case (RN_SLOPE_END):
+			RA_linetrace_PID_balanceoff(75);
 			break;
 
 		default:
@@ -835,7 +886,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
+	logSend(v,cmd_turn,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
 			x_r,y_r);
 
 	sonarcheck();											//超音波センサ状態管理

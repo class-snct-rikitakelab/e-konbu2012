@@ -41,8 +41,8 @@ static float bf_hensa = 0;
 //ライントレース時PID制御用係数
 
 static float Kp = 1.85;
-static float Ki = 2.6;				//I制御用
-static float Kd = 0.002;				//D制御用
+static float Ki = 0;				//I制御用
+static float Kd = 0;				//D制御用
 
 
 static int wait_count = 0;
@@ -244,8 +244,8 @@ void RA_linetrace_PID(int forward_speed) {
 	}
 
 	/*倒立制御OFF時*/
-//	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-//	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 
 }
 
@@ -352,7 +352,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(35);
+			RA_linetrace_PID(80);
 			break;
 
 		default:
@@ -417,8 +417,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
-						tail_mode = RN_TAILUP;
+						runner_mode = RN_MODE_BALANCEOFF;
+						tail_mode = RN_TAILDOWN;
 						break;
 					}
 				}

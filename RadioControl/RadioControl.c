@@ -43,7 +43,6 @@ RN_SETTINGMODE setting_mode = RN_START;
  *	各種プライベート関数定義
  */
 
-
 //各種プライベート関数
 void RN_calibrate();
 void RN_setting();
