@@ -39,8 +39,8 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-static float Kp = 1.20;				//P制御用
-static float Ki = 2.6;				//I制御用
+static float Kp = 1.45;				//P制御用
+static float Ki = 2.9;				//I制御用
 static float Kd = 0.002;				//D制御用
 
 
@@ -124,6 +124,7 @@ static int remote_start(void);
 int rapid_speed_up(int target_gyro);
 void self_location(void);
 void battery_average_check(void);
+void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -232,10 +233,9 @@ void RA_linetrace_PID(int forward_speed) {
 	d_hensa = (hensa - bf_hensa)/0.0005;
 	bf_hensa = hensa;
 
-	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);//
+	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 
-cmd_turn=-(Kp*hensa);
-
+	cmd_turn = -(Kp * hensa + Ki * i_hensa);	
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -351,7 +351,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(100);
+			RA_linetrace_PID(80);
 			break;
 
 		default:
@@ -463,6 +463,27 @@ void RN_modesetting()
 	}
 }
 
+//bluetoothログ送信関数
+void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
+            U8 data_log_buffer[32];
+
+            *((U32 *)(&data_log_buffer[0]))  = (U32)systick_get_ms();
+            *(( S8 *)(&data_log_buffer[4]))  =  (S8)data1;
+            *(( S8 *)(&data_log_buffer[5]))  =  (S8)data2;
+            *((U16 *)(&data_log_buffer[6]))  = (U16)ecrobot_get_light_sensor(NXT_PORT_S3);
+            *((S32 *)(&data_log_buffer[8]))  = (S32)nxt_motor_get_count(0);
+            *((S32 *)(&data_log_buffer[12])) = (S32)nxt_motor_get_count(1);
+            *((S32 *)(&data_log_buffer[16])) = (S32)nxt_motor_get_count(2);
+            *((S16 *)(&data_log_buffer[20])) = (S16)adc1;
+            *((S16 *)(&data_log_buffer[22])) = (S16)adc2;
+            *((S16 *)(&data_log_buffer[24])) = (S16)adc3;
+            *((S16 *)(&data_log_buffer[26])) = (S16)adc4;
+            *((S32 *)(&data_log_buffer[28])) = (S32)ecrobot_get_sonar_sensor(NXT_PORT_S2);
+
+            ecrobot_send_bt_packet(data_log_buffer, 32);
+}
+
+
 /*
  *	各種タスク
  */
@@ -492,7 +513,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(0,0,0,0,0,0);		//ログ取り
+	logSend(cmd_forward,cmd_turn,0,0,0,0);		//ログ取り
 	TerminateTask();
 }
 

@@ -255,7 +255,7 @@ void RN_setting()
 		case (RN_RUN):
 			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
 			
-			cmd_forward = -((S8)bt_receive_buf[0])/1.5;
+			cmd_forward = -((S8)bt_receive_buf[0])/2;
 			cmd_turn = ((S8)bt_receive_buf[1]);
 			
 			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
@@ -297,6 +297,7 @@ void RN_setting()
 void RN_calibrate()
 {
 	/*バランサーON用*/
+	/*
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -306,7 +307,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-	
+	*/
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -314,7 +315,6 @@ void RN_calibrate()
 			tail_mode_change(0,ANGLEOFDOWN,1,2);
 			setting_mode = RN_RUN;
 			runner_mode = RN_MODE_BALANCEOFF;
-//			runner_mode = RN_MODE_BALANCE;
 			systick_wait_ms(500);
 			break;
 		}

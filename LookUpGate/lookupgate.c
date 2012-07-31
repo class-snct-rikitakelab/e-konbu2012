@@ -14,15 +14,15 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 103 				//降下目標角度
+#define ANGLEOFDOWN 105 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
-#define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 51
+#define ANGLEOFPUSH 110				//押上目標角度（未使用）
+#define ANGLEOFLOOKUP 54
 
 #define PI 3.141592
 
 //速度カウンタの上限値
-#define SPEED_COUNT 20
+#define SPEED_COUNT 10
 
 //ジャイロ振幅値
 #define PM_GYRO 65
@@ -726,7 +726,7 @@ void RN_setting()
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
-				if(getsonarflag(15) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -822,11 +822,18 @@ void RN_setting()
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
 			}
 
-			if(t_angle == ANGLEOFDOWN && wait_count >= 1200)
+			if(t_angle == ANGLEOFDOWN && wait_count >= 1000)
+			{
+				tail_mode_change(1,ANGLEOFPUSH,0,10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
+
+			if(t_angle == ANGLEOFPUSH && wait_count >= 1050)
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,5,2);
+				tail_mode_change(1,ANGLEOFUP,0,2);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);
