@@ -21,7 +21,7 @@
 #define PI 3.141592
 
 //速度カウンタの上限値
-#define SPEED_COUNT 20
+#define SPEED_COUNT 10
 
 //ジャイロ振幅値
 #define PM_GYRO 65
@@ -153,6 +153,7 @@ typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
+	RN_SLOPE_DOWN,
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -642,14 +643,19 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			//RA_speed(100,10);
-			/*
-			forward_speed = 60;
-			cmd_turn = RA_wheels(cmd_turn);
-			nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-			nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-			*/
 			RA_linetrace_PID_balanceoff(65);
+			if(GYRO_OFFSET + 70 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_DOWN;
+			}
+			break;
+
+		case (RN_SLOPE_DOWN):
+			RA_linetrace_PID_balanceoff(40);
+			wait_count++;
+			if(wait_count > 800)
+				setting_mode = RN_RUN;
 			break;
 
 		default:
