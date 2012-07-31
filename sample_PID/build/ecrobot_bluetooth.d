@@ -51,4 +51,9 @@ build/ecrobot_bluetooth.o:  \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_bluetooth.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
+<<<<<<< HEAD
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/colorsensor.h
+=======
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h
+>>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939

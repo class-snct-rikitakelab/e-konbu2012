@@ -39,8 +39,18 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
+<<<<<<< HEAD
 static float Kp = 1.45;				//P制御用
 static float Ki = 2.9;				//I制御用
+=======
+
+<<<<<<< HEAD
+static float Kp = 0.84;				//P制御用
+=======
+static float Kp = 1.85;
+>>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
+static float Ki = 2.6;				//I制御用
+>>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
 static float Kd = 0.002;				//D制御用
 
 
@@ -55,7 +65,7 @@ static U32	gyro_offset = 0;    /* gyro sensor offset value */
 //バッテリ電圧値状態
 static U32	battery_value;
 
-char rx_buf[BT_MAX_RX_BUF_SIZE];
+//char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -234,8 +244,18 @@ void RA_linetrace_PID(int forward_speed) {
 	bf_hensa = hensa;
 
 	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+<<<<<<< HEAD
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa);	
+=======
+<<<<<<< HEAD
+cmd_turn=-(Kp*hensa);
+=======
+
+	cmd_turn=-(Kp*hensa);
+	
+>>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
+>>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -243,8 +263,8 @@ void RA_linetrace_PID(int forward_speed) {
 	}
 
 	/*倒立制御OFF時*/
-	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+//	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+//	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
 
 }
 
@@ -351,7 +371,15 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+<<<<<<< HEAD
 			RA_linetrace_PID(80);
+=======
+<<<<<<< HEAD
+			RA_linetrace_PID(100);
+=======
+			RA_linetrace_PID(35);
+>>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
+>>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
 			break;
 
 		default:
@@ -389,7 +417,7 @@ void RN_calibrate()
 
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
-/*
+
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
@@ -403,7 +431,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-*/
+
 	//走行開始合図
 	while(1){
 
@@ -416,8 +444,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCEOFF;
-						tail_mode = RN_TAILDOWN;
+						runner_mode = RN_MODE_BALANCE;
+						tail_mode = RN_TAILUP;
 						break;
 					}
 				}
