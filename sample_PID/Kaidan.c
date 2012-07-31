@@ -39,24 +39,9 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-<<<<<<< HEAD
 static float Kp = 1.45;				//P制御用
-static float Ki = 2.9;				//I制御用
-=======
-
-<<<<<<< HEAD
-static float Kp = 0.84;				//P制御用
-=======
-static float Kp = 1.85;
-<<<<<<< HEAD
-static float Ki = 0;				//I制御用
-static float Kd = 0;				//D制御用
-=======
->>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
 static float Ki = 2.6;				//I制御用
->>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
 static float Kd = 0.002;				//D制御用
->>>>>>> 5e8551357a3b0073025a5a6e6c7c997b380d6318
 
 
 static int wait_count = 0;
@@ -249,18 +234,9 @@ void RA_linetrace_PID(int forward_speed) {
 	bf_hensa = hensa;
 
 	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
-<<<<<<< HEAD
-
-	cmd_turn = -(Kp * hensa + Ki * i_hensa);	
-=======
-<<<<<<< HEAD
-cmd_turn=-(Kp*hensa);
-=======
 
 	cmd_turn=-(Kp*hensa);
 	
->>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
->>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -376,19 +352,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-<<<<<<< HEAD
 			RA_linetrace_PID(80);
-=======
-<<<<<<< HEAD
-			RA_linetrace_PID(80);
-=======
-<<<<<<< HEAD
-			RA_linetrace_PID(100);
-=======
-			RA_linetrace_PID(35);
->>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
->>>>>>> 491618df891f2fae61b93938f2be3e3779beabd8
->>>>>>> 5e8551357a3b0073025a5a6e6c7c997b380d6318
 			break;
 
 		default:
