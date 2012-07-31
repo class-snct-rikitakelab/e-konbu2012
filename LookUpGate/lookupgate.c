@@ -16,13 +16,13 @@
 //尻尾設定角度
 #define ANGLEOFDOWN 103 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
-#define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 51
+#define ANGLEOFPUSH 108				//押上目標角度（未使用）
+#define ANGLEOFLOOKUP 56
 
 #define PI 3.141592
 
 //速度カウンタの上限値
-#define SPEED_COUNT 20
+#define SPEED_COUNT 10
 
 //ジャイロ振幅値
 #define PM_GYRO 65
@@ -60,17 +60,17 @@ static float i_hensa = 0;			//I制御用
 static float d_hensa = 0;			//D制御用
 static float bf_hensa = 0;
 
-/*
+
 //ライントレース時PID制御用係数
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;			//D制御用
-*/
 
+/*
 static float Kp = 0.648;
 static float Ki = 1.8;
 static float Kd = 0.0405;
-	
+	*/
 //尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用
 static float t_Ki = 0;				//I制御用
@@ -194,9 +194,8 @@ void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
-void sonarcheck(void);
+int sonarcheck(int target_sonar);
 void runner_mode_change(int flag);
-int getsonarflag(int target_sonar);
 void tailpower(float value);
 void tail_mode_change(int mode,int value,int limit,int t_up);
 void RA_linetrace_PID_balanceoff(int forward_speed);
@@ -351,6 +350,7 @@ void RA_linetrace_PID_balanceoff(int forward_speed){
 	bf_hensa = hensa;
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+//	cmd_turn = -(Kp * hensa);
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -423,24 +423,15 @@ void RA_hensareset(void)
 	d_hensa = 0;
 	bf_hensa = 0;
 }
-
 //超音波センサ状態検出関数
-void sonarcheck(void)
+int sonarcheck(int target_sonar)
 {
-	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
+	if(sonarvalue <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
 	{
-		sonarflag = 1;
+		return 1;
 	}
 	else
-		sonarflag = 0;
-}
-
-//超音波センサ状態確認関数
-int getsonarflag(int target)
-{
-	target_sonar = target;				//超音波センサの目標値を指定
-
-	return sonarflag;					//指定した値に近づいているかどうかを返す（1:範囲内）
+		return 0;
 }
 
 void getsonarvalue(void)
@@ -713,20 +704,20 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(20);
+			RA_linetrace_PID(30);
 			
 			setting_mode = RN_LOOKUP_START;
 			
 			break;
 
 		case (RN_LOOKUP_START):
-			RA_linetrace_PID(20);
+			RA_linetrace_PID(30);
 
 			wait_count++;
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
-				if(getsonarflag(15) == 1)				//超音波センサが反応したかどうか
+				if(sonarcheck(18) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -738,7 +729,7 @@ void RN_setting()
 			//ルックアップゲート走行準備状態
 		case (RN_LOOKUP):
 			RA_linetrace_PID(0);
-			cmd_turn = RA_wheels(cmd_turn);
+			//cmd_turn = RA_wheels(cmd_turn);
 
 			wait_count++;
 
@@ -785,13 +776,13 @@ void RN_setting()
 			//ルックアップゲート走行、尻尾降下状態で前進
 		case (RN_LOOKUPMOVE):
 
-			RA_linetrace(25,20);
+			RA_linetrace(30,20);
 
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			
-			if(distance_after_gate - distance_before_gate > 40)
+			if(distance_after_gate - distance_before_gate > 45)
 			{	
 				setting_mode = RN_LOOKUPUP;
 			}
@@ -822,11 +813,18 @@ void RN_setting()
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
 			}
 
-			if(t_angle == ANGLEOFDOWN && wait_count >= 1200)
+			if(t_angle == ANGLEOFDOWN && wait_count >= 1000)
+			{
+				tail_mode_change(1,ANGLEOFPUSH,0,10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
+
+			if(t_angle == ANGLEOFPUSH && wait_count >= 1050)
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,5,2);
+				tail_mode_change(1,ANGLEOFUP,0,2);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);
@@ -838,7 +836,7 @@ void RN_setting()
 				balance_init();
 				wait_count=0;
 				cmd_forward=0;
-				setting_mode = RN_RUN;
+				setting_mode = RN_LOOKUP_START;
 			}
 			
 			break;
@@ -1136,14 +1134,8 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,wait_count,m_flg,		//Bluetoothを用いてデータ送信
-			x_r,y_r);
-	m_flg = MKTrigger();
-	
-	if(m_flg == 1){
-		ecrobot_sound_tone(880, 512, 20);
-	}
-	
-	sonarcheck();															//超音波センサ状態管理
+			sonarvalue,y_r);
+
 	getsonarvalue();
 
 	TerminateTask();

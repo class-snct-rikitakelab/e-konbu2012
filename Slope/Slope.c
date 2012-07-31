@@ -15,16 +15,19 @@
 
 //尻尾設定角度
 #define ANGLEOFSTOP 105				//直立停止状態角度
-#define ANGLEOFDOWN 85 			//降下目標角度
+#define ANGLEOFDOWN 95 			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define PI 3.141592
 
 //速度カウンタの上限値
-#define SPEED_COUNT 20
+#define SPEED_COUNT 10
 
 //ジャイロ振幅値
 #define PM_GYRO 65
+
+//ジャイロオフセット値
+static unsigned int GYRO_OFFSET;
 
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
@@ -57,8 +60,8 @@ static float bf_hensa = 0;
 
 //ライントレース時PID制御用係数
 static float Kp = 1.85;				//P制御用
-static float Ki = 2.8;				//I制御用
-static float Kd = 0;//0.00205;			//D制御用
+static float Ki = 2.6;				//I制御用
+static float Kd = 0.00205;			//D制御用
 /*
 static float Kp = 0.648;
 static float Ki = 1.8;
@@ -126,6 +129,12 @@ int revL = 0;
 int revR = 0;
 
 
+static double min_vol;
+static int stepflag = 0;
+
+//バッテリ電圧値状態
+static U32	battery_value;
+
 /*
  *	各種状態定義
  */
@@ -144,6 +153,7 @@ typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
+	RN_SLOPE_DOWN,
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -268,6 +278,25 @@ void user_1ms_isr_type2(void){
 }
 
 
+//衝撃検知関数
+int shock(int target){
+
+	int result=0;
+
+	//電圧降下の最小値を更新
+	if(min_vol>ecrobot_get_battery_voltage())
+		min_vol=ecrobot_get_battery_voltage();
+
+	//ジャイロ及び電圧降下から衝撃検知
+	if(target <= battery_value-min_vol)
+	{
+		result = 1;
+	}
+	else
+		result = 0;
+
+	return result;
+}
 
 //ON-OFF制御ライントレース関数
 void RA_linetrace(int forward_speed, int turn_speed) {
@@ -614,14 +643,19 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			//RA_speed(100,10);
-			/*
-			forward_speed = 60;
-			cmd_turn = RA_wheels(cmd_turn);
-			nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-			nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-			*/
-			RA_linetrace_PID_balanceoff(70);
+			RA_linetrace_PID_balanceoff(65);
+			if(GYRO_OFFSET + 70 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_DOWN;
+			}
+			break;
+
+		case (RN_SLOPE_DOWN):
+			RA_linetrace_PID_balanceoff(40);
+			wait_count++;
+			if(wait_count > 800)
+				setting_mode = RN_RUN;
 			break;
 
 		default:
@@ -666,6 +700,9 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET = gyro_offset;
+			battery_value = ecrobot_get_battery_voltage();
+			min_vol = battery_value;
 			systick_wait_ms(500);
 			break;
 		}
@@ -798,7 +835,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,wait_count,t_value,		//Bluetoothを用いてデータ送信
+	logSend(cmd_forward,cmd_turn,ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
 			x_r,y_r);
 
 	sonarcheck();											//超音波センサ状態管理
