@@ -1,5 +1,5 @@
 #define VOL 20
-#define ADJUST_FLOAT_STEP 0.1
+#define ADJUST_FLOAT_STEP 0.1 //’l‚Ì‘Œ¸’l‚Ìw’è
 
 
 extern void do_tyreal(float *Kp_t,float *Ki_t,float *Kd_t);
