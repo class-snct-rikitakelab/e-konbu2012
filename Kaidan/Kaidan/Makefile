@@ -14,12 +14,8 @@ USER_LIB = nxtway_gs_balancer
 TARGET_SOURCES := \
 		balancer_param.c \
 		Kaidan.c \
-<<<<<<< HEAD
 		logSend.c \
 		tyreal_light_ver.c
-=======
-		logSend.c
->>>>>>> 62b9c9b5a83d0501627b072f2661f9e32ddc334b
 
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 
