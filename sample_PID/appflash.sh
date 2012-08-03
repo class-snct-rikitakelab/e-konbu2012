@@ -1,2 +1,2 @@
 echo Executing appflash to upload PID_rom.bin...
- ../../nxtOSEK/ecrobot/../bin/appflash.exe ./PID_rom.bin
+ /cygdrive/c/cygwin/nxtOSEK/ecrobot/../bin/appflash.exe ./PID_rom.bin

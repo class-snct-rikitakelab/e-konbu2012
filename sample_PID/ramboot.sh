@@ -1,2 +1,2 @@
 echo Executing ramboot to upload PID_ram.bin...
- ../../nxtOSEK/ecrobot/../bin/ramboot.exe ./PID_ram.bin
+ /cygdrive/c/cygwin/nxtOSEK/ecrobot/../bin/ramboot.exe ./PID_ram.bin

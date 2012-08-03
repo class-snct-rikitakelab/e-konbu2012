@@ -14,16 +14,20 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 100 				//降下目標角度
+#define ANGLEOFSTOP 105				//直立停止状態角度
+#define ANGLEOFDOWN 95 			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define PI 3.141592
 
 //速度カウンタの上限値
-#define SPEED_COUNT 20
+#define SPEED_COUNT 10
 
 //ジャイロ振幅値
 #define PM_GYRO 65
+
+//ジャイロオフセット値
+static unsigned int GYRO_OFFSET;
 
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
@@ -57,8 +61,12 @@ static float bf_hensa = 0;
 //ライントレース時PID制御用係数
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;			//D制御用
-
+static float Kd = 0.00205;			//D制御用
+/*
+static float Kp = 0.648;
+static float Ki = 1.8;
+static float Kd = 0.0405;
+	*/
 //尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用
 static float t_Ki = 0;				//I制御用
@@ -120,6 +128,17 @@ S8	pwm_l, pwm_r;
 int revL = 0;
 int revR = 0;
 
+int distance_before_slope;	//ルックアップゲート通過前距離
+int distance_now_slope;	//ルックアップゲート通過中距離
+int distance_peak_slope;
+int distance_after_slope;
+
+
+static double min_vol;
+static int stepflag = 0;
+
+//バッテリ電圧値状態
+static U32	battery_value;
 
 /*
  *	各種状態定義
@@ -139,6 +158,10 @@ typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
+	RN_SLOPE_START,
+	RN_SLOPE_DOWN,
+	RN_SLOPE_AFTER,
+	RN_SLOPE_END,
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -263,6 +286,25 @@ void user_1ms_isr_type2(void){
 }
 
 
+//衝撃検知関数
+int shock(int target){
+
+	int result=0;
+
+	//電圧降下の最小値を更新
+	if(min_vol>ecrobot_get_battery_voltage())
+		min_vol=ecrobot_get_battery_voltage();
+
+	//ジャイロ及び電圧降下から衝撃検知
+	if(target <= battery_value-min_vol)
+	{
+		result = 1;
+	}
+	else
+		result = 0;
+
+	return result;
+}
 
 //ON-OFF制御ライントレース関数
 void RA_linetrace(int forward_speed, int turn_speed) {
@@ -588,7 +630,7 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定関数
 void RN_setting()
 {
-
+	int forward_speed;
 	switch (setting_mode){
 
 			//キャリブレーション状態
@@ -609,7 +651,62 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(25);	
+			wait_count++;
+			RA_linetrace_PID_balanceoff(75);
+			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_START;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_before_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+				wait_count = 0;
+			}
+			break;
+
+		case (RN_SLOPE_START):
+			RA_linetrace_PID_balanceoff(75);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_now_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_now_slope - distance_before_slope > 30)
+			{
+				setting_mode = RN_SLOPE_DOWN;
+			}
+			
+			break;
+
+		case (RN_SLOPE_DOWN):
+			RA_linetrace_PID_balanceoff(70);
+			
+			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_AFTER;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_peak_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+			}
+			break;
+
+		case (RN_SLOPE_AFTER):
+			RA_linetrace_PID_balanceoff(70);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_after_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_after_slope - distance_peak_slope > 30)
+			{
+				setting_mode = RN_SLOPE_END;
+			}
+
+			break;
+
+		case (RN_SLOPE_END):
+			RA_linetrace_PID_balanceoff(75);
 			break;
 
 		default:
@@ -654,6 +751,9 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET = gyro_offset;
+			battery_value = ecrobot_get_battery_voltage();
+			min_vol = battery_value;
 			systick_wait_ms(500);
 			break;
 		}
@@ -681,8 +781,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_SPEEDZERO;
-						runner_mode_change(1);
-						tail_mode_change(1,ANGLEOFUP,0,2);
+						runner_mode_change(2);
+//						tail_mode_change(1,ANGLEOFUP,0,2);
 						break;
 					}
 			}
@@ -786,7 +886,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,wait_count,t_value,		//Bluetoothを用いてデータ送信
+	logSend(v,cmd_turn,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
 			x_r,y_r);
 
 	sonarcheck();											//超音波センサ状態管理
