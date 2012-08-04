@@ -704,14 +704,14 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID_balanceoff(30);
+			RA_linetrace_PID_balanceoff(25);
 			
 			setting_mode = RN_LOOKUP_START;
 			
 			break;
 
 		case (RN_LOOKUP_START):
-			RA_linetrace_PID_balanceoff(30);
+			RA_linetrace_PID_balanceoff(25);
 
 			wait_count++;
 
@@ -777,7 +777,7 @@ void RN_setting()
 		case (RN_LOOKUPMOVE):
 
 //			RA_linetrace(30,20);
-			RA_linetrace_PID_balanceoff(30);
+			RA_linetrace_PID_balanceoff(25);
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
@@ -1134,8 +1134,8 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,wait_count,m_flg,		//Bluetoothを用いてデータ送信
-			sonarvalue,y_r);
+	logSend(cmd_forward,cmd_turn,BLACK_VALUE,0,		//Bluetoothを用いてデータ送信
+			x_r,y_r);
 
 	getsonarvalue();
 
