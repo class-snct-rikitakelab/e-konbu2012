@@ -39,8 +39,9 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-static float Kp = 1.45;				//P制御用
-static float Ki = 2.6;				//I制御用
+
+static float Kp = 1.0944;			//P制御用
+static float Ki = 2.2;				//I制御用
 static float Kd = 0.002;				//D制御用
 
 
@@ -236,7 +237,6 @@ void RA_linetrace_PID(int forward_speed) {
 	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 
 	cmd_turn=-(Kp*hensa);
-	
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -392,6 +392,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
+/*
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -404,7 +405,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-
+*/
 	//走行開始合図
 	while(1){
 
@@ -418,7 +419,6 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_BALANCEOFF;
-						tail_mode = RN_TAILDOWN;
 						break;
 					}
 				}
