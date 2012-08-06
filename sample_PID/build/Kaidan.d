@@ -42,10 +42,6 @@ build/Kaidan.o: Kaidan.c Kaidan.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
-<<<<<<< HEAD
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/colorsensor.h \
-=======
->>>>>>> e2636be6643d3cb9947be0ce2b938a492bfcb939
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rtwtypes.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/limits.h \

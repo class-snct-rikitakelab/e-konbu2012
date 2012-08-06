@@ -1,27 +1,9 @@
-build/ecrobot_base.o:  \
- /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_base.c \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/string.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/newlib.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/config.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/machine/ieeefp.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/reent.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/_types.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/lock.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/stddef.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/string.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_base.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/bios/bios.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/bios/flash_loader.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/flashprog.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_types.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_private.h \
+build/tyreal_light_ver.o: tyreal_light_ver.c \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_interface.h \
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/interrupts.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/aic.h \
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/mytypes.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/AT91SAM7.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/uart.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/systick.h \
@@ -48,7 +30,9 @@ build/ecrobot_base.o:  \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/sound.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/udp.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../lejos_nxj/src//nxtvm/platform/nxt/hs.h \
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_types.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_bluetooth.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
-  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
+  tyreal_light_ver.h
