@@ -151,8 +151,8 @@ typedef enum{
 
 //èâä˙èÛë‘
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-//RN_SETTINGMODE setting_mode = TYREAL;
+//RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+RN_SETTINGMODE setting_mode = TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
