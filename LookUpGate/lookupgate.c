@@ -14,10 +14,10 @@
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 104 				//降下目標角度
+#define ANGLEOFDOWN 108 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 #define ANGLEOFPUSH 210				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 51
+#define ANGLEOFLOOKUP 56
 
 #define PI 3.141592
 
@@ -699,14 +699,14 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(20);
+			RA_linetrace_PID(25);
 			
 			wait_count++;
 
 			if(wait_count >= 150)					//スタート時に反応するのを防ぐ（テスト用）
 			{
 
-				if(getsonarflag(20) == 1)				//超音波センサが反応したかどうか
+				if(getsonarflag(21) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
 					setting_mode = RN_LOOKUP;
@@ -772,7 +772,7 @@ void RN_setting()
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 			
-			if(distance_after_gate - distance_before_gate > 35)
+			if(distance_after_gate - distance_before_gate > 38)
 			{	
 				//tailpower(20.0);
 				setting_mode = RN_LOOKUPUP;
@@ -807,7 +807,7 @@ void RN_setting()
 			{
 				tailpower(1.85);			
 
-				tail_mode_change(1,ANGLEOFUP,0,10);
+				tail_mode_change(1,ANGLEOFUP,0,2);
 
 				ecrobot_set_motor_rev(NXT_PORT_B,0);
 				ecrobot_set_motor_rev(NXT_PORT_C,0);

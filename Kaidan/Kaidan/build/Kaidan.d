@@ -1,4 +1,4 @@
-build/Kaidan.o: Kaidan.c \
+build/Kaidan.o: Kaidan.c Kaidan.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/kernel.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/lego_nxt/sys_defs.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/cpu_defs.h \

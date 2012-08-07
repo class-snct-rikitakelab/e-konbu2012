@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "ecrobot_interface.h"
-#include "balancer.h"
 #include "tyreal.h"
 
 
@@ -12,14 +11,16 @@ static	 int fw=50;
 	float Kp_a=3.212;
 	float Ki_b=2.223;
 	char int_string[INT_EXPRESS_RENGE];
-	char float_string[100];
-	char print_string[100];
+	char float_string[25];
+	char print_string[25];
 
 typedef enum {
 	ADJUST_FORWARD, ADJUST_TURN, ADJUST_TAIL_ANGLE,ADJUST_Kp_VAL,ADJUST_Ki_VAL,
 } ADJUST_PARAM_STATE;
 
 static ADJUST_PARAM_STATE adjust_param_state;
+
+
 
 void display_show_string(char* string,int x,int y){
 
@@ -75,7 +76,7 @@ float change_float_param(float param){
 	static int temp =0;
 	
 	
-	//?O??ï??????]?p??????p????l???
+
 if((int)nxt_motor_get_count(NXT_PORT_C) - temp>0){
 	param=param+ADJUST_FLOAT_STEP/*0.001*/;	
 //	param=(param+0.1)/*(float)ADJUST_FLOAT_STEP*/;
@@ -135,7 +136,18 @@ void make_printf_string(char* val_string,char* text_msg,char *string){
 	sprintf(string,"%s%s",text_msg,val_string);
 }
 	
-	
+int tyreal_trigger(){
+	int result=0;
+
+	if (ecrobot_is_RUN_button_pressed() == 1) {
+				systick_wait_ms(100);
+				result = 1;
+			}
+	return result;
+}
+
+
+
 void do_tyreal(){
 
 
@@ -183,7 +195,7 @@ void do_tyreal(){
    	int_to_string(fw,int_string);
    	make_printf_string(int_string,"FORWARD:",print_string);
    	display_show_string(print_string,0,0);
-   	
+   	/*
    	int_to_string(tn,int_string);
    	make_printf_string(int_string,"TURN:",print_string);
    	display_show_string(print_string,0,1);
@@ -200,8 +212,5 @@ void do_tyreal(){
    	float_to_string(Ki_b,float_string);
    	make_printf_string(float_string,"Ki:",print_string);
    	display_show_string(print_string,0,4);
+	*/
 }
-	
-
-
-
