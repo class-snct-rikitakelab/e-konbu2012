@@ -3,6 +3,7 @@
 #include "Kaidan.h"
 #include "logSend.h"
 #include "math.h"
+#include "tyreal_light_ver.h"
 
 
 /*
@@ -77,6 +78,7 @@ typedef enum{
 
 
 typedef enum{
+	RN_TYREAL,
 	RN_SETTINGMODE_START,		//初期状態
 	RN_RUN,						//基本走行（ライントレース）
 	RN_STOP,					//停止
@@ -97,7 +99,7 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+RN_SETTINGMODE setting_mode = RN_TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -345,6 +347,19 @@ void RN_setting()
 {
 	switch (setting_mode){
 
+		case (RN_TYREAL):
+			do_tyreal(&Kp,&Ki,&Kd);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+			}
+			break;
+		
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();				//キャリブレーション
@@ -352,7 +367,21 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(80);
+			RA_linetrace_PID(100);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+				cmd_forward = 0;
+				cmd_turn = 0;
+				RA_hensareset();
+				systick_wait_ms(500);
+				setting_mode = RN_TYREAL;
+			}
 			break;
 
 		default:
@@ -392,7 +421,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
-/*
+
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -405,7 +434,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-*/
+
 	//走行開始合図
 	while(1){
 
@@ -507,7 +536,7 @@ TASK(ActionTask2)
 //状態表示管理(20ms)
 TASK(DisplayTask)
 {
-	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
+//	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
 	TerminateTask();
 }
 
