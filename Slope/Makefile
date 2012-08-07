@@ -13,7 +13,7 @@ USER_LIB = nxtway_gs_balancer
 # User application source
 TARGET_SOURCES := \
 	balancer_param.c \
-	Slope.c 
+	positionPresumption.c 
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

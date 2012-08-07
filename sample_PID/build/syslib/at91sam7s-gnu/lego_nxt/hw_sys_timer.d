@@ -47,5 +47,9 @@ build/syslib/at91sam7s-gnu/lego_nxt/hw_sys_timer.oram:  \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_bluetooth.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
+<<<<<<< HEAD
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/colorsensor.h
+=======
+  /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834

@@ -3,6 +3,7 @@
 #include "Kaidan.h"
 #include "logSend.h"
 #include "math.h"
+#include "tyreal_light_ver.h"
 
 
 /*
@@ -39,9 +40,20 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
+<<<<<<< HEAD
 
 static float Kp = 0.85;				//P制御用
 static float Ki = 2.2;				//I制御用
+=======
+<<<<<<< HEAD
+static float Kp = 1.03;				//P制御用
+static float Ki = 2.6;				//I制御用
+=======
+
+static float Kp = 1.0944;			//P制御用
+static float Ki = 2.2;				//I制御用
+>>>>>>> dfd44131329b28f87128fbeb1f2e528552db7843
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 static float Kd = 0.002;				//D制御用
 
 
@@ -77,6 +89,7 @@ typedef enum{
 
 
 typedef enum{
+	RN_TYREAL,
 	RN_SETTINGMODE_START,		//初期状態
 	RN_RUN,						//基本走行（ライントレース）
 	RN_STOP,					//停止
@@ -97,7 +110,7 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+RN_SETTINGMODE setting_mode = RN_TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -237,7 +250,10 @@ void RA_linetrace_PID(int forward_speed) {
 	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 
 	cmd_turn=-(Kp*hensa);
+<<<<<<< HEAD
 
+=======
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -366,6 +382,19 @@ void RN_setting()
 {
 	switch (setting_mode){
 
+		case (RN_TYREAL):
+			do_tyreal(&Kp,&Ki,&Kd);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+			}
+			break;
+		
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();				//キャリブレーション
@@ -373,7 +402,28 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+<<<<<<< HEAD
 			RA_linetrace_PID(60);
+=======
+			RA_linetrace_PID(100);
+<<<<<<< HEAD
+=======
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+				cmd_forward = 0;
+				cmd_turn = 0;
+				RA_hensareset();
+				systick_wait_ms(500);
+				setting_mode = RN_TYREAL;
+			}
+>>>>>>> dfd44131329b28f87128fbeb1f2e528552db7843
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 			break;
 
 		default:
@@ -413,7 +463,11 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -440,7 +494,10 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_BALANCEOFF;
+<<<<<<< HEAD
 						//tail_mode = RN_TAILUP;
+=======
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 						break;
 					}
 				}
@@ -486,6 +543,27 @@ void RN_modesetting()
 	}
 }
 
+//bluetoothログ送信関数
+void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
+            U8 data_log_buffer[32];
+
+            *((U32 *)(&data_log_buffer[0]))  = (U32)systick_get_ms();
+            *(( S8 *)(&data_log_buffer[4]))  =  (S8)data1;
+            *(( S8 *)(&data_log_buffer[5]))  =  (S8)data2;
+            *((U16 *)(&data_log_buffer[6]))  = (U16)ecrobot_get_light_sensor(NXT_PORT_S3);
+            *((S32 *)(&data_log_buffer[8]))  = (S32)nxt_motor_get_count(0);
+            *((S32 *)(&data_log_buffer[12])) = (S32)nxt_motor_get_count(1);
+            *((S32 *)(&data_log_buffer[16])) = (S32)nxt_motor_get_count(2);
+            *((S16 *)(&data_log_buffer[20])) = (S16)adc1;
+            *((S16 *)(&data_log_buffer[22])) = (S16)adc2;
+            *((S16 *)(&data_log_buffer[24])) = (S16)adc3;
+            *((S16 *)(&data_log_buffer[26])) = (S16)adc4;
+            *((S32 *)(&data_log_buffer[28])) = (S32)ecrobot_get_sonar_sensor(NXT_PORT_S2);
+
+            ecrobot_send_bt_packet(data_log_buffer, 32);
+}
+
+
 /*
  *	各種タスク
  */
@@ -508,7 +586,7 @@ TASK(ActionTask2)
 //状態表示管理(20ms)
 TASK(DisplayTask)
 {
-	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
+//	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
 	TerminateTask();
 }
 

@@ -52,7 +52,10 @@ build/ecrobot.o:  \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
+<<<<<<< HEAD
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/colorsensor.h \
+=======
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/include/kernel.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/lego_nxt/sys_defs.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../toppers_osek/config/at91sam7s-gnu/cpu_defs.h \

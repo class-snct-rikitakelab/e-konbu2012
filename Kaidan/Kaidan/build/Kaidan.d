@@ -60,4 +60,5 @@ build/Kaidan.o: Kaidan.c Kaidan.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/_types.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/sys/lock.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/stddef.h \
-  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h
+  /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/../../../../arm-elf/sys-include/_ansi.h \
+  tyreal_light_ver.h

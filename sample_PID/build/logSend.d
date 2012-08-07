@@ -42,7 +42,10 @@ build/logSend.o: logSend.c \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_usb.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_rs485.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/ecrobot_mindsensors.h \
+<<<<<<< HEAD
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/../ecrobot/c/colorsensor.h \
+=======
+>>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/balancer.h \
   /cygdrive/c/cygwin/nxtOSEK/ecrobot/nxtway_gs_balancer/rtwtypes.h \
   /cygdrive/C/cygwin/GNUARM/bin/../lib/gcc/arm-elf/4.0.2/include/limits.h \
