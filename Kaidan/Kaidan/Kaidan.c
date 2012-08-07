@@ -1,9 +1,8 @@
 
-
 #include "Kaidan.h"
 #include "logSend.h"
 #include "math.h"
-
+#include "tyreal_light_ver.h"
 
 /*
  *	各種変数定義
@@ -54,11 +53,11 @@ static float d_hensa = 0;			//D制御用
 static float bf_hensa = 0;
 
 
-//ライントレース時PID制御用係数
-
-static float Kp = 1.85;				//P制御用
+	static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
+//ライントレース時PID制御用係数
+
 
 
 static int wait_count = 0;
@@ -138,7 +137,8 @@ typedef enum{
 	RN_STEP_SHOCK,
 	RN_STEP_SLOW,
 	RN_STEP_STAY,
-	RN_STEP_SECOND
+	RN_STEP_SECOND,
+	TYREAL
 } RN_SETTINGMODE;
 
 
@@ -151,7 +151,8 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+//RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+RN_SETTINGMODE setting_mode = TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -200,9 +201,11 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_motor_rev(NXT_PORT_A,0);
 	ecrobot_set_motor_rev(NXT_PORT_B,0);
 	ecrobot_set_motor_rev(NXT_PORT_C,0);
+	/*
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	*/
 }
 
 
@@ -452,17 +455,26 @@ void RN_setting()
 	static int step_count = 0;
 
 	switch (setting_mode){
+		case (TYREAL) :
+			do_tyreal(&Kp,&Ki,&Kd);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+			}
+			break;
 
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();				//キャリブレーション
 			break;
 
+		
 			//通常走行
 		case (RN_RUN):
-			//RA_linetrace_PID(25);
-			//cmd_turn = RA_wheels(cmd_turn);
-			/*
+				RA_linetrace_PID(50);
+		//	cmd_turn = RA_wheels(cmd_turn);
+			
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
 				setting_mode = RN_STEP_RAPID;
@@ -471,7 +483,7 @@ void RN_setting()
 
 				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
 			}
-			*/
+			
 			break;
 
 			//加速
@@ -534,7 +546,8 @@ void RN_setting()
 			//二段目
 		case (RN_STEP_SECOND):
 			if(step_count == 0)
-				RA_linetrace_PID(25);
+			//RA_linetrace_PID(25);
+			RA_linetrace_PID(0);
 
 			else if(step_count == 1)
 			{
@@ -778,6 +791,8 @@ void self_location()
 	
 }
 
+
+
 /*
  *	各種タスク
  */
@@ -802,7 +817,7 @@ TASK(ActionTask2)
 //状態表示管理(20ms)
 TASK(DisplayTask)
 {
-	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
+	//ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
 	TerminateTask();
 }
 
@@ -810,9 +825,6 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
-			position_x,position_y);		//ログ取り
+			position_x,position_y,position_y);		//ログ取り
 	TerminateTask();
 }
-
-
-/******************************** END OF FILE ********************************/
