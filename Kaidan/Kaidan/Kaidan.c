@@ -466,7 +466,11 @@ void RN_setting()
 
 			//走行開始前
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();				//キャリブレーション
+			RN_calibrate();		//キャリブレーション
+			
+			ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
 			break;
 
 		
@@ -483,7 +487,13 @@ void RN_setting()
 
 				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
 			}
-			
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, VOL);
+				systick_wait_ms(100);
+
+				setting_mode = TYREAL;
+			}
 			break;
 
 			//加速

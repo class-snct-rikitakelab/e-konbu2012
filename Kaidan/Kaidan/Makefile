@@ -15,7 +15,8 @@ TARGET_SOURCES := \
 		balancer_param.c \
 		Kaidan.c \
 		logSend.c \
-		tyreal_light_ver.c
+		tyreal_light_ver.c \
+		NXTButton.c
 
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 
