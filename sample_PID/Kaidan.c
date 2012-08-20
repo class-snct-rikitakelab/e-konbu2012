@@ -25,6 +25,12 @@ static int counter = 0;
 #define ANGLEOFDOWN 95			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
+#define CMD_STOP '3'
+
+int x=25;   //速度の変数
+
+#define ANGLE_OF_AIM 180  //右を向く角度
+
 //速度調節係数
 #define SPEED_COUNT 20
 
@@ -40,28 +46,25 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-<<<<<<< HEAD
 
+/*
 static float Kp = 0.85;				//P制御用
 static float Ki = 2.2;				//I制御用
-=======
-<<<<<<< HEAD
+
 static float Kp = 1.03;				//P制御用
 static float Ki = 2.6;				//I制御用
-=======
+*/
 
-<<<<<<< HEAD
+
 static float Kp = 1.360;			//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
-=======
+
+/*
 static float Kp = 1.0944;			//P制御用
 static float Ki = 2.2;				//I制御用
->>>>>>> dfd44131329b28f87128fbeb1f2e528552db7843
->>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 static float Kd = 0.002;				//D制御用
->>>>>>> 9c0ceee02ce5a8b54442a177a58ef55daf9cd7f3
-
+*/
 
 static int wait_count = 0;
 
@@ -69,12 +72,13 @@ static double min_vol;
 static int stepflag = 0;
 
 //ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
+static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
+
 
 //バッテリ電圧値状態
 static U32	battery_value;
 
-//char rx_buf[BT_MAX_RX_BUF_SIZE];
+char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -103,7 +107,8 @@ typedef enum{
 	RN_STEP_SHOCK,
 	RN_STEP_SLOW,
 	RN_STEP_STAY,
-	RN_STEP_SECOND
+	RN_STEP_SECOND,
+	RN_Right
 } RN_SETTINGMODE;
 
 
@@ -116,7 +121,9 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_TYREAL;
+//RN_SETTINGMODE setting_mode = RN_TYREAL;
+RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -133,6 +140,8 @@ void RN_setting();
 int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
+static int remote_stop(void);  // 停止用関数 
+static int right(void);  //右向く関数 
 
 int shock(int target);
 void tailcontrol();
@@ -256,10 +265,7 @@ void RA_linetrace_PID(int forward_speed) {
 	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 
 	cmd_turn=-(Kp*hensa);
-<<<<<<< HEAD
 
-=======
->>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 	if (-100 > cmd_turn) {
 		cmd_turn = -100;
 	} else if (100 < cmd_turn) {
@@ -408,33 +414,26 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-<<<<<<< HEAD
-			RA_linetrace_PID(100);
-=======
-<<<<<<< HEAD
-			RA_linetrace_PID(60);
-=======
-			RA_linetrace_PID(100);
-<<<<<<< HEAD
-=======
-			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-			{
-				ecrobot_sound_tone(932, 512, 20);
-				systick_wait_ms(100);
-				ecrobot_sound_tone(466, 256, 20);
-				systick_wait_ms(10);
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-				cmd_forward = 0;
-				cmd_turn = 0;
-				RA_hensareset();
-				systick_wait_ms(500);
-				setting_mode = RN_TYREAL;
-			}
->>>>>>> dfd44131329b28f87128fbeb1f2e528552db7843
->>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
->>>>>>> 9c0ceee02ce5a8b54442a177a58ef55daf9cd7f3
-			break;
+	
+			RA_linetrace_PID(x);
+
+                        if (remote_stop( )==1)
+ 		{                  
+ 		 	x=0;
+		setting_mode=RN_Right;
+		}
+		
+		break;
+
+
+			//右を向く
+		case(RN_Right):
+		
+		right( );
+		
+		break;
+
+
 
 		default:
 			break;
@@ -473,11 +472,8 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
-<<<<<<< HEAD
 /*
-=======
 
->>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
@@ -504,10 +500,8 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_BALANCEOFF;
-<<<<<<< HEAD
 						//tail_mode = RN_TAILUP;
-=======
->>>>>>> fbbbb0d67f0ca3da8c3cd37e3c89592259c37834
+
 						break;
 					}
 				}
@@ -516,6 +510,55 @@ void RN_calibrate()
 	}
 
 }
+//リモートストップ関数
+static int remote_stop(void)
+{
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
+
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
+	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == CMD_STOP)
+		{
+			start = 1; /* 走行停止 */
+		}
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+	}
+
+	return start;
+}
+
+//右を向く関数
+static int right(void)
+{
+
+ecrobot_set_motor_rev(NXT_PORT_C, 0);
+
+ecrobot_set_motor_speed(NXT_PORT_C, 50);
+
+while(ecrobot_get_motor_rev(NXT_PORT_C) <= ANGLE_OF_AIM){
+	}
+
+ecrobot_set_motor_speed(NXT_PORT_C, 0);
+
+
+}
+
+
+
+
+
+
+
+
 
 
 //走行体状態設定関数
@@ -552,7 +595,7 @@ void RN_modesetting()
 			break;
 	}
 }
-
+/*
 //bluetoothログ送信関数
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
             U8 data_log_buffer[32];
@@ -572,7 +615,7 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 
             ecrobot_send_bt_packet(data_log_buffer, 32);
 }
-
+*/
 
 /*
  *	各種タスク

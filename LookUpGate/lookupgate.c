@@ -159,10 +159,10 @@ typedef enum{
 	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
 	RN_LOOKUP_START,
-	RN_LOOKUP,					//ルックアップゲート準備
-	RN_LOOKUPDOWN,				//走行体降下
-	RN_LOOKUPMOVE,				//走行体前進
-	RN_LOOKUPUP					//走行体復帰
+	RN_LOOKUP_STOP,					//ルックアップゲート準備
+	RN_LOOKUP_DOWN,				//走行体降下
+	RN_LOOKUP_MOVE,				//走行体前進
+	RN_LOOKUP_UP					//走行体復帰
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -720,14 +720,14 @@ void RN_setting()
 				if(sonarcheck(19) == 1)				//超音波センサが反応したかどうか
 				{
 					ecrobot_sound_tone(900,512,30);
-					setting_mode = RN_LOOKUP;
+					setting_mode = RN_LOOKUP_STOP;
 					wait_count = 0;
 				}
 			}
 			break;
 
 			//ルックアップゲート走行準備状態
-		case (RN_LOOKUP):
+		case (RN_LOOKUP_STOP):
 			RA_linetrace_PID_balanceoff(5);
 			//cmd_turn = RA_wheels(cmd_turn);
 
@@ -743,7 +743,7 @@ void RN_setting()
 					cmd_turn = RA_wheels(cmd_turn);
 					wait_count++;
 				}
-				setting_mode = RN_LOOKUPDOWN;
+				setting_mode = RN_LOOKUP_DOWN;
 				wait_count = 0;
 				runner_mode_change(2);
 			}
@@ -751,7 +751,7 @@ void RN_setting()
 			break;
 		
 			//ルックアップゲート走行、尻尾降下
-		case (RN_LOOKUPDOWN):
+		case (RN_LOOKUP_DOWN):
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 
@@ -763,7 +763,7 @@ void RN_setting()
 				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
 				if(ecrobot_get_motor_rev(NXT_PORT_A) == ANGLEOFLOOKUP)
 					{
-						setting_mode = RN_LOOKUPMOVE;
+						setting_mode = RN_LOOKUP_MOVE;
 						wait_count = 0;
 						revL = nxt_motor_get_count(NXT_PORT_C);
 						revR = nxt_motor_get_count(NXT_PORT_B);
@@ -774,7 +774,7 @@ void RN_setting()
 			break;
 
 			//ルックアップゲート走行、尻尾降下状態で前進
-		case (RN_LOOKUPMOVE):
+		case (RN_LOOKUP_MOVE):
 
 //			RA_linetrace(30,20);
 			RA_linetrace_PID_balanceoff(25);
@@ -784,13 +784,13 @@ void RN_setting()
 			
 			if(distance_after_gate - distance_before_gate > 30)
 			{	
-				setting_mode = RN_LOOKUPUP;
+				setting_mode = RN_LOOKUP_UP;
 			}
 			
 			break;
 
 			//ルックアップゲート走行、前進後倒立状態へ復帰
-		case (RN_LOOKUPUP):
+		case (RN_LOOKUP_UP):
 			if(wait_count < 200)
 			{
 				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
