@@ -1,4 +1,5 @@
 
+
 #include "Kaidan.h"
 #include "logSend.h"
 #include "math.h"
@@ -20,7 +21,7 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 104			//降下目標角度
+#define ANGLEOFDOWN 95			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
@@ -46,6 +47,9 @@ static int counter = 0;
 #define WHEEL_R		41
 #define MACHINE_W	162
 
+#define RIGHT_ANGLE_LIGHT_VALUE 540		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_AIM 140				//回転角度(160)
+
 //PID制御用偏差値
 static float hensa;					//P制御用
 static float i_hensa = 0;			//I制御用
@@ -53,7 +57,7 @@ static float d_hensa = 0;			//D制御用
 static float bf_hensa = 0;
 
 
-	static float Kp = 1.85;				//P制御用
+static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
 //ライントレース時PID制御用係数
@@ -87,6 +91,8 @@ float distance_step_brake = 0;
 float distance_step_stop = 0;
 float distance_gyro_up = 0;
 float distance_over_forty = 0;
+float distance_turn_clear = 0;
+float distance_turn_after = 0;
 
 
 /* 自己位置同定用　変数宣言 */
@@ -138,6 +144,9 @@ typedef enum{
 	RN_STEP_SLOW,
 	RN_STEP_STAY,
 	RN_STEP_SECOND,
+	RN_STEP_TURN_LEFT,
+	RN_STEP_TURN_FORWARD,
+	RN_STEP_TURN_TAILUP,
 	TYREAL
 } RN_SETTINGMODE;
 
@@ -148,13 +157,11 @@ typedef enum{
 	RN_TAILUP,					//尻尾上昇
 } RN_TAILMODE;
 
-
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-//RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_SETTINGMODE setting_mode = TYREAL;
+RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+//RN_SETTINGMODE setting_mode = TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
-
 
 //段差検知関連マクロ、プロトタイプ
 static int RN_rapid_speed_up_signal_recevie(void);
@@ -251,9 +258,9 @@ void RA_linetrace(int forward_speed, int turn_speed) {
 	int light_value = 0;
 	light_value = online();
 	if (TRUE != light_value) {
-		cmd_turn = turn_speed;
-	} else {
 		cmd_turn = (-1)*turn_speed;
+	} else {
+		cmd_turn = turn_speed;
 	}
 
 }
@@ -396,7 +403,7 @@ int online(void) {
 //尻尾角度コントロール関数
 void tailcontrol(){
 
-	static const float t_Kp = 0.7;
+	static const float t_Kp = 2.85;
 
 	static float t_hensa = 0;
 	static float t_speed = 0;
@@ -425,30 +432,6 @@ void tailcontrol(){
 
 }
 
-//電圧値チェック関数（使わない）
-void battery_average_check(void)
-{
-	if(bt_counter == 40)
-	{
-		battery_average = now_battery/40;
-
-		if(battery_average > before_battery)
-			average_flag = 1;
-		else
-			average_flag = 0;
-
-		before_battery = battery_average;
-		
-		now_battery = 0;
-		bt_counter = 0;
-	}
-	else
-	{
-		now_battery += ecrobot_get_gyro_sensor(NXT_PORT_S1);
-		bt_counter++;
-	}
-}
-
 //走行設定関数
 void RN_setting()
 {
@@ -466,15 +449,18 @@ void RN_setting()
 
 			//走行開始前
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();				//キャリブレーション
+			RN_calibrate();		//キャリブレーション
+			
+			ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
 			break;
 
-		
 			//通常走行
 		case (RN_RUN):
-				RA_linetrace_PID(50);
-		//	cmd_turn = RA_wheels(cmd_turn);
-			
+			wait_count++;
+			RA_linetrace_PID(30);
+
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
 				setting_mode = RN_STEP_RAPID;
@@ -483,13 +469,29 @@ void RN_setting()
 
 				distance_before_step = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
 			}
+
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, VOL);
+				systick_wait_ms(100);
+
+				setting_mode = TYREAL;
+			}
+
+			//直角カーブ部分
+			
+			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && wait_count > 300)
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_STEP_TURN_LEFT;
+				wait_count = 0;
+			}
 			
 			break;
 
 			//加速
 		case (RN_STEP_RAPID):
 			RA_linetrace_PID(25);
-			//if(rapid_speed_up(17) == 1)
 			gyro_offset += 17;
 			wait_count = 0;
 			setting_mode = RN_STEP_SHOCK;
@@ -519,7 +521,6 @@ void RN_setting()
 			//減速
 		case (RN_STEP_SLOW):
 			RA_linetrace_PID(25);
-			//if(rapid_speed_up(-34) == 1)
 			gyro_offset -= 34;
 			ecrobot_sound_tone(880, 512, 30);
 			setting_mode = RN_STEP_STAY;
@@ -562,10 +563,110 @@ void RN_setting()
 			}
 			break;
 
-			//強制停止
+			//直角カーブ
+		case (RN_STEP_TURN_LEFT):
+			cmd_forward = 0;
+			cmd_turn = 0;
+			if(wait_count == 0)
+			{
+				ecrobot_set_motor_rev(NXT_PORT_B, 0);
+				ecrobot_set_motor_rev(NXT_PORT_C, 0);
+			}
+
+			wait_count++;
+
+			if(ecrobot_get_motor_rev(NXT_PORT_B) <= RIGHT_ANGLE_AIM)
+			{
+				/* 回転する */
+				ecrobot_set_motor_speed(NXT_PORT_B, 50);
+				ecrobot_set_motor_speed(NXT_PORT_C, -50);
+			}
+			else
+			{
+				/* 止まる */
+				ecrobot_set_motor_speed(NXT_PORT_B, 0);
+				ecrobot_set_motor_speed(NXT_PORT_C, 0);
+				wait_count = 0;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_turn_clear = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
+				setting_mode = RN_STEP_TURN_FORWARD;
+			}
+	
+			break;
+
+			//カーブ後直進
+		case (RN_STEP_TURN_FORWARD):
+			RA_linetrace(20,10);
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_turn_after = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));	//段差突入時の距離を測定
+			if(distance_turn_after - distance_turn_clear > 5)
+			{
+				setting_mode = RN_STEP_TURN_TAILUP;
+				ecrobot_sound_tone(880, 512, 30);
+			}
+			break;
+
+			//尻尾→倒立
+		case (RN_STEP_TURN_TAILUP):
+			if(wait_count < 200)
+			{
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
+			wait_count++;
+
+			//尻尾持ち上げ補助
+			if(wait_count == 200)
+			{
+				tail_mode = RN_TAILDOWN;
+				
+				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
+				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
+			}
+			
+			if(wait_count == 400)
+			{
+				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
+				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
+			}
+			
+			/*
+			if(t_angle == ANGLEOFDOWN && wait_count >= 1000)
+			{
+				tail_mode_change(1,ANGLEOFPUSH,0,10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			}
+			*/
+			/*
+			if(t_angle == ANGLEOFDOWN && wait_count >= 1050)
+			{		
+
+				//tail_mode_change(1,ANGLEOFUP,0,2);
+
+				ecrobot_set_motor_rev(NXT_PORT_B,0);
+				ecrobot_set_motor_rev(NXT_PORT_C,0);
+				ecrobot_set_motor_speed(NXT_PORT_B,0);
+				ecrobot_set_motor_speed(NXT_PORT_C,0);
+				
+				runner_mode_change(1);
+				RA_hensareset();
+				balance_init();
+				wait_count=0;
+				cmd_forward=0;
+				
+			}
+			*/
+			break;
+
+				//強制停止
 		case(RN_STOP):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			cmd_forward = 0;
+			cmd_turn = 0;
+			//nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+			//nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 			break;
 
 		default:
@@ -721,8 +822,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
-						tail_mode = RN_TAILUP;
+						runner_mode = RN_MODE_BALANCEOFF;
+						tail_mode = RN_TAILDOWN;
 						break;
 					}
 				}
@@ -761,6 +862,8 @@ void RN_modesetting()
 			break;
 
 		case (RN_MODE_BALANCEOFF):
+			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
+			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
 			break;
 
 		default:
@@ -810,7 +913,6 @@ TASK(ActionTask)
 TASK(ActionTask2)
 {
 	RN_setting();		//走行状態
-	battery_average_check();
 	TerminateTask();
 }
 
@@ -825,6 +927,6 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
-			position_x,position_y,position_y);		//ログ取り
+			position_x,position_y,distance_turn_after - distance_turn_clear);		//ログ取り
 	TerminateTask();
 }

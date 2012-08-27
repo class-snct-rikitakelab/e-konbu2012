@@ -22,8 +22,14 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 95			//降下目標角度
+#define ANGLEOFDOWN 100			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
+
+#define CMD_STOP '3'
+
+int x=60;   //速度の変数
+
+#define ANGLE_OF_AIM 180  //右を向く角度
 
 //速度調節係数
 #define SPEED_COUNT 20
@@ -40,6 +46,8 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
+<<<<<<< HEAD
+=======
 
 /*
 static float Kp = 0.85;				//P制御用
@@ -49,10 +57,17 @@ static float Kp = 1.03;				//P制御用
 static float Ki = 2.6;				//I制御用
 */
 
+
+static float Kp = 1.360;			//P制御用
+static float Ki = 2.6;				//I制御用
+static float Kd = 0.003;				//D制御用
+>>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
+
+/*
 static float Kp = 1.0944;			//P制御用
 static float Ki = 2.2;				//I制御用
 static float Kd = 0.002;				//D制御用
-
+*/
 
 static int wait_count = 0;
 
@@ -60,12 +75,13 @@ static double min_vol;
 static int stepflag = 0;
 
 //ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
+static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
+
 
 //バッテリ電圧値状態
 static U32	battery_value;
 
-//char rx_buf[BT_MAX_RX_BUF_SIZE];
+char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -94,7 +110,8 @@ typedef enum{
 	RN_STEP_SHOCK,
 	RN_STEP_SLOW,
 	RN_STEP_STAY,
-	RN_STEP_SECOND
+	RN_STEP_SECOND,
+	RN_Right
 } RN_SETTINGMODE;
 
 
@@ -107,7 +124,9 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-RN_SETTINGMODE setting_mode = RN_TYREAL;
+//RN_SETTINGMODE setting_mode = RN_TYREAL;
+RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -124,6 +143,8 @@ void RN_setting();
 int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
+static int remote_stop(void);  // 停止用関数 
+static int right(void);  //右向く関数 
 
 int shock(int target);
 void tailcontrol();
@@ -157,9 +178,11 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_motor_rev(NXT_PORT_A,0);
 	ecrobot_set_motor_rev(NXT_PORT_B,0);
 	ecrobot_set_motor_rev(NXT_PORT_C,0);
+	/*
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	*/
 }
 
 
@@ -322,7 +345,7 @@ int online(void) {
 //尻尾角度コントロール関数
 void tailcontrol(){
 
-	static const float t_Kp = 0.7;
+	static const float t_Kp = 1.7;
 
 	static float t_hensa = 0;
 	static float t_speed = 0;
@@ -392,14 +415,15 @@ void RN_setting()
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 			RN_calibrate();				//キャリブレーション
+			ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
 			break;
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(60);
-
+<<<<<<< HEAD
 			RA_linetrace_PID(100);
-
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
 				ecrobot_sound_tone(932, 512, 20);
@@ -414,8 +438,29 @@ void RN_setting()
 				systick_wait_ms(500);
 				setting_mode = RN_TYREAL;
 			}
-
 			break;
+=======
+	
+			RA_linetrace_PID(x);
+
+                        if (remote_stop( )==1)
+ 		{                  
+ 		 	x=0;
+		setting_mode=RN_Right;
+		}
+		
+		break;
+
+
+			//右を向く
+		case(RN_Right):
+		
+		right( );
+		
+		break;
+
+
+>>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
 
 		default:
 			break;
@@ -492,6 +537,55 @@ void RN_calibrate()
 	}
 
 }
+//リモートストップ関数
+static int remote_stop(void)
+{
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
+
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
+	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == CMD_STOP)
+		{
+			start = 1; /* 走行停止 */
+		}
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+	}
+
+	return start;
+}
+
+//右を向く関数
+static int right(void)
+{
+
+ecrobot_set_motor_rev(NXT_PORT_C, 0);
+
+ecrobot_set_motor_speed(NXT_PORT_C, 50);
+
+while(ecrobot_get_motor_rev(NXT_PORT_C) <= ANGLE_OF_AIM){
+	}
+
+ecrobot_set_motor_speed(NXT_PORT_C, 0);
+
+
+}
+
+
+
+
+
+
+
+
 
 
 //走行体状態設定関数
