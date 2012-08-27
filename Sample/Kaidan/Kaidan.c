@@ -24,7 +24,7 @@ static int counter = 0;
 #define ANGLEOFUP 0					//上昇目標角度
 
 //速度調節係数
-#define SPEED_COUNT 50
+#define SPEED_COUNT 20
 
 //バッテリ降下値
 #define STEP_BATTERY 300
@@ -155,8 +155,8 @@ typedef enum{
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
-//RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_SETTINGMODE setting_mode = TYREAL;
+RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+//RN_SETTINGMODE setting_mode = TYREAL;
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
@@ -177,7 +177,7 @@ void RA_linetrace_PID(int forward_speed);
 int shock(int target);
 void tailcontrol();
 void RA_linetrace_P(int forward_speed);
-void RA_speed(int limit,int s_Kp);
+int RA_speed(int forward_speed);
 int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
@@ -283,7 +283,7 @@ void RA_linetrace_P(int forward_speed){
 void RA_linetrace_PID(int forward_speed) {
 
 
-	RA_speed(forward_speed,2);	//速度を段階的に変化
+	//RA_speed(forward_speed,2);	//速度を段階的に変化
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
@@ -316,36 +316,30 @@ void RA_hensareset(void)
 	bf_hensa = 0;
 }
 
-//段階的加速用関数（指定量だけ速度を徐々に上昇）
-void RA_speed(int limit,int s_Kp){
+///段階的加速用関数（指定量だけ速度を徐々に上昇）
+int RA_speed(int forward_speed){
 
-	static int forward_speed;
-
-	counter ++;
+	static int result_speed = 0;
+	counter++;
 
 	if(counter >= SPEED_COUNT)
 	{
+		if(forward_speed - result_speed >= 0){
+			result_speed++;
 
-		forward_speed = cmd_forward;
-
-		if(limit-forward_speed >= 0){
-			forward_speed += s_Kp;
-
-			if(forward_speed > limit)
-				forward_speed = limit;
+			if(result_speed > forward_speed)
+				result_speed = forward_speed;
 		}
 		else{
-			forward_speed -= s_Kp;
+			result_speed--;
 
-			if(forward_speed < limit)
-				forward_speed = limit;
+			if(result_speed < forward_speed)
+				result_speed = forward_speed;
 		}
-
-		cmd_forward = forward_speed;
-		counter =0;
-
-
+		counter = 0;
 	}
+
+	return result_speed;
 }
 
 
@@ -476,7 +470,11 @@ void RN_setting()
 		
 			//通常走行
 		case (RN_RUN):
+<<<<<<< HEAD
+			cmd_forward = RA_speed(200);
+=======
 				RA_linetrace_PID(60);
+>>>>>>> 036326785cde64e52ecda4928d60365b8011ee1e
 		//	cmd_turn = RA_wheels(cmd_turn);
 			
 /*
@@ -726,7 +724,7 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
+						runner_mode = RN_MODE_BALANCEOFF;
 						tail_mode = RN_TAILUP;
 						break;
 					}
@@ -766,6 +764,8 @@ void RN_modesetting()
 			break;
 
 		case (RN_MODE_BALANCEOFF):
+			nxt_motor_set_speed(NXT_PORT_C, cmd_forward, 1);
+//			nxt_motor_set_speed(NXT_PORT_B, cmd_forward, 1);
 			break;
 
 		default:
@@ -829,7 +829,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(velocity,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
+	logSend(cmd_forward,shock(STEP_BATTERY),distance_gyro_up - distance_before_step,battery_value - ecrobot_get_battery_voltage(),
 			position_x,position_y,position_y);		//ログ取り
 	TerminateTask();
 }

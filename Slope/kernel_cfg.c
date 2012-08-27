@@ -1,16 +1,8 @@
 /*
  *  kernel_cfg.c
-<<<<<<< HEAD
- *  Tue Aug 07 01:50:27 2012
-=======
-<<<<<<< HEAD
- *  Fri Aug 10 07:36:18 2012
-=======
- *  Mon Aug 20 02:32:17 2012
->>>>>>> f4b184d6d93818b241d4a4615ba1c089213237b9
->>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
+ *  Wed Aug 22 12:15:56 2012
  *  SG Version 2.00
- *  sg.exe prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
+ *  sg.exe ./prog.oil -os=ECC2 -IC:/cygwin/nxtOSEK/toppers_osek/sg/impl_oil -template=C:/cygwin/nxtOSEK/toppers_osek/sg/lego_nxt.sgt
  */
 #include "osek_kernel.h"
 #include "kernel_id.h"
@@ -115,7 +107,7 @@ const CounterType alminib_cntid[TNUM_ALARM] = { 0, 0, 0, 0, };
 const FP alminib_cback[TNUM_ALARM] = { _activate_alarm_cyclic_alarm1, _activate_alarm_cyclic_alarm2, _activate_alarm_cyclic_alarm3, _activate_alarm_cyclic_alarm4, };
 const AppModeType alminib_autosta[TNUM_ALARM] = { 0x00000001, 0x00000001, 0x00000001, 0x00000001, };
 const TickType alminib_almval[TNUM_ALARM] = { 1, 1, 1, 1, };
-const TickType alminib_cycle[TNUM_ALARM] = { 4, 5, 20, 4, };
+const TickType alminib_cycle[TNUM_ALARM] = { 4, 5, 20, 50, };
 
 AlarmType almcb_next[TNUM_ALARM];
 AlarmType almcb_prev[TNUM_ALARM];

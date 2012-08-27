@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1E1EBE64-52FC-413D-9639-3D741FA05CCD}</ProjectGuid>
+    <ProjectGuid>{B8EAD8CA-CF9F-47E0-BDAB-31C316E62CC3}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -34,12 +34,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeOutput>PID_parameter.exe</NMakeOutput>
+    <NMakeOutput>petbottle.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;C:\cygwin\GNUARM\arm-elf\include; C:\cygwin\GNUARM\include; C:\cygwin\nxtOSEK\ecrobot\c; C:\cygwin\nxtOSEK\ecrobot\nxtcommfantom; C:\cygwin\nxtOSEK\ecrobot\nxtway_gs_balancer; C:\cygwin\nxtOSEK\ecrobot\bios; C:\cygwin\nxtOSEK\toppers_osek\include; C:\cygwin\nxtOSEK\toppers_osek\kernel; C:\cygwin\nxtOSEK\lejos_nxj\src\nxtvm\platform\nxt; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu\lego_nxt</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeOutput>PID_parameter.exe</NMakeOutput>
+    <NMakeOutput>petbottle.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -47,22 +47,15 @@
   <ItemGroup>
     <None Include="Makefile" />
     <None Include="mk.cmd" />
-    <None Include="mk_clean.cmd" />
     <None Include="prog.oil" />
     <None Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="balancer_param.c" />
-    <ClCompile Include="LogSend.c" />
-    <ClCompile Include="NXTButton.c" />
-    <ClCompile Include="PID_parameter.c" />
-    <ClCompile Include="tyreal_light_ver.c" />
+    <ClCompile Include="Petbottle.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LogSend.h" />
-    <ClInclude Include="NXTButton.h" />
-    <ClInclude Include="PID_parameter.h" />
-    <ClInclude Include="tyreal_light_ver.h" />
+    <ClInclude Include="Petbottle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

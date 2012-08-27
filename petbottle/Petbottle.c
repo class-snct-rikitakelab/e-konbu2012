@@ -1,10 +1,10 @@
 /*
- * Slope.c
- * 坂道プログラム
+ * petbottle.c
+ * ドリフトターン用ペットボトル検知プログラム
  */
 
 
-#include "Slope.h"
+#include "Petbottle.h"
 #include "math.h"
 
 
@@ -14,9 +14,10 @@
 
 
 //尻尾設定角度
-#define ANGLEOFSTOP 105				//直立停止状態角度
-#define ANGLEOFDOWN 95 			//降下目標角度
+#define ANGLEOFDOWN 95 				//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
+#define ANGLEOFPUSH ANGLEOFDOWN+5				//押上目標角度（未使用）
+#define ANGLEOFLOOKUP 56
 
 #define PI 3.141592
 
@@ -25,9 +26,6 @@
 
 //ジャイロ振幅値
 #define PM_GYRO 65
-
-//ジャイロオフセット値
-static unsigned int GYRO_OFFSET;
 
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
@@ -38,6 +36,7 @@ static unsigned int GYRO_OFFSET;
 #define WHEEL_R		41	//[mm]
 #define MACHINE_W	162	//[mm]
 
+#define BOTTLE 27	//[cm]
 /*
  *	グローバル変数
  */
@@ -46,6 +45,11 @@ static unsigned int GYRO_OFFSET;
 static unsigned int BLACK_VALUE;	//黒値
 static unsigned int WHITE_VALUE;	//白値
 static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
+static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
+static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
+static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
+
+static unsigned int LOOKUP_SONAR_VALUE;
 
 //速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
 static int speed_counter = 0;
@@ -62,11 +66,7 @@ static float bf_hensa = 0;
 static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;			//D制御用
-/*
-static float Kp = 0.648;
-static float Ki = 1.8;
-static float Kd = 0.0405;
-	*/
+
 //尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用
 static float t_Ki = 0;				//I制御用
@@ -116,6 +116,10 @@ static float x_r_zero = 0;	//X座標初期値
 static float y_r_zero = 0;	//Y座標初期値
 static float theta_R_zero = 0;	//車体角度初期値
 
+static int get_sonar = 0;		//超音波センサの値
+static int bottle_flag ;		//ペットボトルの判断
+static int alarm_flag;
+
 char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
@@ -128,17 +132,13 @@ S8	pwm_l, pwm_r;
 int revL = 0;
 int revR = 0;
 
-int distance_before_slope;	//ルックアップゲート通過前距離
-int distance_now_slope;	//ルックアップゲート通過中距離
-int distance_peak_slope;
-int distance_after_slope;
+int distance_before_gate;	//ルックアップゲート通過前距離
+int distance_after_gate;	//ルックアップゲート通過中距離
 
 
-static double min_vol;
-static int stepflag = 0;
-
-//バッテリ電圧値状態
-static U32	battery_value;
+//マーカーフラグ　0: OFF, 1: ON
+unsigned char m_flg = 0;
+static unsigned int LV_buf = 0;		/* Light Value buffer */
 
 /*
  *	各種状態定義
@@ -153,15 +153,11 @@ typedef enum{
 } RN_MODE;
 
 
-//キャリブレーションの状態
+//状態
 typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
-	RN_SPEEDZERO,				//速度ゼロキープ
-	RN_RUN,						//基本走行（ライントレース）
-	RN_SLOPE_START,
-	RN_SLOPE_DOWN,
-	RN_SLOPE_AFTER,
-	RN_SLOPE_END,
+	RN_RUN,				//基本走行（ライントレース）
+	RN_DRIFTTURN,			//ドリフトターン
 } RN_SETTINGMODE;
 
 //尻尾の状態
@@ -193,9 +189,8 @@ void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
-void sonarcheck(void);
+int sonarcheck(int target_sonar);
 void runner_mode_change(int flag);
-int getsonarflag(int target_sonar);
 void tailpower(float value);
 void tail_mode_change(int mode,int value,int limit,int t_up);
 void RA_linetrace_PID_balanceoff(int forward_speed);
@@ -205,6 +200,12 @@ void RA_hensareset(void);
 
 
 void self_location(void);
+unsigned char MKTrigger(void);
+signed char LVTrigger(void);
+int abs(int n);
+void sonar();
+void get_bottle();
+void alarm();
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -219,7 +220,7 @@ DeclareTask(LogTask);
 */
 
 //液晶ディスプレイに表示するシステム名設定
-const char target_subsystem_name[] = "Slope";
+const char target_subsystem_name[] = "petbottle";
 
 
 
@@ -286,176 +287,17 @@ void user_1ms_isr_type2(void){
 }
 
 
-//衝撃検知関数
-int shock(int target){
 
-	int result=0;
-
-	//電圧降下の最小値を更新
-	if(min_vol>ecrobot_get_battery_voltage())
-		min_vol=ecrobot_get_battery_voltage();
-
-	//ジャイロ及び電圧降下から衝撃検知
-	if(target <= battery_value-min_vol)
-	{
-		result = 1;
-	}
-	else
-		result = 0;
-
-	return result;
-}
-
-//ON-OFF制御ライントレース関数
-void RA_linetrace(int forward_speed, int turn_speed) {
-
-	cmd_forward = forward_speed;
-
-	int light_value = 0;
-	light_value = online();
-	if (TRUE != light_value) {
-		cmd_turn = turn_speed;
-	} else {
-		cmd_turn = (-1)*turn_speed;
-	}
-
-	nxt_motor_set_speed(NXT_PORT_C, forward_speed - cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_B, forward_speed + cmd_turn/2, 1);
-}
-
-
-//PID制御ライントレース関数
-void RA_linetrace_PID(int forward_speed) {
-
-	RA_speed(forward_speed,1);	//速度を段階的に変化
-
-	if(forward_speed > 0)
-		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
-	else
-		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
-
-	i_hensa = i_hensa+(hensa*0.0005);
-	d_hensa = (hensa - bf_hensa)/0.0005;
-	bf_hensa = hensa;
-
-	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
-	if (-100 > cmd_turn) {
-		cmd_turn = -100;
-	} else if (100 < cmd_turn) {
-		cmd_turn = 100;
-	}
-
-
-	/*倒立制御OFF時*/
-	//nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-	//nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-
-}
-
-//PID制御ライントレース関数（バランサーOFF用）
-void RA_linetrace_PID_balanceoff(int forward_speed){
-	RA_speed(forward_speed,1);		//速度を段階的に変化
-
-	if(forward_speed > 0)
-		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
-	else
-		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
-
-	i_hensa = i_hensa+(hensa*0.0005);
-	d_hensa = (hensa - bf_hensa)/0.0005;
-	bf_hensa = hensa;
-
-	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
-	if (-100 > cmd_turn) {
-		cmd_turn = -100;
-	} else if (100 < cmd_turn) {
-		cmd_turn = 100;
-	}
-
-	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-}
-
-//段階的加速用関数
-void RA_speed(int limit,int s_Kp){
-
-	static int forward_speed;
-
-	speed_counter++;						//速度調節用カウンタ
-
-	if(speed_counter >= SPEED_COUNT)		//カウンタが最大で速度変更へ
-	{
-
-		forward_speed = cmd_forward;
-
-		if(limit-forward_speed >= 0){
-			forward_speed += s_Kp;		//指定量だけ速度上昇
-
-			if(forward_speed > limit)
-				forward_speed = limit;
-		}
-		else{
-			forward_speed -= s_Kp;		//指定量だけ速度減少
-
-			if(forward_speed < limit)
-				forward_speed = limit;
-		}
-
-		cmd_forward = forward_speed;
-		speed_counter = 0;					//カウンタリセット
-	}
-}
-
-
-//2車輪の回転量差、P制御関数（目標値に近づける）
-int RA_wheels(int turn){
-	float w_kp = 1.4;	//回転量P制御パラメータ
-
-	signed long def = ecrobot_get_motor_rev(NXT_PORT_B) - ecrobot_get_motor_rev(NXT_PORT_C);	//回転量差
-	turn = w_kp * def;	//回転量算出
-
-	return turn;
-}
-
-
-//ON-OFF制御用ライン判定関数
-int online(void) {
-
-	int light_value;
-	light_value = ecrobot_get_light_sensor(NXT_PORT_S3);	//現在の輝度値
-					
-	if (GRAY_VALUE > light_value)		//輝度値が目標値より大きいか判断
-		return FALSE;					//ライン外
-	else
-		return TRUE;					//ライン内
-
-}
-
-void RA_hensareset(void)
-{
-	hensa = 0;
-	i_hensa = 0;
-	d_hensa = 0;
-	bf_hensa = 0;
-}
 
 //超音波センサ状態検出関数
-void sonarcheck(void)
+int sonarcheck(int target_sonar)
 {
-	if(ecrobot_get_sonar_sensor(NXT_PORT_S2) <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
+	if(sonarvalue <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
 	{
-		sonarflag = 1;
+		return 1;
 	}
 	else
-		sonarflag = 0;
-}
-
-//超音波センサ状態確認関数
-int getsonarflag(int target)
-{
-	target_sonar = target;				//超音波センサの目標値を指定
-
-	return sonarflag;					//指定した値に近づいているかどうかを返す（1:範囲内）
+		return 0;
 }
 
 void getsonarvalue(void)
@@ -514,7 +356,9 @@ void taildown(){
 				}
 			}
 			else
+			{
 				t_angle = t_value;
+			}
 
 			break;
 
@@ -529,7 +373,9 @@ void taildown(){
 				}
 			}
 			else
+			{
 				t_angle = t_value;
+			}
 
 			break;
 
@@ -630,7 +476,6 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定関数
 void RN_setting()
 {
-	int forward_speed;
 	switch (setting_mode){
 
 			//キャリブレーション状態
@@ -638,77 +483,13 @@ void RN_setting()
 			RN_calibrate();
 			break;
 
-		case (RN_SPEEDZERO):
-			cmd_forward = 0;
-			cmd_turn = RA_wheels(cmd_turn);
-			wait_count++;
-			if(wait_count >= 200)
-			{
-				setting_mode = RN_RUN;
-				wait_count = 0;
-			}
-			break;
-		
 			//通常走行状態
 		case (RN_RUN):
-			wait_count++;
-			RA_linetrace_PID_balanceoff(100);
-			/*
-			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
-			{
-				ecrobot_sound_tone(880, 512, 30);
-				setting_mode = RN_SLOPE_START;
-				revL = nxt_motor_get_count(NXT_PORT_C);
-				revR = nxt_motor_get_count(NXT_PORT_B);
-				distance_before_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-				wait_count = 0;
-			}
-			*/
+			setting_mode = RN_DRIFTTURN;
 			break;
 
-		case (RN_SLOPE_START):
-			RA_linetrace_PID_balanceoff(70);
-			
-			revL = nxt_motor_get_count(NXT_PORT_C);
-			revR = nxt_motor_get_count(NXT_PORT_B);
-			distance_now_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-
-			if(distance_now_slope - distance_before_slope > 30)
-			{
-				setting_mode = RN_SLOPE_DOWN;
-			}
-			
-			break;
-
-		case (RN_SLOPE_DOWN):
-			RA_linetrace_PID_balanceoff(55);
-			
-			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
-			{
-				ecrobot_sound_tone(880, 512, 30);
-				setting_mode = RN_SLOPE_AFTER;
-				revL = nxt_motor_get_count(NXT_PORT_C);
-				revR = nxt_motor_get_count(NXT_PORT_B);
-				distance_peak_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-			}
-			break;
-
-		case (RN_SLOPE_AFTER):
-			RA_linetrace_PID_balanceoff(55);
-			
-			revL = nxt_motor_get_count(NXT_PORT_C);
-			revR = nxt_motor_get_count(NXT_PORT_B);
-			distance_after_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-
-			if(distance_after_slope - distance_peak_slope > 30)
-			{
-				setting_mode = RN_SLOPE_END;
-			}
-
-			break;
-
-		case (RN_SLOPE_END):
-			RA_linetrace_PID_balanceoff(65);
+		case (RN_DRIFTTURN):
+			alarm();
 			break;
 
 		default:
@@ -753,9 +534,6 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-			GYRO_OFFSET = gyro_offset;
-			battery_value = ecrobot_get_battery_voltage();
-			min_vol = battery_value;
 			systick_wait_ms(500);
 			break;
 		}
@@ -769,7 +547,7 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(982,512,30);
 			tail_mode_change(1,ANGLEOFUP,0,2);
-			setting_mode = RN_SPEEDZERO;
+			setting_mode = RN_RUN;
 			runner_mode = RN_MODE_BALANCE;
 			break;
 		}
@@ -782,10 +560,9 @@ void RN_calibrate()
 			{
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
-						setting_mode = RN_SPEEDZERO;
+						setting_mode = RN_RUN;
 						runner_mode_change(2);
-//						tail_mode_change(1,ANGLEOFUP,0,2);
-						break;
+											break;
 					}
 			}
 			break;
@@ -793,30 +570,6 @@ void RN_calibrate()
 
 	}
 
-}
-
-//自己位置同定関数
-void self_location()
-{
-	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * PI / 180.0;
-	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * PI / 180.0;
-
-	omega_l = (d_theta_l - d_theta_l_t)/0.004;
-	omega_r = (d_theta_r - d_theta_r_t)/0.004;
-
-	v_l = (WHEEL_R * 0.1) * omega_l;
-	v_r = (WHEEL_R * 0.1) * omega_r;
-
-	v = (v_r + v_l) / 2.0;
-	omega = (v_r - v_l) / (MACHINE_W * 0.1);
-
-	d_theta_l_t = d_theta_l;
-	d_theta_r_t = d_theta_r;
-
-	theta_R += omega * 0.004 + theta_R_zero;
-	x_r += v * cos(theta_R) * 0.004 + x_r_zero;
-	y_r += v * sin(theta_R) * 0.004 + y_r_zero;
-	
 }
 
 //走行体状態設定関数
@@ -857,6 +610,30 @@ void RN_modesetting()
 	}
 }
 
+void sonar()
+{
+	
+	get_sonar = ecrobot_get_sonar_sensor(NXT_PORT_S2);
+
+}
+
+void get_bottle()
+{
+	bottle_flag = 0;
+	if(get_sonar < BOTTLE)
+		bottle_flag = 1;
+}
+
+void alarm()
+{
+	if(bottle_flag == 1){
+		ecrobot_sound_tone(900,512,30);
+		alarm_flag = 1;
+	}
+	else
+		alarm_flag = 0;
+		
+}
 
 /*
  *	各種タスク
@@ -867,7 +644,6 @@ TASK(ActionTask)
 {
 	RN_modesetting();	//走行体状態設定
 	taildown();			//尻尾制御
-	self_location();	//自己位置同定
 	TerminateTask();
 }
 
@@ -888,11 +664,11 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(v,cmd_turn,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
-			BLACK_VALUE,WHITE_VALUE);
+	logSend(cmd_forward,cmd_turn,get_sonar,bottle_flag,		//Bluetoothを用いてデータ送信
+			alarm_flag,y_r);
 
-	sonarcheck();											//超音波センサ状態管理
-	getsonarvalue();
+	sonar();
+	get_bottle();
 
 	TerminateTask();
 }
