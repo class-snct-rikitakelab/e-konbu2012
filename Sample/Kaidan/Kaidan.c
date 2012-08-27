@@ -52,12 +52,16 @@ static float i_hensa = 0;			//I制御用
 static float d_hensa = 0;			//D制御用
 static float bf_hensa = 0;
 
-
+/*
 	static float Kp = 1.85;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;				//D制御用
+static float Kd = 0.003;//D制御用
 //ライントレース時PID制御用係数
+*/
 
+static float Kp = 1.360;			//P制御用
+static float Ki = 2.6;				//I制御用
+static float Kd = 0.003;
 
 
 static int wait_count = 0;
@@ -466,7 +470,11 @@ void RN_setting()
 		
 			//通常走行
 		case (RN_RUN):
+<<<<<<< HEAD
 			cmd_forward = RA_speed(200);
+=======
+				RA_linetrace_PID(60);
+>>>>>>> 036326785cde64e52ecda4928d60365b8011ee1e
 		//	cmd_turn = RA_wheels(cmd_turn);
 			
 /*

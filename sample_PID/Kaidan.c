@@ -22,12 +22,12 @@ static int counter = 0;
 
 
 //尻尾設定角度
-#define ANGLEOFDOWN 95			//降下目標角度
+#define ANGLEOFDOWN 100			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define CMD_STOP '3'
 
-int x=25;   //速度の変数
+int x=60;   //速度の変数
 
 #define ANGLE_OF_AIM 180  //右を向く角度
 
@@ -342,7 +342,7 @@ int online(void) {
 //尻尾角度コントロール関数
 void tailcontrol(){
 
-	static const float t_Kp = 0.7;
+	static const float t_Kp = 1.7;
 
 	static float t_hensa = 0;
 	static float t_speed = 0;
