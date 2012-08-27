@@ -51,12 +51,27 @@
     <None Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Calibration.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Factory.h" />
+    <ClInclude Include="PIDCalcDebug.h" />
+    <ClInclude Include="PWMValGenerator.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Slope.h" />
+    <ClInclude Include="WLReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="balancer_param.c" />
+    <ClCompile Include="Calibration.c" />
+    <ClCompile Include="Factory.c" />
+    <ClCompile Include="PIDCalcDebug.c" />
     <ClCompile Include="positionPresumption.c" />
+    <ClCompile Include="PWMValGenerator.c" />
     <ClCompile Include="Slope.c" />
+    <ClCompile Include="WLReceiver.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Slope.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

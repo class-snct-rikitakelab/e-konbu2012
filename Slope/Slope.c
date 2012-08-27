@@ -5,7 +5,7 @@
 
 
 #include "Slope.h"
-#include "math.h"
+#include "Factory.h"
 
 
 /*
@@ -31,8 +31,6 @@ static unsigned int GYRO_OFFSET;
 
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
-
-#define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
 
 /* 車輪半径、走行体幅*/
 #define WHEEL_R		41	//[mm]
@@ -116,8 +114,6 @@ static float x_r_zero = 0;	//X座標初期値
 static float y_r_zero = 0;	//Y座標初期値
 static float theta_R_zero = 0;	//車体角度初期値
 
-char rx_buf[BT_MAX_RX_BUF_SIZE];
-
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
 /* バランスコントロールから返されるモータ制御用変数 */
@@ -173,7 +169,7 @@ typedef enum{
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILUP;
+RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 /*
  *	各種プライベート関数定義
@@ -231,6 +227,7 @@ const char target_subsystem_name[] = "Slope";
 //初期処理関数（プログラムの最初に呼び出し）
 void ecrobot_device_initialize(void)
 {
+	factory();										//全オブジェクト初期化
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);	//光センサ起動
 	ecrobot_init_bt_slave("LEJOS-OSEK");			//Bluetooth起動
 	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
@@ -580,32 +577,6 @@ void tail_mode_change(int mode,int value,int limit,int up)	//mode(0:尻尾を下ろす
 
 }
 
-//リモートスタート管理関数
-static int remote_start(void)
-{
-	int i;
-	unsigned int rx_len;
-	unsigned char start = 0;		//状態フラグ
-
-	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
-	{
-		rx_buf[i] = 0; //受信バッファをクリア
-	}
-
-	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
-	if (rx_len > 0)
-	{
-		//受信データあり
-		if (rx_buf[0] == CMD_START)
-		{
-			start = 1; //走行開始フラグ
-		}
-		ecrobot_send_bt(rx_buf, 0, rx_len); //受信データをエコーバック
-	}
-
-	return start;
-}
-
 //bluetoothログ送信関数
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
             U8 data_log_buffer[32];
@@ -631,28 +602,35 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 void RN_setting()
 {
 	int forward_speed;
+	PWMValues pValues;
+
+
 	switch (setting_mode){
 
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();
+			if(Calibration_doCalibrate(&mCalibration) == 1)
+				setting_mode = RN_RUN;
 			break;
 
 		case (RN_SPEEDZERO):
-			cmd_forward = 0;
-			cmd_turn = RA_wheels(cmd_turn);
-			wait_count++;
-			if(wait_count >= 200)
-			{
+			//cmd_forward = 0;
+			//cmd_turn = RA_wheels(cmd_turn);
+			//wait_count++;
+			//if(wait_count >= 200)
+			//{
 				setting_mode = RN_RUN;
-				wait_count = 0;
-			}
+				//wait_count = 0;
+			//}
 			break;
 		
 			//通常走行状態
 		case (RN_RUN):
-			wait_count++;
-			RA_linetrace_PID_balanceoff(100);
+			//wait_count++;
+			//RA_linetrace_PID_balanceoff(100);
+			pValues = PWMValGenerator_calTailRunPWM(&mPWMValGenerator,50,PIDCalcDebug_PIDLinetrace(&mPIDCalcDebug));
+			nxt_motor_set_speed(NXT_PORT_C, pValues.pwmL, 1);
+			nxt_motor_set_speed(NXT_PORT_B, pValues.pwmR, 1);
 			/*
 			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
 			{
@@ -716,84 +694,7 @@ void RN_setting()
 	}
 }
 
-//キャリブレーション関数
-void RN_calibrate()
-{
 
-	tail_mode_change(0,ANGLEOFDOWN,1,2);
-
-	//黒値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(880, 512, 10);
-			BLACK_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//白値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(906, 512, 10);
-			WHITE_VALUE=ecrobot_get_light_sensor(NXT_PORT_S3);
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//灰色値計算
-	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
-
-	//ジャイロオフセット及びバッテリ電圧値
-	while(1){
-		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(932, 512, 10);
-			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-			GYRO_OFFSET = gyro_offset;
-			battery_value = ecrobot_get_battery_voltage();
-			min_vol = battery_value;
-			systick_wait_ms(500);
-			break;
-		}
-	}
-
-	//走行開始合図
-	while(1)
-	{
-		//リモートスタート
-		if(remote_start()==1)
-		{
-			ecrobot_sound_tone(982,512,30);
-			tail_mode_change(1,ANGLEOFUP,0,2);
-			setting_mode = RN_SPEEDZERO;
-			runner_mode = RN_MODE_BALANCE;
-			break;
-		}
-
-		//タッチセンサスタート
-		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-		{
-			ecrobot_sound_tone(982,512,10);
-			while(1)
-			{
-					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
-					{
-						setting_mode = RN_SPEEDZERO;
-						runner_mode_change(2);
-//						tail_mode_change(1,ANGLEOFUP,0,2);
-						break;
-					}
-			}
-			break;
-		}
-
-	}
-
-}
 
 //自己位置同定関数
 void self_location()
