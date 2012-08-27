@@ -46,6 +46,8 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
+<<<<<<< HEAD
+=======
 
 /*
 static float Kp = 0.85;				//P制御用
@@ -59,6 +61,7 @@ static float Ki = 2.6;				//I制御用
 static float Kp = 1.360;			//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
+>>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
 
 /*
 static float Kp = 1.0944;			//P制御用
@@ -419,6 +422,24 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+<<<<<<< HEAD
+			RA_linetrace_PID(100);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+				cmd_forward = 0;
+				cmd_turn = 0;
+				RA_hensareset();
+				systick_wait_ms(500);
+				setting_mode = RN_TYREAL;
+			}
+			break;
+=======
 	
 			RA_linetrace_PID(x);
 
@@ -439,6 +460,7 @@ void RN_setting()
 		break;
 
 
+>>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
 
 		default:
 			break;
