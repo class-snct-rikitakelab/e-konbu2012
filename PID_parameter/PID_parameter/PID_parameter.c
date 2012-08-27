@@ -29,12 +29,13 @@ static int counter = 0;
 #define ANGLE_OF_AIM 180  //右を向く角度
 
 //速度調節係数
-#define SPEED_COUNT 20
+#define SPEED_COUNT 5
 
 //ライントレース時PID制御用係数
-static float Kp = 0.9;				//P制御用
-static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;			//D制御用
+
+static float Kp = 0.436;//0.436;				//P制御用
+static float Ki = 1.31;//1.31;					//I制御用
+static float Kd = 0.011;//0.011;				//D制御用
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
@@ -76,6 +77,8 @@ typedef enum{
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
+//RN_SETTINGMODE setting_mode = RN_TYREAL;
+
 RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 /*	
@@ -89,7 +92,7 @@ int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
 void tailcontrol();
-void RA_speed(int limit,int s_Kp);
+int RA_speed(int forward_speed);
 void RN_modesetting();
 static int remote_start(void);
 static int remote_stop(void);
@@ -160,65 +163,72 @@ void RA_linetrace_PID(int forward_speed) {
 	static float i_hensa = 0;			//I制御用
 	static float d_hensa = 0;			//D制御用
 	static float bf_hensa = 0;
-
-	RA_speed(forward_speed,2);	//速度を段階的に変化
+	float right_motor_turn=0,left_motor_turn;
+	
+	forward_speed = RA_speed(forward_speed);	//速度を段階的に変化
 
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
 	else
 		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
 
-	i_hensa = i_hensa+(hensa*0.0005);
-	d_hensa = (hensa - bf_hensa)/0.0005;
+	i_hensa = i_hensa+(hensa*0.0002);
+	d_hensa = (hensa - bf_hensa)/0.0002;
 	bf_hensa = hensa;
 
-	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+	
+//	cmd_turn = -(Kp * hensa);
 
-	cmd_turn=-(Kp*hensa);
+	right_motor_turn = forward_speed - cmd_turn/2;
+	left_motor_turn = forward_speed  + cmd_turn/2;
 
-	if (-100 > cmd_turn) {
-		cmd_turn = -100;
-	} else if (100 < cmd_turn) {
-		cmd_turn = 100;
+	if (-128 > right_motor_turn) {
+		right_motor_turn = -128;
+	} else if (127 < right_motor_turn) {
+		right_motor_turn = 127;
 	}
 
+	if (-128 > left_motor_turn) {
+		left_motor_turn = -128;
+	} else if (127 < left_motor_turn) {
+		left_motor_turn = 127;
+	}
+
+
 	/*倒立制御OFF時*/
-	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+//	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+//	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_C,left_motor_turn , 1);
+	nxt_motor_set_speed(NXT_PORT_B, right_motor_turn, 1);
 
 }
 
 
 //段階的加速用関数（指定量だけ速度を徐々に上昇）
-void RA_speed(int limit,int s_Kp){
+int RA_speed(int forward_speed){
 
-	static int forward_speed;
-
-	counter ++;
+	static int result_speed = 0;
+	counter++;
 
 	if(counter >= SPEED_COUNT)
 	{
+		if(forward_speed - result_speed >= 0){
+			result_speed++;
 
-		forward_speed = cmd_forward;
-
-		if(limit-forward_speed >= 0){
-			forward_speed += s_Kp;
-
-			if(forward_speed > limit)
-				forward_speed = limit;
+			if(result_speed > forward_speed)
+				result_speed = forward_speed;
 		}
 		else{
-			forward_speed -= s_Kp;
+			result_speed--;
 
-			if(forward_speed < limit)
-				forward_speed = limit;
+			if(result_speed < forward_speed)
+				result_speed = forward_speed;
 		}
-
-		cmd_forward = forward_speed;
-		counter =0;
-
-
+		counter = 0;
 	}
+
+	return result_speed;
 }
 
 //尻尾角度コントロール関数
@@ -257,12 +267,17 @@ void tailcontrol(){
 //走行設定関数
 void RN_setting()
 {
-	int speed = 100;
+	int speed = 110;
 
 	switch (setting_mode){
 
 		case (RN_TYREAL):
 			do_tyreal(&Kp,&Ki,&Kd);
+
+			ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
+
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
 				ecrobot_sound_tone(932, 512, 20);
@@ -286,9 +301,14 @@ void RN_setting()
 		case (RN_RUN):
 			RA_linetrace_PID(speed);
 			if (remote_stop()==1 || ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
-			{				
+			{				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
 				systick_wait_ms(500);
- 		 		speed = 0;
+ 		 		//speed = 0;
+				runner_mode = RN_MODE_BALANCEOFF;
+				setting_mode = RN_TYREAL;
+				
 			}
 			break;
 

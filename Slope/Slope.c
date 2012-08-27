@@ -652,7 +652,8 @@ void RN_setting()
 			//’Êí‘–só‘Ô
 		case (RN_RUN):
 			wait_count++;
-			RA_linetrace_PID_balanceoff(70);
+			RA_linetrace_PID_balanceoff(100);
+			/*
 			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
@@ -662,6 +663,7 @@ void RN_setting()
 				distance_before_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
 				wait_count = 0;
 			}
+			*/
 			break;
 
 		case (RN_SLOPE_START):
