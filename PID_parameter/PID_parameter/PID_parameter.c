@@ -33,9 +33,9 @@ static int counter = 0;
 
 //ライントレース時PID制御用係数
 
-static float Kp = 0.436;//0.436;				//P制御用
-static float Ki = 1.31;//1.31;					//I制御用
-static float Kd = 0.011;//0.011;				//D制御用
+static float Kp = 0.456;//0.436;				//P制御用
+static float Ki = 1.61;//1.31;					//I制御用
+static float Kd = 0.017;//0.011;				//D制御用
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
@@ -195,12 +195,8 @@ void RA_linetrace_PID(int forward_speed) {
 		left_motor_turn = 127;
 	}
 
-
-	/*倒立制御OFF時*/
-//	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-//	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_C,left_motor_turn , 1);
-	nxt_motor_set_speed(NXT_PORT_B, right_motor_turn, 1);
+	pwm_l = left_motor_turn;
+	pwm_r = right_motor_turn;
 
 }
 
@@ -442,6 +438,8 @@ void RN_modesetting()
 			break;
 
 		case (RN_MODE_BALANCEOFF):
+			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
+			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
 			break;
 
 		default:
@@ -471,7 +469,7 @@ TASK(ActionTask2)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,0,0,0,0);		//ログ取り
+	logSend(cmd_forward,cmd_turn,pwm_l,pwm_r,0,0);		//ログ取り
 	TerminateTask();
 }
 
