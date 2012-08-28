@@ -27,9 +27,9 @@ static int counter = 0;
 
 #define CMD_STOP '3'
 
-int x=25;   //速度の変数
+int x=30;   //速度の変数
 
-#define ANGLE_OF_AIM 180  //右を向く角度
+#define ANGLE_OF_AIM 180 //右を向く角度
 
 //速度調節係数
 #define SPEED_COUNT 20
@@ -108,7 +108,14 @@ typedef enum{
 	RN_STEP_SLOW,
 	RN_STEP_STAY,
 	RN_STEP_SECOND,
-	RN_Right
+
+	RN_Right,
+	RN_Left,
+	RN_Stop,
+	RN_Go,
+	RN_Hit
+
+
 } RN_SETTINGMODE;
 
 
@@ -141,7 +148,10 @@ int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
 static int remote_stop(void);  // 停止用関数 
-static int right(void);  //右向く関数 
+static int right(int angle);  //右向く関数 
+static int stop(void);//止まる関数
+static int goforward(void); //進む関数
+static int hit(void); //衝突検知関数
 
 int shock(int target);
 void tailcontrol();
@@ -154,6 +164,8 @@ int rapid_speed_up(int target_gyro);
 void self_location(void);
 void battery_average_check(void);
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
+int abs(int value);
+
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -416,6 +428,10 @@ void RN_setting()
 		case (RN_RUN):
 	
 			RA_linetrace_PID(x);
+			if(hit()==1)
+			{
+			setting_mode=RN_Stop;
+			}
 
                         if (remote_stop( )==1)
  		{                  
@@ -429,15 +445,55 @@ void RN_setting()
 			//右を向く
 		case(RN_Right):
 		
-		right( );
-		
+		if(right(180)==1)
+		{
+
+		setting_mode=RN_Left;
+		ecrobot_sound_tone(880, 512, 10);
+		systick_wait_ms(500);
+	
+		}
+
+			break;
+	
+			//左を向く
+		case(RN_Left):
+
+		if(right(-180)==1)
+		{	
+		setting_mode=RN_Stop;
+	
+		}
+		break;
+
+		case(RN_Stop):
+
+		stop();
+		/*if(stop()==1)
+		{
+		setting_mode=RN_Go;
+		}*/
 		break;
 
 
+		case(RN_Go):
+
+		if(goforward()==1)
+		{
+		setting_mode=RN_Hit;
+		}
+
+		break;
+
+		case(RN_Hit):
+		
+		hit();
+		break;
 
 		default:
 			break;
-	}
+
+		}
 }
 
 
@@ -472,7 +528,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
-/*
+
 
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
@@ -486,7 +542,7 @@ void RN_calibrate()
 			break;
 		}
 	}
-*/
+
 	//走行開始合図
 	while(1){
 
@@ -537,27 +593,111 @@ static int remote_stop(void)
 }
 
 //右を向く関数
-static int right(void)
+static int right(int angle)
 {
+static int flag=0;
 
+if(flag==0){
 ecrobot_set_motor_rev(NXT_PORT_C, 0);
+ecrobot_set_motor_rev(NXT_PORT_B, 0);
 
-ecrobot_set_motor_speed(NXT_PORT_C, 50);
+flag=1;
+}
 
-while(ecrobot_get_motor_rev(NXT_PORT_C) <= ANGLE_OF_AIM){
-	}
+if(flag==1&& abs(ecrobot_get_motor_rev(NXT_PORT_C)) <= abs(angle) && 
+abs(ecrobot_get_motor_rev(NXT_PORT_B)) <= abs(angle) ){
 
+if(angle>0)
+{
+ecrobot_set_motor_speed(NXT_PORT_C,  50);
+ecrobot_set_motor_speed(NXT_PORT_B, -50);
+
+}
+
+else
+{
+ecrobot_set_motor_speed(NXT_PORT_C, -50);
+ecrobot_set_motor_speed(NXT_PORT_B,  50);
+}
+
+
+				             }
+else
+{
 ecrobot_set_motor_speed(NXT_PORT_C, 0);
-
-
+ecrobot_set_motor_speed(NXT_PORT_B, 0);
+flag=0;
+return 1;
 }
 
 
 
+return 0;
+}
+
+//止まる関数
+static int stop(void)
+{
+
+ecrobot_set_motor_speed(NXT_PORT_C, 0);
+ecrobot_set_motor_speed(NXT_PORT_B, 0);
+
+return 1;
+}
+
+//ライントレースなしで前進
+static int goforward(void)
+{
+
+ecrobot_set_motor_speed(NXT_PORT_C, 50);
+ecrobot_set_motor_speed(NXT_PORT_B, 50);
+
+return 1;
+}
+
+//衝撃を感知する関数
+static int hit(void)
+{
+static U16 buf=600;
+static int hit_counter=0;
+int hit_result=0;
+
+hit_counter=hit_counter+1;
+
+if(hit_counter==3)
+{
+buf=ecrobot_get_gyro_sensor(NXT_PORT_S1);
+hit_counter=0;
+}
 
 
+if((buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))>=30||(buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))<=-30 )
+{
+ecrobot_sound_tone(880, 512, 10);
+systick_wait_ms(30);
+hit_result=1;
+//ecrobot_set_motor_speed(NXT_PORT_C, 0);
+//ecrobot_set_motor_speed(NXT_PORT_B, 0);
+}
 
+/*
+ecrobot_set_motor_speed(NXT_PORT_C, -50);
+ecrobot_set_motor_speed(NXT_PORT_B, -50);*/
+return hit_result;
+}
 
+int abs(int value){
+int result=0;
+
+if(value>=0){
+result=value;
+}
+else {
+result = -value;
+}
+
+return result;
+}
 
 
 
@@ -646,7 +786,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,0,0,0,0);		//ログ取り
+	logSend(cmd_forward,cmd_turn,ecrobot_get_gyro_sensor(NXT_PORT_S1),0,0,0);		//ログ取り
 	TerminateTask();
 }
 
