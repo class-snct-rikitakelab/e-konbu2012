@@ -1,59 +1,45 @@
-/*
- * petbottle.c
- * ドリフトターン用ペットボトル検知プログラム
- */
 
 
 #include "Petbottle.h"
+#include "logSend.h"
 #include "math.h"
 
 
 /*
- *	各種定義
-*/
-
-
-//尻尾設定角度
-#define ANGLEOFDOWN 95 				//降下目標角度
-#define ANGLEOFUP 0					//上昇目標角度
-#define ANGLEOFPUSH ANGLEOFDOWN+5				//押上目標角度（未使用）
-#define ANGLEOFLOOKUP 56
-
-#define PI 3.141592
-
-//速度カウンタの上限値
-#define SPEED_COUNT 10
-
-//ジャイロ振幅値
-#define PM_GYRO 65
-
-//車輪の円周[cm]
-#define CIRCUMFERENCE 25.8			//車輪の円周
-
-#define CMD_START '1'    			//リモートスタートコマンド(変更禁止)
-
-/* 車輪半径、走行体幅*/
-#define WHEEL_R		41	//[mm]
-#define MACHINE_W	162	//[mm]
-
-#define BOTTLE 27	//[cm]
-/*
- *	グローバル変数
+ *	各種変数定義
  */
 
 //ライントレース用目標値
 static unsigned int BLACK_VALUE;	//黒値
 static unsigned int WHITE_VALUE;	//白値
 static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
-static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
-static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
-static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
 
-static unsigned int LOOKUP_SONAR_VALUE;
+//ジャイロオフセット値
+static unsigned int GYRO_OFFSET;	
 
-//速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
-static int speed_counter = 0;
+static int counter = 0;
 
+#define BOTTLE 	27//[cm]
+
+//尻尾設定角度
+#define ANGLEOFDOWN 95			//降下目標角度
+#define ANGLEOFUP 0					//上昇目標角度
+
+#define CMD_STOP '3'
+
+//車輪の円周[cm]
+#define CIRCUMFERENCE 25.8			//車輪の円周
+
+int x=30;   //速度の変数
+
+#define ANGLE_OF_AIM 180 //右を向く角度
+
+//速度調節係数
+#define SPEED_COUNT 20
+
+//バッテリ降下値
+#define STEP_BATTERY 300
+#define STOP_BATTERY 400
 
 //PID制御用偏差値
 static float hensa;					//P制御用
@@ -63,62 +49,43 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-static float Kp = 1.85;				//P制御用
+
+/*
+static float Kp = 0.85;				//P制御用
+static float Ki = 2.2;				//I制御用
+
+static float Kp = 1.03;				//P制御用
 static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;			//D制御用
+*/
 
-//尻尾PI制御用係数
-static float t_Kp = 1.85;			//P制御用
-static float t_Ki = 0;				//I制御用
 
-//尻尾制御用変数
-static int t_angle = 0;				//現在の角度
-static int t_count = 0;				//制御速度調節用カウンタ
-static int t_value = 0;				//角度目標値
-static int t_count_limit = 0;		//カウンタ最大値
-static int t_up = 0;				//増減値
+static float Kp = 1.360;			//P制御用
+static float Ki = 2.6;				//I制御用
+static float Kd = 0.003;				//D制御用
 
-//全体用カウンタ（時間稼ぎ用）
-static int wait_count = 0;
+/*
+static float Kp = 1.0944;			//P制御用
+static float Ki = 2.2;				//I制御用
+static float Kd = 0.002;				//D制御用
+*/
 
-//超音波センサ目標値
-static int target_sonar = 20;
+static int time_count = 0;
 
-//超音波センサ用フラグ
-static int sonarflag;
-
-static int sonarvalue;
-
-//ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
-
-/* 自己位置同定用変数 */
-float d_theta_r;			//1ステップ当たりの右車輪回転角度
-float d_theta_l;			//1ステップ当たりの左車輪回転角度
-
-static float d_theta_r_t = 0;		//前回のステップの右車輪回転角度
-static float d_theta_l_t = 0;		//前回のステップの左車輪回転角度
-
-static double omega_r;			//右車輪の回転角速度
-static double omega_l;			//左車輪の回転角速度
-
-float v_r;				//右車輪の回転速度
-float v_l;				//左車輪の回転速度
-
-float v;					//走行体の走行速度
-float omega;				//走行体の回転角速度
-
-static float x_r = 0;		//車体のX座標
-static float y_r = 0;		//車体のY座標
-static float theta_R = 0;	//車体の角度
-
-static float x_r_zero = 0;	//X座標初期値
-static float y_r_zero = 0;	//Y座標初期値
-static float theta_R_zero = 0;	//車体角度初期値
+static double min_vol;
+static int stepflag = 0;
 
 static int get_sonar = 0;		//超音波センサの値
 static int bottle_flag ;		//ペットボトルの判断
 static int alarm_flag;
+
+//ジャイロセンサオフセット計算用変数
+static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
+
+int distancestop;	//停止時の距離
+int distanceback;	//後退時の距離
+
+//バッテリ電圧値状態
+static U32	battery_value;
 
 char rx_buf[BT_MAX_RX_BUF_SIZE];
 
@@ -127,38 +94,35 @@ S8  cmd_forward, cmd_turn;
 /* バランスコントロールから返されるモータ制御用変数 */
 S8	pwm_l, pwm_r;
 
-
-//距離計測用変数
-int revL = 0;
-int revR = 0;
-
-int distance_before_gate;	//ルックアップゲート通過前距離
-int distance_after_gate;	//ルックアップゲート通過中距離
-
-
-//マーカーフラグ　0: OFF, 1: ON
-unsigned char m_flg = 0;
-static unsigned int LV_buf = 0;		/* Light Value buffer */
-
 /*
- *	各種状態定義
+ *	状態定義
  */
-
 
 //システム全体の状態
 typedef enum{
 	RN_MODE_INIT, 					//初期状態
+
 	RN_MODE_BALANCE,				//倒立制御ON
-	RN_MODE_BALANCEOFF				//倒立制御OF
+	RN_MODE_BALANCEOFF,				//倒立制御OFF
 } RN_MODE;
 
 
-//状態
 typedef enum{
+	RN_TYREAL,
 	RN_SETTINGMODE_START,		//初期状態
-	RN_RUN,				//基本走行（ライントレース）
-	RN_DRIFTTURN,			//ドリフトターン
+	RN_RUN,						//基本走行（ライントレース）
+	RN_STOP,					//停止
+
+	RN_Right,
+	RN_Left,
+	RN_Stop,
+	RN_Go,
+	RN_Hit,
+	RN_Back,
+
+
 } RN_SETTINGMODE;
+
 
 //尻尾の状態
 typedef enum{
@@ -166,15 +130,21 @@ typedef enum{
 	RN_TAILUP,					//尻尾上昇
 } RN_TAILMODE;
 
+
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
+//RN_SETTINGMODE setting_mode = RN_TYREAL;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILUP;
 
-/*
- *	各種プライベート関数定義
+RN_TAILMODE tail_mode = RN_TAILDOWN;
+
+
+//段差検知関連マクロ、プロトタイプ
+static int RN_rapid_speed_up_signal_recevie(void);
+
+/*	
+ *	各種関数定義
  */
-
 
 //各種プライベート関数
 void RN_calibrate();
@@ -182,87 +152,72 @@ void RN_setting();
 int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
-void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
-void taildown();
+static int remote_stop(void);  // 停止用関数 
+static int right(int angle);  //右向く関数 
+static int stop(void);//止まる関数
+static int goforward(void); //進む関数
+static int hit(void); //衝突検知関数
+static int back(void);
+
+int shock(int target);
+void tailcontrol();
 void RA_linetrace_P(int forward_speed);
-void RA_speed(int limit,int s_Kp);
+int RA_speed(int forward_speed);
 int RA_wheels(int turn);
 void RN_modesetting();
 static int remote_start(void);
-int sonarcheck(int target_sonar);
-void runner_mode_change(int flag);
-void tailpower(float value);
-void tail_mode_change(int mode,int value,int limit,int t_up);
-void RA_linetrace_PID_balanceoff(int forward_speed);
-void getsonarvalue(void);
-
-void RA_hensareset(void);
-
-
+int rapid_speed_up(int target_gyro);
 void self_location(void);
-unsigned char MKTrigger(void);
-signed char LVTrigger(void);
-int abs(int n);
-void sonar();
-void get_bottle();
-void alarm();
+void battery_average_check(void);
+void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
+int abs(int value);
+
+void sonar(void);
+void get_bottle(void);
+void alarm(void);
+
+int distance(void);
+
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
 
-
-//タスクの宣言
-/*
-DeclareTask(ActionTask);
-DeclareTask(ActionTask2);
-DeclareTask(DisplayTask);
-DeclareTask(LogTask);
-*/
-
 //液晶ディスプレイに表示するシステム名設定
-const char target_subsystem_name[] = "petbottle";
-
+const char target_subsystem_name[] = "Kaidan";
 
 
 /*
- *	関数実装
+ *	各種関数
  */
 
-
-//初期処理関数（プログラムの最初に呼び出し）
+//初期処理
 void ecrobot_device_initialize(void)
 {
-	ecrobot_set_light_sensor_active(NXT_PORT_S3);	//光センサ起動
-	ecrobot_init_bt_slave("LEJOS-OSEK");			//Bluetooth起動
+	ecrobot_set_light_sensor_active(NXT_PORT_S3);
 	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
+	ecrobot_init_bt_slave("LEJOS-OSEK");
 
-	//モータリセット
 	ecrobot_set_motor_rev(NXT_PORT_A,0);
 	ecrobot_set_motor_rev(NXT_PORT_B,0);
 	ecrobot_set_motor_rev(NXT_PORT_C,0);
+	/*
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	*/
 }
 
 
-
-//後始末処理関数（プログラム終了時呼び出し）
+//後始末処理
 void ecrobot_device_terminate(void)
 {
-	tail_mode = RN_TAILUP;							//尻尾を上げる（意味あるのか？）
-
-	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);	//光センサ終了
-	ecrobot_term_sonar_sensor(NXT_PORT_S2);			//超音波センサ終了
-	ecrobot_term_bt_connection();					//Bluetooth終了
-
-	//モータリセット
-	ecrobot_set_motor_rev(NXT_PORT_A,0);
-	ecrobot_set_motor_rev(NXT_PORT_B,0);
-	ecrobot_set_motor_rev(NXT_PORT_C,0);
-	ecrobot_set_motor_speed(NXT_PORT_A, 0);			
+	tail_mode = RN_TAILUP;
+	ecrobot_set_motor_speed(NXT_PORT_A, 0);
 	ecrobot_set_motor_speed(NXT_PORT_B, 0);
 	ecrobot_set_motor_speed(NXT_PORT_C, 0);
+	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);
+	ecrobot_term_sonar_sensor(NXT_PORT_S2);
+	ecrobot_term_bt_connection();
 }
 
 
@@ -287,169 +242,152 @@ void user_1ms_isr_type2(void){
 }
 
 
+//ON-OFF制御ライントレース関数
+void RA_linetrace(int forward_speed, int turn_speed) {
 
+	cmd_forward = forward_speed;
 
-//超音波センサ状態検出関数
-int sonarcheck(int target_sonar)
-{
-	if(sonarvalue <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
-	{
-		return 1;
+	int light_value = 0;
+	light_value = online();
+	if (TRUE != light_value) {
+		cmd_turn = turn_speed;
+	} else {
+		cmd_turn = (-1)*turn_speed;
 	}
+
+}
+
+
+//P制御ライントレース関数
+void RA_linetrace_P(int forward_speed){
+
+	cmd_forward = forward_speed;
+
+	hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
+
+	cmd_turn = -(1.4 * hensa);
+	if (-100 > cmd_turn) {
+		cmd_turn = -100;
+	} else if (100 < cmd_turn) {
+		cmd_turn = 100;
+	}
+}
+
+
+//PID制御ライントレース関数
+void RA_linetrace_PID(int forward_speed) {
+
+
+	forward_speed = RA_speed(forward_speed);	//速度を段階的に変化
+
+	if(forward_speed > 0)
+		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
 	else
-		return 0;
-}
+		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
 
-void getsonarvalue(void)
-{
-	sonarvalue = ecrobot_get_sonar_sensor(NXT_PORT_S2);
-}
+	i_hensa = i_hensa+(hensa*0.0005);
+	d_hensa = (hensa - bf_hensa)/0.0005;
+	bf_hensa = hensa;
 
-//走行体モード変更関数（主にバランサーのON/OFF）
-void runner_mode_change(int flag)
-{
-	switch(flag){
-	case 0:
-		runner_mode = RN_MODE_INIT;			//走行体初期状態
-		break;
-	case 1:
-		runner_mode = RN_MODE_BALANCE;		//バランサーON
-		break;
-	case 2:
-		runner_mode = RN_MODE_BALANCEOFF;	//バランサーOFF
-		break;
-	default:
-		break;
+	//cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
+
+	cmd_turn=-(Kp*hensa);
+
+	if (-100 > cmd_turn) {
+		cmd_turn = -100;
+	} else if (100 < cmd_turn) {
+		cmd_turn = 100;
 	}
+
+	/*倒立制御OFF時*/
+	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
+	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
+
 }
 
-//尻尾制御パラメータ変更関数
-void tailpower(float value)
+//PID制御用偏差リセット関数
+void RA_hensareset(void)
 {
-	t_Kp = value;							//引数の値に尻尾制御のパラメータを変更
+	hensa = 0;
+	i_hensa = 0;
+	d_hensa = 0;
+	bf_hensa = 0;
+}
+
+//段階的加速用関数（指定量だけ速度を徐々に上昇）
+int RA_speed(int forward_speed){
+
+	static int result_speed = 0;
+	counter++;
+
+	if(counter >= SPEED_COUNT)
+	{
+		if(forward_speed - result_speed >= 0){
+			result_speed++;
+
+			if(result_speed > forward_speed)
+				result_speed = forward_speed;
+		}
+		else{
+			result_speed--;
+
+			if(result_speed < forward_speed)
+				result_speed = forward_speed;
+		}
+		counter = 0;
+	}
+
+	return result_speed;
+}
+
+//ON-OFF制御用ライン判定関数
+int online(void) {
+
+	int light_value;
+	light_value = ecrobot_get_light_sensor(NXT_PORT_S3);
+
+	if (GRAY_VALUE > light_value) {
+		if ((GRAY_VALUE) > light_value) {
+			return FALSE; 
+		}
+		else {
+			return TRUE;
+		}
+	}
+	return TRUE;
 }
 
 
-//尻尾角度調節関数
-void taildown(){
+//尻尾角度コントロール関数
+void tailcontrol(){
 
-	//X-ecrobot_get_motor_rev(NXT_PORT_S4) のX = 目標値
-	//目標値を1ずつ調節(現行目標値t_angleそのものを最終目標値t_valueへ近づけていく)
-	//t_angleの初期値は現在の角度
+	static const float t_Kp = 1.7;
 
-	static float t_hensa = 0;	//尻尾角度の目標値との差
-	static float t_ihensa = 0;	//I制御用偏差
-
-	static float t_speed = 0;	//尻尾モータに送る速度
-
-	t_count++;					//速度制御用カウンタ
+	static float t_hensa = 0;
+	static float t_speed = 0;
 
 	switch(tail_mode){
-		case(RN_TAILDOWN):				//尻尾を下げる
-			if(t_angle <= t_value)		//現在の角度が目標値以下かどうか
-			{
-				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
-				if(t_count >= t_count_limit)	//カウンタで尻尾を下げる速度を調整
-				{
-					t_angle+=t_up;			//角度を上げる
-					t_count = 0;
-				}
-			}
-			else
-			{
-				t_angle = t_value;
-			}
-
+		case(RN_TAILDOWN):
+			t_hensa = ANGLEOFDOWN - ecrobot_get_motor_rev(NXT_PORT_A);		//尻尾を下げる
 			break;
 
-		case(RN_TAILUP):				//尻尾を上げる
-			if(t_angle >= t_value)		//現在の角度が目標値以上かどうか
-			{
-				t_hensa = t_angle - ecrobot_get_motor_rev(NXT_PORT_A);
-				if(t_count >= t_count_limit)	//カウンタで尻尾を上げる速度を調整
-				{
-					t_angle-=t_up;			//角度を下げる
-					t_count = 0;
-				}
-			}
-			else
-			{
-				t_angle = t_value;
-			}
-
+		case(RN_TAILUP):
+			t_hensa = ANGLEOFUP - ecrobot_get_motor_rev(NXT_PORT_A);		//尻尾を上げる
 			break;
 
 		default:
 			break;
-
 	}
 
-	t_ihensa = t_ihensa+(t_hensa*0.0004);		//I制御用偏差
-
-	t_speed = (t_Kp*t_hensa + t_Ki*t_ihensa);	//偏差を元に速度調節
+	t_speed = t_Kp*t_hensa;
 
 	if (t_speed < -100)
 		t_speed = -100;
 	else if (t_speed > 100)
 		t_speed = 100;
 
-	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);	//モータに速度を送る
+	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);
 
-}
-
-//尻尾モード変更関数
-void tail_mode_change(int mode,int value,int limit,int up)	//mode(0:尻尾を下ろす、1:尻尾を上げる) value(目標値) limit(上げるほど遅延） up（上げるほど加速）1
-{
-
-	static int flag;					//尻尾モードフラグ
-
-	switch(mode){
-		case 0:
-			tail_mode = RN_TAILDOWN;	//尻尾を下ろす
-			flag = 0;
-			break;
-		case 1:
-			tail_mode = RN_TAILUP;		//尻尾を上げる
-			flag = 1;
-			break;
-		default:
-			break;
-	}
-
-	//目標値が変わった時のみ、角度を決める（複数回呼び出す場合も初期値をキープするため）
-	if(t_value != value)
-		t_angle = ecrobot_get_motor_rev(NXT_PORT_A);
-
-	t_value = value;			//目標値設定
-	t_count_limit = limit;		//カウンタ最大値設定
-	t_up = up;					//角度増減値設定
-
-}
-
-//リモートスタート管理関数
-static int remote_start(void)
-{
-	int i;
-	unsigned int rx_len;
-	unsigned char start = 0;		//状態フラグ
-
-	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
-	{
-		rx_buf[i] = 0; //受信バッファをクリア
-	}
-
-	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
-	if (rx_len > 0)
-	{
-		//受信データあり
-		if (rx_buf[0] == CMD_START)
-		{
-			start = 1; //走行開始フラグ
-		}
-		ecrobot_send_bt(rx_buf, 0, rx_len); //受信データをエコーバック
-	}
-
-	return start;
 }
 
 //bluetoothログ送信関数
@@ -472,36 +410,135 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
             ecrobot_send_bt_packet(data_log_buffer, 32);
 }
 
-
-//走行状態設定関数
+//走行設定関数
 void RN_setting()
 {
+	int distancestop;	//停止時の距離
+	int distanceback;	//後退時の距離
+
 	switch (setting_mode){
-
-			//キャリブレーション状態
+		/*
+		case (RN_TYREAL):
+			do_tyreal(&Kp,&Ki,&Kd);
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(932, 512, 20);
+				systick_wait_ms(100);
+				ecrobot_sound_tone(466, 256, 20);
+				systick_wait_ms(10);
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+			}
+			break;
+		*/
+			//走行開始前
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();
+			RN_calibrate();				//キャリブレーション
+			ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
 			break;
 
-			//通常走行状態
+			//通常走行
 		case (RN_RUN):
-			setting_mode = RN_DRIFTTURN;
+			time_count++;
+
+			RA_linetrace_PID(x);
+			if(time_count > 500)
+			{
+				if(hit()==1)
+				{
+					setting_mode=RN_Back;
+					time_count = 0;
+					distancestop = distance();
+				}
+			}
+			/*
+                        if (remote_stop()==1)
+ 			{                  
+ 		 		x=0;
+				setting_mode=RN_Right;
+			}
+			*/
 			break;
 
-		case (RN_DRIFTTURN):
+
+			//右を向く
+		case(RN_Right):
+		
+		if(right(180)==1)
+		{
 			alarm();
+			setting_mode=RN_Left;
+			/*ecrobot_sound_tone(880, 512, 10);
+			systick_wait_ms(500);
+			*/
+		}
+
+		break;
+	
+			//左を向く
+		case(RN_Left):
+
+		if(right(-180)==1)
+		{	
+		setting_mode=RN_Stop;
+	
+		}
+		break;
+
+		//止まる
+		case(RN_Stop):
+		stop();
+		/*if(stop()==1)
+		{
+		setting_mode=RN_Go;
+		}*/
+		break;
+
+
+		//下がる
+		case (RN_Back):
+
+			back();
+			distanceback = distance();
+			/*
+			if(distanceback - distancestop < -30)	//停止した時と後退している時の距離を比較
+			{
+				setting_mode=RN_Stop;
+			}
+			*/
 			break;
+
+
+		//進む
+		case(RN_Go):
+
+		if(goforward()==1)
+		{
+		setting_mode=RN_Hit;
+		}
+
+		break;
+
+
+		//ぶつかる
+		case(RN_Hit):
+		
+		hit();
+		break;
 
 		default:
 			break;
-	}
+
+		}
 }
+
+
 
 //キャリブレーション関数
 void RN_calibrate()
 {
-
-	tail_mode_change(0,ANGLEOFDOWN,1,2);
 
 	//黒値
 	while(1){
@@ -529,85 +566,189 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//ジャイロオフセット及びバッテリ電圧値
+
+
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET = gyro_offset;
+			battery_value = ecrobot_get_battery_voltage();
+			min_vol = battery_value;
 			systick_wait_ms(500);
 			break;
 		}
 	}
 
 	//走行開始合図
-	while(1)
-	{
-		//リモートスタート
-		if(remote_start()==1)
-		{
-			ecrobot_sound_tone(982,512,30);
-			tail_mode_change(1,ANGLEOFUP,0,2);
-			setting_mode = RN_RUN;
-			runner_mode = RN_MODE_BALANCE;
-			break;
-		}
+	while(1){
 
 		//タッチセンサスタート
-		else if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+		if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(982,512,10);
-			while(1)
-			{
+
+			while(1){
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode_change(2);
-											break;
+						runner_mode = RN_MODE_BALANCEOFF;
+						//tail_mode = RN_TAILUP;
+
+						break;
 					}
-			}
+				}
 			break;
 		}
-
 	}
 
 }
-
-//走行体状態設定関数
-void RN_modesetting()
+//リモートストップ関数
+static int remote_stop(void)
 {
-	switch (runner_mode){
+	int i;
+	unsigned int rx_len;
+	unsigned char start = 0;
 
-			//走行体初期状態
-		case (RN_MODE_INIT):
-			cmd_forward = 0;
-			cmd_turn = 0;
-			break;
-
-			//バランサー
-		case (RN_MODE_BALANCE):
-			balance_control(
-				(F32)cmd_forward,
-				(F32)cmd_turn,
-				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)gyro_offset,
-				(F32)nxt_motor_get_count(NXT_PORT_C),
-		 		(F32)nxt_motor_get_count(NXT_PORT_B),
-				(F32)ecrobot_get_battery_voltage(),
-				&pwm_l,
-				&pwm_r);
-			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
-			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
-			break;
-
-			//バランサー無し
-		case (RN_MODE_BALANCEOFF):
-			break;
-
-		default:
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			break;
+	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
+	{
+		rx_buf[i] = 0; /* 受信バッファをクリア */
 	}
+
+	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
+	if (rx_len > 0)
+	{
+		/* 受信データあり */
+		if (rx_buf[0] == CMD_STOP)
+		{
+			start = 1; /* 走行停止 */
+		}
+		ecrobot_send_bt(rx_buf, 0, rx_len); /* 受信データをエコーバック */
+	}
+
+	return start;
+}
+
+//右を向く関数
+static int right(int angle)
+{
+	static int flag=0;
+
+	if(flag==0)
+	{
+		ecrobot_set_motor_rev(NXT_PORT_C, 0);
+		ecrobot_set_motor_rev(NXT_PORT_B, 0);
+
+		flag=1;
+	}
+
+	if(flag==1&& abs(ecrobot_get_motor_rev(NXT_PORT_C)) <= abs(angle) && 
+		abs(ecrobot_get_motor_rev(NXT_PORT_B)) <= abs(angle) )
+	{
+
+		if(angle>0)
+		{
+			ecrobot_set_motor_speed(NXT_PORT_C,  20);
+			ecrobot_set_motor_speed(NXT_PORT_B, -20);
+
+		}
+
+		else
+		{
+			ecrobot_set_motor_speed(NXT_PORT_C, -20);
+			ecrobot_set_motor_speed(NXT_PORT_B,  20);
+		}
+	}
+	else
+	{
+		ecrobot_set_motor_speed(NXT_PORT_C, 0);
+		ecrobot_set_motor_speed(NXT_PORT_B, 0);
+		flag=0;
+		return 1;
+	}
+
+	return 0;
+}
+
+//止まる関数
+static int stop(void)
+{
+
+
+
+	ecrobot_set_motor_speed(NXT_PORT_C, 0);
+	ecrobot_set_motor_speed(NXT_PORT_B, 0);
+
+	return 1;
+}
+
+//ライントレースなしで前進
+static int goforward(void)
+{
+
+	ecrobot_set_motor_speed(NXT_PORT_C, 30);
+	ecrobot_set_motor_speed(NXT_PORT_B, 30);
+
+	return 1;
+}
+
+//ライントレースなしで後退
+static int back(void)
+{
+
+	static int Flag=0;
+	/*
+	ecrobot_set_motor_rev(NXT_PORT_C, 0);
+	ecrobot_set_motor_rev(NXT_PORT_B, 0);
+	*/
+    ecrobot_set_motor_speed(NXT_PORT_C, -30);
+	ecrobot_set_motor_speed(NXT_PORT_B, -30);
+	/*
+	if(abs(ecrobot_set_motor_rev(NXT_PORT_C))<= 90 && abs(ecrobot_set_motor_rev(NXT_PORT_B))<= 90)
+	{
+	ecrobot_set_motor_speed(NXT_PORT_C, -30);
+	ecrobot_set_motor_speed(NXT_PORT_B, -30);
+	}
+	else
+	{
+	return 1;
+	}
+	*/
+	return 1;
+
+}
+
+
+//衝撃を感知する関数
+static int hit(void)
+{
+	static U16 buf=600;
+	static int hit_counter=0;
+	int hit_result=0;
+
+	hit_counter=hit_counter+1;
+
+	if(hit_counter==3)
+	{
+		buf=ecrobot_get_gyro_sensor(NXT_PORT_S1);
+		hit_counter=0;
+	}
+
+
+	if((buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))>=20||(buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))<=-20 )
+	{
+		ecrobot_sound_tone(880, 512, 10);
+		systick_wait_ms(30);
+		hit_result=1;
+		//ecrobot_set_motor_speed(NXT_PORT_C, 0);
+		//ecrobot_set_motor_speed(NXT_PORT_B, 0);
+	}
+
+	/*
+	ecrobot_set_motor_speed(NXT_PORT_C, -50);
+	ecrobot_set_motor_speed(NXT_PORT_B, -50);*/
+	return hit_result;
 }
 
 void sonar()
@@ -631,48 +772,127 @@ void alarm()
 		alarm_flag = 1;
 	}
 	else
+	{
 		alarm_flag = 0;
+	}
 		
 }
+
+int abs(int value)
+{
+	int result=0;
+
+	if(value>=0){
+	result=value;
+	}
+	else {
+	result = -value;
+	}
+	
+	return result;
+}
+
+int distance(void)
+{
+	int revL = 0;
+	int revR = 0;
+
+	revL = nxt_motor_get_count(NXT_PORT_C);
+	revR = nxt_motor_get_count(NXT_PORT_B);
+	
+	return fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+}
+
+//走行体状態設定関数
+void RN_modesetting()
+{
+	switch (runner_mode){
+
+			//初期状態
+		case (RN_MODE_INIT):
+			cmd_forward = 0;
+			cmd_turn = 0;
+			break;
+
+			//バランサーON
+		case (RN_MODE_BALANCE):
+			balance_control(
+				(F32)cmd_forward,
+				(F32)cmd_turn,
+				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
+		 		(F32)gyro_offset,
+				(F32)nxt_motor_get_count(NXT_PORT_C),
+		 		(F32)nxt_motor_get_count(NXT_PORT_B),
+				(F32)ecrobot_get_battery_voltage(),
+				&pwm_l,
+				&pwm_r);
+			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
+			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
+			break;
+
+		case (RN_MODE_BALANCEOFF):
+			break;
+
+		default:
+			break;
+	}
+}
+/*
+//bluetoothログ送信関数
+void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
+            U8 data_log_buffer[32];
+
+            *((U32 *)(&data_log_buffer[0]))  = (U32)systick_get_ms();
+            *(( S8 *)(&data_log_buffer[4]))  =  (S8)data1;
+            *(( S8 *)(&data_log_buffer[5]))  =  (S8)data2;
+            *((U16 *)(&data_log_buffer[6]))  = (U16)ecrobot_get_light_sensor(NXT_PORT_S3);
+            *((S32 *)(&data_log_buffer[8]))  = (S32)nxt_motor_get_count(0);
+            *((S32 *)(&data_log_buffer[12])) = (S32)nxt_motor_get_count(1);
+            *((S32 *)(&data_log_buffer[16])) = (S32)nxt_motor_get_count(2);
+            *((S16 *)(&data_log_buffer[20])) = (S16)adc1;
+            *((S16 *)(&data_log_buffer[22])) = (S16)adc2;
+            *((S16 *)(&data_log_buffer[24])) = (S16)adc3;
+            *((S16 *)(&data_log_buffer[26])) = (S16)adc4;
+            *((S32 *)(&data_log_buffer[28])) = (S32)ecrobot_get_sonar_sensor(NXT_PORT_S2);
+
+            ecrobot_send_bt_packet(data_log_buffer, 32);
+}
+*/
 
 /*
  *	各種タスク
  */
 
-//走行体管理タスク(4ms)
+//走行方法管理(4ms)
 TASK(ActionTask)
 {
-	RN_modesetting();	//走行体状態設定
-	taildown();			//尻尾制御
+	RN_modesetting();	//走行体状態
+	tailcontrol();		//尻尾コントロール
 	TerminateTask();
 }
 
-//走行状態管理タスク(5ms)
+//走行状態管理(5ms)
 TASK(ActionTask2)
 {
-	RN_setting();		//走行状態設定
+	RN_setting();		//走行状態
 	TerminateTask();
 }
 
-//状態表示管理タスク(20ms)
+//状態表示管理(20ms)
 TASK(DisplayTask)
 {
-	ecrobot_status_monitor(target_subsystem_name);	//モニタに状態表示
+//	ecrobot_status_monitor(target_subsystem_name);	//モニタ出力
 	TerminateTask();
 }
 
-//ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
+//ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,get_sonar,bottle_flag,		//Bluetoothを用いてデータ送信
-			alarm_flag,y_r);
-
-	sonar();
-	get_bottle();
-
+	logSend(cmd_forward,cmd_turn,ecrobot_get_gyro_sensor(NXT_PORT_S1),distanceback - distancestop,0,0);		//ログ取り
+	sonar();	//超音波センサの値を更新
+	get_bottle();	//ペットボトルがあるかどうか更新
 	TerminateTask();
 }
-
 
 
 /******************************** END OF FILE ********************************/
