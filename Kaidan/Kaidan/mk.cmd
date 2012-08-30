@@ -4,6 +4,6 @@ echo off
 del /Q *.rxe 
 
 //make clean 
-make all 
+make clean all 
 
 IF EXIST *.rxe sh rxeflash.sh

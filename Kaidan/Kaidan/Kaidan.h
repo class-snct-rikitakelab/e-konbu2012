@@ -20,16 +20,16 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 static unsigned int GYRO_OFFSET;	
 
 //尻尾設定角度
-#define ANGLEOFDOWN 95			//降下目標角度
+#define ANGLEOFDOWN 90			//降下目標角度
 #define ANGLEOFUP 5				//上昇目標角度
-#define ANGLEOFPUSH 120 			//走行体跳ね上げ目標角度
-#define ANGLEOFSTAND 103		//直立目標角度
+#define ANGLEOFPUSH 115 			//走行体跳ね上げ目標角度
+#define ANGLEOFSTAND 105		//直立目標角度
 
 //速度調節係数
 #define SPEED_COUNT 10
 
 //バッテリ降下値
-#define STEP_BATTERY 300		//段差検知時
+#define STEP_BATTERY 250		//段差検知時
 #define STOP_BATTERY 400
 
 //ジャイロ振幅値
@@ -48,7 +48,7 @@ static unsigned int GYRO_OFFSET;
 #define WHEEL_R		41
 #define MACHINE_W	162
 
-#define RIGHT_ANGLE_LIGHT_VALUE 570		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_LIGHT_VALUE 575		//ラインから脱した際の光センサの値(570)
 #define RIGHT_ANGLE_AIM 160				//回転角度(160)
 
 /*
