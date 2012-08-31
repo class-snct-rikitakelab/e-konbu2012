@@ -20,18 +20,15 @@ static unsigned int GYRO_OFFSET;
 
 static int counter = 0;
 
+#define BOTTLE 	27//[cm]
 
 //尻尾設定角度
-#define ANGLEOFDOWN 100			//降下目標角度
+#define ANGLEOFDOWN 95			//降下目標角度
 #define ANGLEOFUP 0					//上昇目標角度
 
 #define CMD_STOP '3'
 
-<<<<<<< HEAD
 int x=30;   //速度の変数
-=======
-int x=60;   //速度の変数
->>>>>>> 495968c4e0beaffa85f1947f6437296f7a165e18
 
 #define ANGLE_OF_AIM 180 //右を向く角度
 
@@ -50,8 +47,6 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-<<<<<<< HEAD
-=======
 
 /*
 static float Kp = 0.85;				//P制御用
@@ -65,7 +60,6 @@ static float Ki = 2.6;				//I制御用
 static float Kp = 1.360;			//P制御用
 static float Ki = 2.6;				//I制御用
 static float Kd = 0.003;				//D制御用
->>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
 
 /*
 static float Kp = 1.0944;			//P制御用
@@ -73,10 +67,14 @@ static float Ki = 2.2;				//I制御用
 static float Kd = 0.002;				//D制御用
 */
 
-static int wait_count = 0;
+static int time_count = 0;
 
 static double min_vol;
 static int stepflag = 0;
+
+static int get_sonar = 0;		//超音波センサの値
+static int bottle_flag ;		//ペットボトルの判断
+static int alarm_flag;
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
@@ -173,6 +171,10 @@ void battery_average_check(void);
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
 int abs(int value);
 
+void sonar(void);
+void get_bottle(void);
+void alarm(void);
+
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -189,6 +191,7 @@ const char target_subsystem_name[] = "Kaidan";
 void ecrobot_device_initialize(void)
 {
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);
+	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
 	ecrobot_init_bt_slave("LEJOS-OSEK");
 
 	ecrobot_set_motor_rev(NXT_PORT_A,0);
@@ -438,38 +441,25 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-<<<<<<< HEAD
-			RA_linetrace_PID(100);
-			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
-			{
-				ecrobot_sound_tone(932, 512, 20);
-				systick_wait_ms(100);
-				ecrobot_sound_tone(466, 256, 20);
-				systick_wait_ms(10);
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-				cmd_forward = 0;
-				cmd_turn = 0;
-				RA_hensareset();
-				systick_wait_ms(500);
-				setting_mode = RN_TYREAL;
-			}
-			break;
-=======
-	
-			RA_linetrace_PID(x);
-			if(hit()==1)
-			{
-			setting_mode=RN_Stop;
-			}
+			time_count++;
 
-                        if (remote_stop( )==1)
- 		{                  
- 		 	x=0;
-		setting_mode=RN_Right;
-		}
-		
-		break;
+			RA_linetrace_PID(x);
+			if(time_count > 500)
+			{
+				if(hit()==1)
+				{
+					setting_mode=RN_Stop;
+					time_count = 0;
+				}
+			}
+			/*
+                        if (remote_stop()==1)
+ 			{                  
+ 		 		x=0;
+				setting_mode=RN_Right;
+			}
+			*/
+			break;
 
 
 			//右を向く
@@ -477,14 +467,14 @@ void RN_setting()
 		
 		if(right(180)==1)
 		{
-
+		alarm();
 		setting_mode=RN_Left;
-		ecrobot_sound_tone(880, 512, 10);
+		/*ecrobot_sound_tone(880, 512, 10);
 		systick_wait_ms(500);
-	
+		*/
 		}
 
-			break;
+		break;
 	
 			//左を向く
 		case(RN_Left):
@@ -497,8 +487,6 @@ void RN_setting()
 		break;
 
 		case(RN_Stop):
-
-<<<<<<< HEAD
 		stop();
 		/*if(stop()==1)
 		{
@@ -520,9 +508,6 @@ void RN_setting()
 		
 		hit();
 		break;
-=======
->>>>>>> ae5a66b2c796ca5c453dd77f06e83f17bf12ddd2
->>>>>>> 495968c4e0beaffa85f1947f6437296f7a165e18
 
 		default:
 			break;
@@ -629,108 +614,134 @@ static int remote_stop(void)
 //右を向く関数
 static int right(int angle)
 {
-static int flag=0;
+	static int flag=0;
 
-if(flag==0){
-ecrobot_set_motor_rev(NXT_PORT_C, 0);
-ecrobot_set_motor_rev(NXT_PORT_B, 0);
+	if(flag==0)
+	{
+		ecrobot_set_motor_rev(NXT_PORT_C, 0);
+		ecrobot_set_motor_rev(NXT_PORT_B, 0);
 
-flag=1;
-}
+		flag=1;
+	}
 
-if(flag==1&& abs(ecrobot_get_motor_rev(NXT_PORT_C)) <= abs(angle) && 
-abs(ecrobot_get_motor_rev(NXT_PORT_B)) <= abs(angle) ){
+	if(flag==1&& abs(ecrobot_get_motor_rev(NXT_PORT_C)) <= abs(angle) && 
+		abs(ecrobot_get_motor_rev(NXT_PORT_B)) <= abs(angle) )
+	{
 
-if(angle>0)
-{
-ecrobot_set_motor_speed(NXT_PORT_C,  50);
-ecrobot_set_motor_speed(NXT_PORT_B, -50);
+		if(angle>0)
+		{
+			ecrobot_set_motor_speed(NXT_PORT_C,  20);
+			ecrobot_set_motor_speed(NXT_PORT_B, -20);
 
-}
+		}
 
-else
-{
-ecrobot_set_motor_speed(NXT_PORT_C, -50);
-ecrobot_set_motor_speed(NXT_PORT_B,  50);
-}
+		else
+		{
+			ecrobot_set_motor_speed(NXT_PORT_C, -20);
+			ecrobot_set_motor_speed(NXT_PORT_B,  20);
+		}
+	}
+	else
+	{
+		ecrobot_set_motor_speed(NXT_PORT_C, 0);
+		ecrobot_set_motor_speed(NXT_PORT_B, 0);
+		flag=0;
+		return 1;
+	}
 
-
-				             }
-else
-{
-ecrobot_set_motor_speed(NXT_PORT_C, 0);
-ecrobot_set_motor_speed(NXT_PORT_B, 0);
-flag=0;
-return 1;
-}
-
-
-
-return 0;
+	return 0;
 }
 
 //止まる関数
 static int stop(void)
 {
 
-ecrobot_set_motor_speed(NXT_PORT_C, 0);
-ecrobot_set_motor_speed(NXT_PORT_B, 0);
+	ecrobot_set_motor_speed(NXT_PORT_C, 0);
+	ecrobot_set_motor_speed(NXT_PORT_B, 0);
 
-return 1;
+	return 1;
 }
 
 //ライントレースなしで前進
 static int goforward(void)
 {
 
-ecrobot_set_motor_speed(NXT_PORT_C, 50);
-ecrobot_set_motor_speed(NXT_PORT_B, 50);
+	ecrobot_set_motor_speed(NXT_PORT_C, 50);
+	ecrobot_set_motor_speed(NXT_PORT_B, 50);
 
-return 1;
+	return 1;
 }
 
 //衝撃を感知する関数
 static int hit(void)
 {
-static U16 buf=600;
-static int hit_counter=0;
-int hit_result=0;
+	static U16 buf=600;
+	static int hit_counter=0;
+	int hit_result=0;
 
-hit_counter=hit_counter+1;
+	hit_counter=hit_counter+1;
 
-if(hit_counter==3)
+	if(hit_counter==3)
+	{
+		buf=ecrobot_get_gyro_sensor(NXT_PORT_S1);
+		hit_counter=0;
+	}
+
+
+	if((buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))>=20||(buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))<=-20 )
+	{
+		ecrobot_sound_tone(880, 512, 10);
+		systick_wait_ms(30);
+		hit_result=1;
+		//ecrobot_set_motor_speed(NXT_PORT_C, 0);
+		//ecrobot_set_motor_speed(NXT_PORT_B, 0);
+	}
+
+	/*
+	ecrobot_set_motor_speed(NXT_PORT_C, -50);
+	ecrobot_set_motor_speed(NXT_PORT_B, -50);*/
+	return hit_result;
+}
+
+void sonar()
 {
-buf=ecrobot_get_gyro_sensor(NXT_PORT_S1);
-hit_counter=0;
+	
+	get_sonar = ecrobot_get_sonar_sensor(NXT_PORT_S2);
+
 }
 
-
-if((buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))>=30||(buf)-(ecrobot_get_gyro_sensor(NXT_PORT_S1))<=-30 )
+void get_bottle()
 {
-ecrobot_sound_tone(880, 512, 10);
-systick_wait_ms(30);
-hit_result=1;
-//ecrobot_set_motor_speed(NXT_PORT_C, 0);
-//ecrobot_set_motor_speed(NXT_PORT_B, 0);
+	bottle_flag = 0;
+	if(get_sonar < BOTTLE)
+		bottle_flag = 1;
 }
 
-/*
-ecrobot_set_motor_speed(NXT_PORT_C, -50);
-ecrobot_set_motor_speed(NXT_PORT_B, -50);*/
-return hit_result;
+void alarm()
+{
+	if(bottle_flag == 1){
+		ecrobot_sound_tone(900,512,30);
+		alarm_flag = 1;
+	}
+	else
+	{
+		alarm_flag = 0;
+	}
+		
 }
 
-int abs(int value){
-int result=0;
+int abs(int value)
+{
+	int result=0;
 
-if(value>=0){
-result=value;
-}
-else {
-result = -value;
-}
-
-return result;
+	if(value>=0){
+	result=value;
+	}
+	else {
+	result = -value;
+	}
+	
+	return result;
 }
 
 
@@ -821,6 +832,8 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,ecrobot_get_gyro_sensor(NXT_PORT_S1),0,0,0);		//ログ取り
+	sonar();	//超音波センサの値を更新
+	get_bottle();	//ペットボトルがあるかどうか更新
 	TerminateTask();
 }
 

@@ -1,5 +1,5 @@
 #define VOL 20
-#define ADJUST_FLOAT_STEP 0.01 //値の増減値の指定
+#define ADJUST_FLOAT_STEP 0.05 //値の増減値の指定
 #define VALUE_CHANGE_SPEED 150
 
 extern void do_tyreal(float *Kp_t,float *Ki_t,float *Kd_t);

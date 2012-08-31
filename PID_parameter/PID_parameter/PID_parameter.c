@@ -29,13 +29,13 @@ static int counter = 0;
 #define ANGLE_OF_AIM 180  //右を向く角度
 
 //速度調節係数
-#define SPEED_COUNT 5
+#define SPEED_COUNT 10
 
 //ライントレース時PID制御用係数
 
 static float Kp = 0.436;//0.436;				//P制御用
-static float Ki = 1.31;//1.31;					//I制御用
-static float Kd = 0.011;//0.011;				//D制御用
+static float Ki = 0;//1.31;					//I制御用
+static float Kd = 0.074;//0.011;				//D制御用
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
@@ -195,12 +195,8 @@ void RA_linetrace_PID(int forward_speed) {
 		left_motor_turn = 127;
 	}
 
-
-	/*倒立制御OFF時*/
-//	nxt_motor_set_speed(NXT_PORT_C, forward_speed + cmd_turn/2, 1);
-//	nxt_motor_set_speed(NXT_PORT_B, forward_speed - cmd_turn/2, 1);
-	nxt_motor_set_speed(NXT_PORT_C,left_motor_turn , 1);
-	nxt_motor_set_speed(NXT_PORT_B, right_motor_turn, 1);
+	pwm_l = left_motor_turn;
+	pwm_r = right_motor_turn;
 
 }
 
@@ -267,19 +263,18 @@ void tailcontrol(){
 //走行設定関数
 void RN_setting()
 {
-	int speed = 110;
+	int speed = 90;
 
 	switch (setting_mode){
 
 		case (RN_TYREAL):
 			do_tyreal(&Kp,&Ki,&Kd);
 
-			ecrobot_set_motor_speed(NXT_PORT_A,0);
-			ecrobot_set_motor_speed(NXT_PORT_B,0);
-			ecrobot_set_motor_speed(NXT_PORT_C,0);
-
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
+							ecrobot_set_motor_speed(NXT_PORT_A,0);
+			ecrobot_set_motor_speed(NXT_PORT_B,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);
 				ecrobot_sound_tone(932, 512, 20);
 				systick_wait_ms(100);
 				ecrobot_sound_tone(466, 256, 20);
@@ -300,8 +295,9 @@ void RN_setting()
 			//通常走行
 		case (RN_RUN):
 			RA_linetrace_PID(speed);
-			if (remote_stop()==1 || ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
-			{				ecrobot_sound_tone(932, 512, 20);
+			if (remote_stop()==1)
+			{	
+				ecrobot_sound_tone(932, 512, 20);
 				systick_wait_ms(100);
 				ecrobot_sound_tone(466, 256, 20);
 				systick_wait_ms(500);
@@ -442,6 +438,8 @@ void RN_modesetting()
 			break;
 
 		case (RN_MODE_BALANCEOFF):
+			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
+			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
 			break;
 
 		default:
@@ -471,7 +469,7 @@ TASK(ActionTask2)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,0,0,0,0);		//ログ取り
+	logSend(cmd_forward,cmd_turn,pwm_l,pwm_r,0,0);		//ログ取り
 	TerminateTask();
 }
 
