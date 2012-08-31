@@ -15,7 +15,7 @@ TARGET_SOURCES := \
 	balancer_param.c \
 	positionPresumption.c
 
-TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
+TOPPERS_OSEK_OIL_SOURCE := prog.oil
 
 O_PATH ?= build
 
