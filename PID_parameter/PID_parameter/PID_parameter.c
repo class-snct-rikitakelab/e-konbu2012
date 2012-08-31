@@ -18,6 +18,9 @@ static unsigned int BLACK_VALUE;	//黒値
 static unsigned int WHITE_VALUE;	//白値
 static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 
+//車輪の円周[cm]
+#define CIRCUMFERENCE 25.8			//車輪の円周
+
 static int counter = 0;
 
 //尻尾設定角度
@@ -31,11 +34,13 @@ static int counter = 0;
 //速度調節係数
 #define SPEED_COUNT 10
 
+static unsigned int GYRO_OFFSET_FIRST;
+
 //ライントレース時PID制御用係数
 
-static float Kp = 0.436;//0.436;				//P制御用
-static float Ki = 0;//1.31;					//I制御用
-static float Kd = 0.074;//0.011;				//D制御用
+static float Kp = 0.446;//0.436;//0.436;				//P制御用
+static float Ki = 1.31;//0;//1.31;					//I制御用
+static float Kd = 0.005;//0.074;//0.011;				//D制御用
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */ 
@@ -46,6 +51,15 @@ char rx_buf[BT_MAX_RX_BUF_SIZE];
 S8  cmd_forward, cmd_turn;
 /* バランスコントロールから返されるモータ制御用変数 */
 S8	pwm_l, pwm_r;
+
+//距離計測用変数
+int revL = 0;
+int revR = 0;
+
+int distance_before_slope;
+int distance_now_slope;
+int distance_peak_slope;
+int distance_after_slope;
 
 /*
  *	状態定義
@@ -64,6 +78,10 @@ typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
 	RN_RUN,						//基本走行（ライントレース）
 	RN_RIGHT,
+	RN_SLOPE_START,
+	RN_SLOPE_DOWN,
+	RN_SLOPE_AFTER,
+	RN_SLOPE_END,
 } RN_SETTINGMODE;
 
 
@@ -163,10 +181,13 @@ void RA_linetrace_PID(int forward_speed) {
 	static float i_hensa = 0;			//I制御用
 	static float d_hensa = 0;			//D制御用
 	static float bf_hensa = 0;
-	float right_motor_turn=0,left_motor_turn;
+	float right_motor_turn = 0,left_motor_turn = 0;					//目標pwm値
+	float right_motor_turn_overflow = 0,left_motor_turn_overflow = 0;		//目標pwm値オーバーフロー分
+
 	
 	forward_speed = RA_speed(forward_speed);	//速度を段階的に変化
 
+	//光センサ値と目標輝度値の偏差算出
 	if(forward_speed > 0)
 		hensa = (float)GRAY_VALUE - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
 	else
@@ -177,26 +198,37 @@ void RA_linetrace_PID(int forward_speed) {
 	bf_hensa = hensa;
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
-	
-//	cmd_turn = -(Kp * hensa);
 
 	right_motor_turn = forward_speed - cmd_turn/2;
 	left_motor_turn = forward_speed  + cmd_turn/2;
 
+	//オーバーフロー対策及びオーバーフロー分考慮
 	if (-128 > right_motor_turn) {
+		right_motor_turn_overflow = -(-128 - right_motor_turn);
 		right_motor_turn = -128;
 	} else if (127 < right_motor_turn) {
+		right_motor_turn_overflow = right_motor_turn - 127;
 		right_motor_turn = 127;
 	}
 
 	if (-128 > left_motor_turn) {
+		left_motor_turn_overflow = -(-128 - left_motor_turn);
 		left_motor_turn = -128;
 	} else if (127 < left_motor_turn) {
+		left_motor_turn_overflow = left_motor_turn - 127;
 		left_motor_turn = 127;
 	}
 
-	pwm_l = left_motor_turn;
-	pwm_r = right_motor_turn;
+	//出力pwm値算出
+	if(left_motor_turn + right_motor_turn_overflow >= -128 && left_motor_turn + right_motor_turn_overflow <= 127)
+		pwm_l = (int)(left_motor_turn + right_motor_turn_overflow);
+	else
+		pwm_l = (int)left_motor_turn;
+
+	if(right_motor_turn + left_motor_turn_overflow >= -128 && right_motor_turn + left_motor_turn_overflow <= 127)
+		pwm_r = (int)(right_motor_turn + left_motor_turn_overflow);
+	else
+		pwm_r = (int)right_motor_turn;
 
 }
 
@@ -263,7 +295,9 @@ void tailcontrol(){
 //走行設定関数
 void RN_setting()
 {
-	int speed = 90;
+	int speed = 120;
+
+	static int time_count = 0;
 
 	switch (setting_mode){
 
@@ -272,9 +306,9 @@ void RN_setting()
 
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
-							ecrobot_set_motor_speed(NXT_PORT_A,0);
-			ecrobot_set_motor_speed(NXT_PORT_B,0);
-			ecrobot_set_motor_speed(NXT_PORT_C,0);
+				ecrobot_set_motor_speed(NXT_PORT_A,0);
+				ecrobot_set_motor_speed(NXT_PORT_B,0);
+				ecrobot_set_motor_speed(NXT_PORT_C,0);
 				ecrobot_sound_tone(932, 512, 20);
 				systick_wait_ms(100);
 				ecrobot_sound_tone(466, 256, 20);
@@ -294,6 +328,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
+			time_count++;
 			RA_linetrace_PID(speed);
 			if (remote_stop()==1)
 			{	
@@ -303,11 +338,64 @@ void RN_setting()
 				systick_wait_ms(500);
  		 		//speed = 0;
 				runner_mode = RN_MODE_BALANCEOFF;
-				setting_mode = RN_TYREAL;
-				
+				setting_mode = RN_TYREAL;	
+			}
+			
+			if(GYRO_OFFSET_FIRST - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 1000)
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_START;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_before_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+				time_count = 0;
 			}
 			break;
 
+		case (RN_SLOPE_START):
+			RA_linetrace_PID(speed);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_now_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_now_slope - distance_before_slope > 20)
+			{
+				setting_mode = RN_SLOPE_DOWN;
+			}
+			
+			break;
+
+		case (RN_SLOPE_DOWN):
+			RA_linetrace_PID(speed - 25);
+			
+			if(GYRO_OFFSET_FIRST + 30 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE_AFTER;
+				revL = nxt_motor_get_count(NXT_PORT_C);
+				revR = nxt_motor_get_count(NXT_PORT_B);
+				distance_peak_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+			}
+			break;
+
+		case (RN_SLOPE_AFTER):
+			RA_linetrace_PID(speed);
+			
+			revL = nxt_motor_get_count(NXT_PORT_C);
+			revR = nxt_motor_get_count(NXT_PORT_B);
+			distance_after_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
+
+			if(distance_after_slope - distance_peak_slope > 30)
+			{
+				setting_mode = RN_SLOPE_END;
+			}
+
+			break;
+
+		case (RN_SLOPE_END):
+			RA_linetrace_PID(speed);
+			break;
 
 			//右を向く
 		case(RN_RIGHT):
@@ -362,6 +450,17 @@ void RN_calibrate()
 
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
+
+	//ジャイロオフセット及びバッテリ電圧値
+	while(1){
+		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE){
+			ecrobot_sound_tone(932, 512, 10);
+			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET_FIRST = gyro_offset;
+			systick_wait_ms(500);
+			break;
+		}
+	}
 
 	//走行開始合図
 	while(1){
@@ -469,7 +568,7 @@ TASK(ActionTask2)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,pwm_l,pwm_r,0,0);		//ログ取り
+	logSend(cmd_forward,cmd_turn,pwm_l,pwm_r,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
 	TerminateTask();
 }
 
