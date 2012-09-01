@@ -9,9 +9,6 @@
 #include "PIDControl.h"
 
 LineBack mLineBack;
-
-
-
  RobotPosture mRobotPosture;
  GyroVariation mGyroVariation;
  Calibration mCalibration;

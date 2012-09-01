@@ -1,4 +1,4 @@
-#include "factory.h"
+#include "Factory.h"
 
 /*
 LineBack  mLineBack;

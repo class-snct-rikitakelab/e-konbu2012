@@ -5,6 +5,10 @@
 
 #include "config.h"
 #include "RobotPosutre.h"
+#include "Kaidan.h"
+#include "GyroVariation.h"
+#include "PIDControl.h"
+
 
 #define STEP_FALL_THRESHOLD 10
 #define CMD_FALL_DETECT_START '5'
@@ -15,6 +19,15 @@ typedef struct {
 float b;
 
 }LineBack;
+typedef enum{
+	GO_FORWARD,
+	CATCH_LINE,
+	KEEP_LINETRACE,
+	TURNING_LEFT,
+	TURNING_RIGHT,
+	BACK_TO_RIGHT_EDGE,
+	BACK_TO_INIT_POSITION,
+} HEAD_TO_LINE_STATE;
 
 
 typedef enum{
@@ -24,6 +37,8 @@ typedef enum{
 } LINE_BACK_STATE;
 
 
+//headToLineä÷êîì‡ïîÇÃèÛë‘Çï\Ç∑ïœêî
+ static HEAD_TO_LINE_STATE headToLineState= GO_FORWARD;
 
 
 
@@ -45,5 +60,15 @@ int LineBack_headToLine(LineBack * this_LineBack);
 int LineBack_successLineBack(LineBack * this_LineBack);
 
 
+void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
+void LineBack_turningRightAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
+void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
 
+void LineBack_turning(LineBack * this_LineBack,int forwardSpeed,int turnSpeed);
+
+int LineBack_LineBack_detectLineEdge(LineBack * this_LineBack);
+void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
+
+void LineBack_lineCatchAction(LineBack * this_LineBack);
+			
 #endif

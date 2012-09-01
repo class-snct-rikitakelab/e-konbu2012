@@ -1,8 +1,6 @@
 
 #include "LineBack.h"
 #include "Factory.h"
-#include "Kaidan.h"
-#include "GyroVariation.h"
 
 
 void LineBack_init(LineBack * this_LineBack){
@@ -51,10 +49,8 @@ LineBack_headToLine(this_LineBack);
 */
 return lineBackResult;
 
+
 }
-
-
-
 
 int LineBack_detectStepFall(LineBack * this_LineBack){
 	int result=0;
@@ -92,9 +88,8 @@ int LineBack_stableStop(LineBack * this_LineBack){
 	
 
 	if(GyroVariation_getGyroSensorVariation(&mGyroVariation) < 3 && GyroVariation_getGyroSensorVariation(&mGyroVariation) > -3  && (counter > 500/4) ){
-		//result = 1;
+		result = 1;
 		ecrobot_sound_tone(880, 512, 10);
-		//systick_wait_ms(20);
 	}
 
 
@@ -102,53 +97,194 @@ int LineBack_stableStop(LineBack * this_LineBack){
 }
 
 int LineBack_headToLine(LineBack * this_LineBack){
-	typedef enum{
-	GO_FORWARD,
-	CATCH_LINE,
-	KEEP_LINETRACE,
-} HEAD_TO_LINE_STATE;
-
-	 static HEAD_TO_LINE_STATE headToLineState= GO_FORWARD;
 	
-	 ControlVals controlVals;
-	float w_kp = 1.4;
-	signed long def = 0;
 
 	switch (headToLineState) {
 		
+		/*
 		case GO_FORWARD :
-			controlVals.forward_val=RA_speed(30);
-			 def = ecrobot_get_motor_rev(NXT_PORT_B) - ecrobot_get_motor_rev(NXT_PORT_C);
-			controlVals.turn_val= w_kp * def;
-			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
-			if((float)ecrobot_get_light_sensor(NXT_PORT_S3) > 590){
-				ecrobot_sound_tone(880, 512, 10);
 
+			LineBack_goForwardAction(30);
+			
+			if(LineBack_detectLine(&mLineBack)){
+			headToLineState = CATCH_LINE;
 			}
 			
 			break;
+		*/
 		case  CATCH_LINE :
-			 //Ki = 5.0;
+			
+			LineBack_lineCatchAction(this_LineBack);
+	
+
 		break;
+		case TURNING_LEFT :
+			LineBack_turningLeftAction(this_LineBack,10,30,90);
+			break;
 		
+		case BACK_TO_RIGHT_EDGE:
+		LineBack_backToRightEdgeAction(this_LineBack,10,-30,90);		
+		break;
+
+		case BACK_TO_INIT_POSITION :
+		LineBack_backToInitPositionAction(this_LineBack,10,-30,90);
+		break;
+		case TURNING_RIGHT :
+		LineBack_turningRightAction(this_LineBack,10,-30,90);
+			break;
 		default :
-		
 		break;
-
 	}
+		
+	return 0;
+}
+
+void LineBack_lineCatchAction(LineBack * this_LineBack){
+
+	ControlVals controlVals;
+	mPIDControl.Ki = mPIDControl.Ki + 2.0;
+	mPIDControl.Kd = mPIDControl.Kd + 1.0;
+
+	controlVals.forward_val = 10;
+	controlVals.turn_val = PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);	
+	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 	
 
+}
+void LineBack_turningRightAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){
+	static int lineEdgeDetectTimes = 0;
+	static int onceDoFlag = 0;
+	static S32 initRightMotorRev = 0;
+	static S32 initLeftMotorRev = 0;
 	
+	//1回だけ実行
+	if(onceDoFlag ==0 ){
+		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B);
+		initLeftMotorRev  = ecrobot_get_motor_rev(NXT_PORT_C);
+		onceDoFlag = 1;
+	}
+
+	//ラインエッジ検出回数をカウント
+			lineEdgeDetectTimes += LineBack_LineBack_detectLineEdge(this_LineBack);
+			LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
+			if(lineEdgeDetectTimes==2){
+				lineEdgeDetectTimes = 0;	
+				headToLineState = CATCH_LINE;
+				}
+
+			if(initLeftMotorRev + ecrobot_get_motor_rev(NXT_PORT_C) > aimAngle ){
+				//ライン復帰失敗
+			}
+}
+
+void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){
+		
+	static int onceDoFlag = 0;
+	static S32 initRightMotorRev = 0;
+	static S32 initLeftMotorRev = 0;
+	
+	//1回だけ実行
+	if(onceDoFlag ==0 ){
+		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B);
+		initLeftMotorRev  = ecrobot_get_motor_rev(NXT_PORT_C);
+		onceDoFlag = 1;
+	}
+
+	LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
+		
+		if(initRightMotorRev - ecrobot_get_motor_rev(NXT_PORT_B) < aimAngle ){
+				headToLineState = TURNING_RIGHT;
+				onceDoFlag = 0;		
+		}
+
+}
 
 
+void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){
+	static int lineEdgeDetectTimes = 0;
+
+	lineEdgeDetectTimes += LineBack_LineBack_detectLineEdge(this_LineBack);
+	LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
+
+		if(lineEdgeDetectTimes==2){
+			lineEdgeDetectTimes = 0;	
+			headToLineState = CATCH_LINE;
+			}
+}
+
+void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){	
+	static int lineEdgeDetectTimes = 0;
+	static int onceDoFlag = 0;
+	static S32 initRightMotorRev = 0;
+	static S32 initLeftMotorRev = 0;
+	
+	//1回だけ実行
+	if(onceDoFlag ==0 ){
+		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B); 
+		initLeftMotorRev  = ecrobot_get_motor_rev(NXT_PORT_C);
+		onceDoFlag = 1;
+	}
+
+	//ラインエッジ検出回数をカウント
+			lineEdgeDetectTimes += LineBack_LineBack_detectLineEdge(this_LineBack);
+			LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
+
+			if(initRightMotorRev + ecrobot_get_motor_rev(NXT_PORT_B) > aimAngle ){
+				if(lineEdgeDetectTimes==2){
+					lineEdgeDetectTimes = 0;
+					headToLineState = BACK_TO_RIGHT_EDGE;
+				}
+				else {
+					headToLineState = BACK_TO_INIT_POSITION;
+				}
+			}
+}
+
+void LineBack_turning(LineBack * this_LineBack,int forwardSpeed,int turnSpeed){
 	/*
-	controlVals.forward_val=0;
-	controlVals.turn_val=0;
-	
+	ControlVals controlVals;
+	controlVals.forward_val=RA_speed(forwardSpeed);
+	controlVals.turn_val= turnSpeed;
 	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 	*/
+}
+
+int LineBack_goForwardAction(int forwardSpeed) {
+	 
+	ControlVals controlVals;
+	float w_kp = 1.4;
+	signed long def = 0;
+	static int onceDoFlag = 0;
+	static S32 initRightMotorRev = 0;
+	static S32 initLeftMotorRev = 0;
+	
+	//1回だけ実行
+	if(onceDoFlag ==0 ){
+		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B);
+		initLeftMotorRev  = ecrobot_get_motor_rev(NXT_PORT_C);
+		onceDoFlag = 1;
+	}
+	
+	controlVals.forward_val=RA_speed(forwardSpeed);
+	def = (ecrobot_get_motor_rev(NXT_PORT_B)-initRightMotorRev) - (ecrobot_get_motor_rev(NXT_PORT_C) - initLeftMotorRev);
+	controlVals.turn_val= w_kp * def;
+	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
+			
 return 0;
 }
+int LineBack_LineBack_detectLineEdge(LineBack * this_LineBack) {
+	int result=0;
+
+	if((float)ecrobot_get_light_sensor(NXT_PORT_S3)  < Calibration_getGrayValue(&mCalibration) + 10  
+	&& (float)ecrobot_get_light_sensor(NXT_PORT_S3)  > Calibration_getGrayValue(&mCalibration) - 10 ){
+	
+		ecrobot_sound_tone(880, 512, 10);
+		result=1;
+	}
+
+return result;
+}
+
 
 int LineBack_successLineBack(LineBack * this_LineBack){
 
@@ -185,11 +321,4 @@ int LineBack_debugLineBackSignalReceive(LineBack * this_LineBack){
 
 
 	return receiveState;
-
 }
-
-
-
-
-
-

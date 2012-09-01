@@ -140,7 +140,6 @@ RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 
 //段差検知関連マクロ、プロトタイプ
-static int RN_rapid_speed_up_signal_recevie(void);
 
 /*	
  *	各種関数定義
@@ -148,23 +147,8 @@ static int RN_rapid_speed_up_signal_recevie(void);
 
 //各種プライベート関数
 
-void RN_setting();
-int online();
-void RA_linetrace(int forward_speed, int turn_speed);
-
 //void RA_linetrace_PID(int forward_speed);
 //int RA_speed(int forward_speed);
-
-
-int shock(int target);
-void tailcontrol();
-void RA_linetrace_P(int forward_speed);
-int RA_wheels(int turn);
-void RN_modesetting();
-static int remote_start(void);
-int rapid_speed_up(int target_gyro);
-void self_location(void);
-void battery_average_check(void);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -415,7 +399,6 @@ void RN_setting()
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
 			{
 				ecrobot_sound_tone(932, 512, VOL);
-				systick_wait_ms(100);
 				setting_mode= RN_LINEBACK;
 			}
 		//	cmd_turn = RA_wheels(cmd_turn);
@@ -561,7 +544,7 @@ int rapid_speed_up(int target_gyro){
 	return 0;
 }
 
-static int RN_rapid_speed_up_signal_recevie(void)
+ int RN_rapid_speed_up_signal_recevie(void)
 {
 	int i;
 	unsigned int rx_len;
@@ -593,7 +576,7 @@ static int RN_rapid_speed_up_signal_recevie(void)
 }
 
 //リモートスタート関数
-static int remote_start(void)
+ int remote_start(void)
 {
 	int i;
 	unsigned int rx_len;
