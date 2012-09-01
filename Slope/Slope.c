@@ -2,10 +2,17 @@
  * Slope.c
  * 坂道プログラム
  */
+<<<<<<< HEAD
 #include "kernel.h"
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
 
+=======
+
+#include "kernel.h"
+#include "kernel_id.h"
+#include "ecrobot_interface.h"
+>>>>>>> e6bc6e725dbd44c49f00597f8bac65d738124e65
 #include "Slope.h"
 #include "Factory.h"
 
@@ -422,7 +429,7 @@ int online(void) {
 
 	int light_value;
 	light_value = ecrobot_get_light_sensor(NXT_PORT_S3);	//現在の輝度値
-					
+
 	if (GRAY_VALUE > light_value)		//輝度値が目標値より大きいか判断
 		return FALSE;					//ライン外
 	else
@@ -625,7 +632,7 @@ void RN_setting()
 				//wait_count = 0;
 			//}
 			break;
-		
+
 			//通常走行状態
 		case (RN_RUN):
 			//wait_count++;
@@ -648,7 +655,7 @@ void RN_setting()
 
 		case (RN_SLOPE_START):
 			RA_linetrace_PID_balanceoff(70);
-			
+
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_now_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
@@ -657,12 +664,12 @@ void RN_setting()
 			{
 				setting_mode = RN_SLOPE_DOWN;
 			}
-			
+
 			break;
 
 		case (RN_SLOPE_DOWN):
 			RA_linetrace_PID_balanceoff(55);
-			
+
 			if(GYRO_OFFSET - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1))
 			{
 				ecrobot_sound_tone(880, 512, 30);
@@ -675,7 +682,7 @@ void RN_setting()
 
 		case (RN_SLOPE_AFTER):
 			RA_linetrace_PID_balanceoff(55);
-			
+
 			revL = nxt_motor_get_count(NXT_PORT_C);
 			revR = nxt_motor_get_count(NXT_PORT_B);
 			distance_after_slope = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
@@ -719,7 +726,7 @@ void self_location()
 	theta_R += omega * 0.004 + theta_R_zero;
 	x_r += v * cos(theta_R) * 0.004 + x_r_zero;
 	y_r += v * sin(theta_R) * 0.004 + y_r_zero;
-	
+
 }
 
 //走行体状態設定関数

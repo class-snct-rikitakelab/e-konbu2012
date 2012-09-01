@@ -59,9 +59,9 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-static float Kp = 1.85;				//P制御用
-static float Ki = 1.6;				//I制御用
-static float Kd = 0.003;			//D制御用
+static float Kp = 0.436;				//P制御用
+static float Ki = 1.31;				//I制御用
+static float Kd = 0.011;			//D制御用
 
 //尻尾PI制御用係数
 static float t_Kp = 1.85;			//P制御用

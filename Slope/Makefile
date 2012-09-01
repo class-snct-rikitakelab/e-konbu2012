@@ -19,9 +19,8 @@ TARGET_SOURCES := \
 	WLReceiver.c \
 	Factory.c 
 
-TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
+TOPPERS_OSEK_OIL_SOURCE := prog.oil
 
 O_PATH ?= build
 
 include $(NXTOSEK_ROOT)/ecrobot/lejos_osek.tmf
-

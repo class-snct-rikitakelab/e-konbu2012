@@ -1,8 +1,10 @@
 #ifndef __Calibration
 #define __Calibration
 
-#include "kernel.h"
-#include "kernel_id.h"
+//#include "kernel.h"
+//#include "kernel_id.h"
+
+
 #include "ecrobot_interface.h"
 //#include "PWMValGenerator.h"
 
