@@ -191,8 +191,8 @@ void RA_linetrace_PID(int forward_speed) {
 	else
 		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
 
-	i_hensa = i_hensa+(hensa*0.0005);
-	d_hensa = (hensa - bf_hensa)/0.0005;
+	i_hensa = i_hensa+(hensa*0.005);
+	d_hensa = (hensa - bf_hensa)/0.005;
 	bf_hensa = hensa;
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
@@ -296,10 +296,19 @@ int online(void) {
 //尻尾角度コントロール関数
 void tailcontrol(){
 
-	static const float t_Kp = 2.0;
+	static const float t_Kp = 3.2;
+//	static const float t_Ki = 3.3;
+//	static const float t_Kd = 1.5;
 
 	static float t_hensa = 0;
+	/*
+	static float t_i_hensa = 0;
+	static float t_d_hensa = 0;
+	static float t_bf_hensa = 0;
+	*/
 	static float t_speed = 0;
+
+
 
 	switch(tail_mode){
 		case(RN_TAILDOWN):
@@ -320,7 +329,11 @@ void tailcontrol(){
 		default:
 			break;
 	}
-
+	/*
+	t_i_hensa = t_i_hensa+(t_hensa*0.004);
+	t_d_hensa = (t_hensa - t_bf_hensa)/0.004;
+	t_bf_hensa = t_hensa;
+	*/
 	t_speed = t_Kp*t_hensa;
 
 	if (t_speed < -100)
@@ -378,14 +391,14 @@ void RN_setting()
 			}
 
 			//直角カーブ部分
-			/*
+			
 			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 300)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_STEP_TURN_LEFT;
 				time_count = 0;
 			}
-			*/
+			
 			break;
 
 			//加速
@@ -511,16 +524,19 @@ void RN_setting()
 				/* 止まる */
 				ecrobot_set_motor_speed(NXT_PORT_B, 0);
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);
-				time_count = 0;
-				distance_turn_clear = distance();	//段差突入時の距離を測定
-				setting_mode = RN_STEP_TURN_FORWARD;
+				if(time_count > 500)
+				{
+					time_count = 0;
+					distance_turn_clear = distance();	//段差突入時の距離を測定
+					setting_mode = RN_STEP_TURN_FORWARD;
+				}
 			}
 	
 			break;
 
 			//カーブ後直進
 		case (RN_STEP_TURN_FORWARD):
-			RA_linetrace(10,30);
+			RA_linetrace_PID(10);
 			
 			distance_turn_after = distance();	//段差突入時の距離を測定
 			if(distance_turn_after - distance_turn_clear > 5)
@@ -552,22 +568,22 @@ void RN_setting()
 				*/
 			}
 			
-			if(time_count == 400)
+			if(time_count == 4000)
 			{
 				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
 			}
 			
-			if(time_count == 500)
+			if(time_count == 5000)
 			{
 				tail_mode = RN_TAILPUSH;
 			}
 
-			if(time_count == 550)
+			if(time_count == 5500)
 			{
 				time_count = 0;
 				balance_init();
-				gyro_offset += 28;
+				gyro_offset += 2;
 				runner_mode = RN_MODE_BALANCE;
 				setting_mode = RN;
 				tail_mode = RN_TAILUP;
@@ -771,8 +787,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCE;
-						tail_mode = RN_TAILUP;
+						runner_mode = RN_MODE_BALANCEOFF;
+						tail_mode = RN_TAILDOWN;
 						break;
 					}
 				}
@@ -875,7 +891,7 @@ TASK(DisplayTask)
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(velocity,0,ecrobot_get_motor_rev(NXT_PORT_A),distance_second - distance_stay,
+	logSend(velocity,0,GRAY_VALUE,distance_second - distance_stay,
 			position_x,position_y,0);		//ログ取り
 	TerminateTask();
 }
