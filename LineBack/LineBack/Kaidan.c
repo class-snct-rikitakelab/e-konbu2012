@@ -415,7 +415,7 @@ void RN_setting()
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
 			{
 				ecrobot_sound_tone(932, 512, VOL);
-				systick_wait_ms(100);
+				//systick_wait_ms(100);
 				setting_mode= RN_LINEBACK;
 			}
 		//	cmd_turn = RA_wheels(cmd_turn);
@@ -679,6 +679,6 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(0,shock(STEP_BATTERY),theta*(180/M_PI)/*distance_gyro_up - distance_before_step*/,ecrobot_get_gyro_sensor(NXT_PORT_S1),
-			position_x,GyroVariation_getGyroSensorVariation(&mGyroVariation),position_y);		//ÉçÉOéÊÇË
+			position_x,position_y/*GyroVariation_getGyroSensorVariation(&mGyroVariation)*/,position_y);		//ÉçÉOéÊÇË
 	TerminateTask();
 }
