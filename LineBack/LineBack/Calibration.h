@@ -16,5 +16,8 @@ typedef struct{
 extern void Calibration_init(Calibration * this_Calibration);
 extern int Calibration_doCalibrate(Calibration * this_Calibration);
 extern int Calibration_getGrayValue(Calibration * this_Calibration);
+extern int Calibration_getWhiteValue(Calibration * this_Calibration);
+extern int Calibration_getBlackValue(Calibration * this_Calibration);
+
 
 #endif

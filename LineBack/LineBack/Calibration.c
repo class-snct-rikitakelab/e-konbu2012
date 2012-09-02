@@ -57,3 +57,12 @@ int Calibration_getGrayValue(Calibration * this_Calibration)
 {
 	return this_Calibration ->grayValue;
 }
+
+extern int Calibration_getWhiteValue(Calibration * this_Calibration){
+return this_Calibration ->whiteValue;
+
+}
+extern int Calibration_getBlackValue(Calibration * this_Calibration){
+return this_Calibration ->blackValue;
+
+}
