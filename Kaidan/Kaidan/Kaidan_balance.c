@@ -18,7 +18,7 @@ static double min_vol;
 static int stepflag = 0;
 
 //ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
+static U32	GYRO_OFFSET_INIT = 0;    /* gyro sensor offset value */
 
 //バッテリ電圧値状態
 static U32	battery_value;
@@ -352,13 +352,16 @@ void RN_setting()
 	static int time_count = 0;
 
 	//距離計測用変数
-	int distance_before_step = 0;
-	int distance_step_brake = 0;
-	int distance_step_stop = 0;
-	int distance_gyro_up = 0;
-	int distance_over_forty = 0;
-	int distance_turn_clear = 0;
-	int distance_turn_after = 0;
+	static int distance_before_step = 0;
+	static int distance_step_brake = 0;
+	static int distance_step_stop = 0;
+	static int distance_gyro_up = 0;
+	static int distance_over_forty = 0;
+	static int distance_turn_clear = 0;
+	static int distance_turn_after = 0;
+
+	static unsigned int angle_l_now = 0;
+	static unsigned int angle_r_now = 0;
 
 
 	switch (setting_mode){
@@ -382,117 +385,13 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			time_count++;
-			RA_linetrace_PID(20);
-
-			if(RN_rapid_speed_up_signal_recevie() == 1)
-			{
-				setting_mode = RN_STEP_RAPID;
-			}
-
-			//直角カーブ部分
-			
-			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 300)
-			{
-				ecrobot_sound_tone(880, 512, 30);
-				setting_mode = RN_STEP_TURN_LEFT;
-				time_count = 0;
-			}
-			
-			break;
-
-			//加速
-		case (RN_STEP_RAPID):
-			RA_linetrace_PID(25);
-			gyro_offset += 17;
-			time_count = 0;
-			setting_mode = RN_STEP_SHOCK;
-			break;
-
-			//段差検知
-		case (RN_STEP_SHOCK):
-			RA_linetrace_PID(25);
-			time_count++;
-
-			if(time_count > 100)
-			{
-				if(shock(STEP_BATTERY) == 1)
-				{
-					min_vol = battery_value;
-					setting_mode = RN_STEP_SLOW;
-				}
-			}
-
-			distance_gyro_up = distance();	//段差突入時の距離を測定
-
-			break;
-
-			//減速
-		case (RN_STEP_SLOW):
-			RA_linetrace_PID(25);
-			gyro_offset -= 34;
-			ecrobot_sound_tone(880, 512, 30);
-			setting_mode = RN_STEP_STAY;
-			time_count = 0;
-			break;
-
-			//留まる
-		case (RN_STEP_STAY):
-			RA_linetrace_PID(25);
-			time_count++;
-
-			if(time_count == 85)
-				gyro_offset += 16;
-			
-			if(time_count >= 300)
-			{
-				setting_mode = RN_STEP_SECOND;
-				distance_stay = distance();
-
-				time_count = 0;
-			}
-			
-			break;
-
-			//二段目
-		case (RN_STEP_SECOND):
-			time_count++;
-
-			if(step_count == 0)
-			{
-				distance_second = distance();
-				RA_linetrace_PID(25);
-				if(RN_rapid_speed_up_signal_recevie() == 1 || distance_second - distance_stay > 8)
-				{
-					step_count = 1;
-					setting_mode = RN_STEP_RAPID;
-				}
-			}
-
-
-			else if(step_count == 1)
-			{
-				RA_linetrace_PID(0);
-				cmd_turn = RA_wheels(cmd_turn);
-				if(time_count > 300)
-				{
-					gyro_offset -= 30;
-					if(time_count > 350);
-					{
-						time_count = 0;
-						setting_mode = RN_STEP_TURN_START;
-						runner_mode = RN_MODE_BALANCEOFF;
-						tail_mode = RN_TAILDOWN;
-					}
-				}
-
-			}
-
+			RA_linetrace_PID(15);
+			setting_mode = RN_STEP_TURN_START;
 			break;
 
 		case (RN_STEP_TURN_START):
 			time_count++;
-			RA_linetrace_PID(20);
+			RA_linetrace_PID(15);
 			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 300)
 			{
 				ecrobot_sound_tone(880, 512, 30);
@@ -507,113 +406,34 @@ void RN_setting()
 			cmd_turn = 0;
 			if(time_count == 0)
 			{
-				ecrobot_set_motor_rev(NXT_PORT_B, 0);
-				ecrobot_set_motor_rev(NXT_PORT_C, 0);
+				angle_l_now = ecrobot_get_motor_rev(NXT_PORT_B);
+				angle_r_now = ecrobot_get_motor_rev(NXT_PORT_C);
 			}
 
 			time_count++;
 
-			if(ecrobot_get_motor_rev(NXT_PORT_B) <= RIGHT_ANGLE_AIM)
+			if(ecrobot_get_motor_rev(NXT_PORT_B) - angle_l_now <= RIGHT_ANGLE_AIM)
 			{
 				/* 回転する */
-				ecrobot_set_motor_speed(NXT_PORT_B, 50);
-				ecrobot_set_motor_speed(NXT_PORT_C, -50);
+				cmd_turn = -100;
 			}
 			else
 			{
 				/* 止まる */
-				ecrobot_set_motor_speed(NXT_PORT_B, 0);
-				ecrobot_set_motor_speed(NXT_PORT_C, 0);
-				if(time_count > 500)
-				{
-					time_count = 0;
-					distance_turn_clear = distance();	//段差突入時の距離を測定
-					setting_mode = RN_STEP_TURN_FORWARD;
-				}
+				time_count = 0;
+				setting_mode = RN_STEP_TURN_FORWARD;
 			}
 	
 			break;
 
-			//カーブ後直進
 		case (RN_STEP_TURN_FORWARD):
-			RA_linetrace_PID(10);
+			RA_linetrace_PID(20);
 			
-			distance_turn_after = distance();	//段差突入時の距離を測定
-			if(distance_turn_after - distance_turn_clear > 5)
+			if(GYRO_OFFSET_INIT - 50 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET_INIT + 50 < ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 200)
 			{
-				setting_mode = RN_STEP_TURN_TAILUP;
-				runner_mode = RN_MODE_INIT;
-				ecrobot_sound_tone(880, 512, 30);
-			}
-			break;
-
-			//尻尾→倒立
-		case (RN_STEP_TURN_TAILUP):
-
-			if(time_count < 200)
-			{
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			}
-			time_count++;
-			
-			//尻尾持ち上げ補助
-			if(time_count == 200)
-			{
-				tail_mode = RN_TAILSTAND;
-
-				/*
-				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
-				*/
-			}
-			
-			if(time_count == 400)
-			{
-				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
-			}
-			
-			if(time_count == 600)
-			{
-				tail_mode = RN_TAILPUSH;
-			}
-
-			if(time_count == 650)
-			{
-				time_count = 0;
-				balance_init();
-				gyro_offset -= 3;
-				runner_mode = RN_MODE_BALANCE;
-				setting_mode = RN;
-				tail_mode = RN_TAILUP;
-			}
-			break;
-
-		case (RN):
-			time_count++;
-			/*			
-			if(time_count > 300)
-			{
-				RA_linetrace(20,20);
-			}
-			else
-			{
-				RA_linetrace_PID(0);
-				cmd_turn = RA_wheels(cmd_turn);
-			}
-			*/
-			//RA_linetrace_PID(20);
-			/*
-			if(GYRO_OFFSET - 50 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET + 50 < ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 200)
-			{
-				gyro_offset += 7;
+				//GYRO_OFFSET_INIT += 7;
 				setting_mode = RN_STOP;
 			}
-			*/
-			
-			RA_linetrace_PID(0);
-			cmd_turn = RA_wheels(cmd_turn);
 			
 			break;
 				//強制停止
@@ -638,17 +458,17 @@ int rapid_speed_up(int target_gyro){
 
 	if(rapid_speed_up_counter >= 0)
 	{
-		if(GYRO_OFFSET > (target_gyro + GYRO_OFFSET))
-			gyro_offset--;
+		if(GYRO_OFFSET_INIT > (target_gyro + GYRO_OFFSET_INIT))
+			GYRO_OFFSET_INIT--;
 		else
-			gyro_offset++;
+			GYRO_OFFSET_INIT++;
 
 		rapid_speed_up_counter = 0;
 	}
 
 	rapid_speed_up_counter++;
 
-	if((target_gyro + GYRO_OFFSET) == gyro_offset)
+	if((target_gyro + GYRO_OFFSET_INIT) == GYRO_OFFSET_INIT)
 		return 1;
 	else
 		return 0;
@@ -759,8 +579,8 @@ void RN_calibrate()
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(932, 512, 10);
-			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-			GYRO_OFFSET = gyro_offset;
+			GYRO_OFFSET_INIT += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET_INIT = GYRO_OFFSET_INIT;
 			battery_value = ecrobot_get_battery_voltage();
 			min_vol = battery_value;
 			systick_wait_ms(500);
@@ -790,8 +610,8 @@ void RN_calibrate()
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
 						setting_mode = RN_RUN;
-						runner_mode = RN_MODE_BALANCEOFF;
-						tail_mode = RN_TAILDOWN;
+						runner_mode = RN_MODE_BALANCE;
+						tail_mode = RN_TAILUP;
 						break;
 					}
 				}
@@ -819,7 +639,7 @@ void RN_modesetting()
 				(F32)cmd_forward,
 				(F32)cmd_turn,
 				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)gyro_offset,
+		 		(F32)GYRO_OFFSET_INIT,
 				(F32)nxt_motor_get_count(NXT_PORT_C),
 		 		(F32)nxt_motor_get_count(NXT_PORT_B),
 				(F32)ecrobot_get_battery_voltage(),
