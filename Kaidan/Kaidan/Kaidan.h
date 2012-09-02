@@ -23,7 +23,7 @@ static unsigned int GYRO_OFFSET;
 #define ANGLEOFDOWN 95			//降下目標角度
 #define ANGLEOFUP 5				//上昇目標角度
 #define ANGLEOFPUSH 115 			//走行体跳ね上げ目標角度
-#define ANGLEOFSTAND 108		//直立目標角度
+#define ANGLEOFSTAND 106		//直立目標角度
 
 //速度調節係数
 #define SPEED_COUNT 10
@@ -49,7 +49,7 @@ static unsigned int GYRO_OFFSET;
 #define MACHINE_W	162
 
 #define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.95		//ラインから脱した際の光センサの値(570)
-#define RIGHT_ANGLE_AIM 110				//回転角度(160)
+#define RIGHT_ANGLE_AIM 240				//回転角度(160)
 
 /*
  *	状態定義
