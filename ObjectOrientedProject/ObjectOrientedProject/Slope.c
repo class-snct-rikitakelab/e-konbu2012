@@ -14,12 +14,6 @@
  *	各種定義
 */
 
-
-//尻尾設定角度
-#define ANGLEOFSTOP 105				//直立停止状態角度
-#define ANGLEOFDOWN 95 			//降下目標角度
-#define ANGLEOFUP 0					//上昇目標角度
-
 #define PI 3.141592
 
 //速度カウンタの上限値
@@ -34,9 +28,7 @@ static unsigned int GYRO_OFFSET;
 //車輪の円周[cm]
 #define CIRCUMFERENCE 25.8			//車輪の円周
 
-/* 車輪半径、走行体幅*/
-#define WHEEL_R		41	//[mm]
-#define MACHINE_W	162	//[mm]
+
 
 /*
  *	グローバル変数
@@ -78,9 +70,6 @@ static int t_value = 0;				//角度目標値
 static int t_count_limit = 0;		//カウンタ最大値
 static int t_up = 0;				//増減値
 
-//全体用カウンタ（時間稼ぎ用）
-static int wait_count = 0;
-
 //超音波センサ目標値
 static int target_sonar = 20;
 
@@ -91,30 +80,6 @@ static int sonarvalue;
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
-
-/* 自己位置同定用変数 */
-float d_theta_r;			//1ステップ当たりの右車輪回転角度
-float d_theta_l;			//1ステップ当たりの左車輪回転角度
-
-static float d_theta_r_t = 0;		//前回のステップの右車輪回転角度
-static float d_theta_l_t = 0;		//前回のステップの左車輪回転角度
-
-static double omega_r;			//右車輪の回転角速度
-static double omega_l;			//左車輪の回転角速度
-
-float v_r;				//右車輪の回転速度
-float v_l;				//左車輪の回転速度
-
-float v;					//走行体の走行速度
-float omega;				//走行体の回転角速度
-
-static float x_r = 0;		//車体のX座標
-static float y_r = 0;		//車体のY座標
-static float theta_R = 0;	//車体の角度
-
-static float x_r_zero = 0;	//X座標初期値
-static float y_r_zero = 0;	//Y座標初期値
-static float theta_R_zero = 0;	//車体角度初期値
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -133,7 +98,6 @@ int distance_after_slope;
 
 
 static double min_vol;
-static int stepflag = 0;
 
 //バッテリ電圧値状態
 static U32	battery_value;
@@ -190,7 +154,6 @@ void RA_linetrace_P(int forward_speed);
 void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
-static int remote_start(void);
 void sonarcheck(void);
 void runner_mode_change(int flag);
 int getsonarflag(int target_sonar);
@@ -228,8 +191,7 @@ const char target_subsystem_name[] = "Slope";
 
 //初期処理関数（プログラムの最初に呼び出し）
 void ecrobot_device_initialize(void)
-{
-	factory();										//全オブジェクト初期化
+{										//全オブジェクト初期化
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);	//光センサ起動
 	ecrobot_init_bt_slave("LEJOS-OSEK");			//Bluetooth起動
 	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
@@ -241,6 +203,7 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_motor_speed(NXT_PORT_A,0);
 	ecrobot_set_motor_speed(NXT_PORT_B,0);
 	ecrobot_set_motor_speed(NXT_PORT_C,0);
+	factory();
 }
 
 
@@ -603,27 +566,18 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4){
 //走行状態設定関数
 void RN_setting()
 {
-	int forward_speed;
 	PWMValues pValues;
-
 
 	switch (setting_mode){
 
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
+			
 			if(Calibration_doCalibrate(&mCalibration) == 1)
+			{
 				setting_mode = RN_RUN;
-			break;
-
-		case (RN_SPEEDZERO):
-			//cmd_forward = 0;
-			//cmd_turn = RA_wheels(cmd_turn);
-			//wait_count++;
-			//if(wait_count >= 200)
-			//{
-				setting_mode = RN_RUN;
-				//wait_count = 0;
-			//}
+			}
+			
 			break;
 		
 			//通常走行状態
@@ -696,32 +650,6 @@ void RN_setting()
 	}
 }
 
-
-
-//自己位置同定関数
-void self_location()
-{
-	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * PI / 180.0;
-	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * PI / 180.0;
-
-	omega_l = (d_theta_l - d_theta_l_t)/0.004;
-	omega_r = (d_theta_r - d_theta_r_t)/0.004;
-
-	v_l = (WHEEL_R * 0.1) * omega_l;
-	v_r = (WHEEL_R * 0.1) * omega_r;
-
-	v = (v_r + v_l) / 2.0;
-	omega = (v_r - v_l) / (MACHINE_W * 0.1);
-
-	d_theta_l_t = d_theta_l;
-	d_theta_r_t = d_theta_r;
-
-	theta_R += omega * 0.004 + theta_R_zero;
-	x_r += v * cos(theta_R) * 0.004 + x_r_zero;
-	y_r += v * sin(theta_R) * 0.004 + y_r_zero;
-	
-}
-
 //走行体状態設定関数
 void RN_modesetting()
 {
@@ -768,9 +696,10 @@ void RN_modesetting()
 //走行体管理タスク(4ms)
 TASK(ActionTask)
 {
-	RN_modesetting();	//走行体状態設定
-	taildown();			//尻尾制御
-	self_location();	//自己位置同定
+	RN_modesetting();							//走行体状態設定
+	TailControl_PIDTailControl(&mTailControl);	//問題点:尻尾が目標角度で停止せずに回り続ける
+//	taildown();									//尻尾制御
+	SelfLocation_SelfLocate(&mSelfLocation);	//自己位置同定
 	TerminateTask();
 }
 
@@ -791,7 +720,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(v,cmd_turn,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
+	logSend(SelfLocation_GetDistance(&mSelfLocation),cmd_turn,SelfLocation_GetDistance(&mSelfLocation),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
 			BLACK_VALUE,WHITE_VALUE);
 
 	sonarcheck();											//超音波センサ状態管理
@@ -799,5 +728,7 @@ TASK(LogTask)
 
 	TerminateTask();
 }
+
+
 
 /******************************** END OF FILE ********************************/
