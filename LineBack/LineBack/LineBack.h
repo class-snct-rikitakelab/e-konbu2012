@@ -8,10 +8,14 @@
 #include "Kaidan.h"
 #include "GyroVariation.h"
 #include "PIDControl.h"
+#include "LineEdgeDetecter.h"
 
 
-#define STEP_FALL_THRESHOLD 10
+#define STEP_FALL_THRESHOLD 80
 #define CMD_FALL_DETECT_START '5'
+
+#define KI_GAIN_VAL 2.0
+#define KD_GAIN_VAL 1.5
 
 
 typedef struct {
@@ -27,6 +31,8 @@ typedef enum{
 	TURNING_RIGHT,
 	BACK_TO_RIGHT_EDGE,
 	BACK_TO_INIT_POSITION,
+	ENTRY_LINE_EDGE,
+	LINE_TRACE_DEBUG,
 } HEAD_TO_LINE_STATE;
 
 
@@ -38,7 +44,7 @@ typedef enum{
 
 
 //headToLineä÷êîì‡ïîÇÃèÛë‘Çï\Ç∑ïœêî
- static HEAD_TO_LINE_STATE headToLineState= GO_FORWARD;
+ static HEAD_TO_LINE_STATE headToLineState= TURNING_LEFT;
 
 
 
@@ -65,10 +71,13 @@ void LineBack_turningRightAction(LineBack * this_LineBack,int forwardSpeed,int t
 void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
 
 void LineBack_turning(LineBack * this_LineBack,int forwardSpeed,int turnSpeed);
-
-int LineBack_LineBack_detectLineEdge(LineBack * this_LineBack);
+/*
+int LineBack_detectLineEdge(LineBack * this_LineBack);*/
 void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle);
 
 void LineBack_lineCatchAction(LineBack * this_LineBack);
-			
+
+int LineBack_goForwardAction(LineBack *this_LineBack,int forwardSpeed);
+
+void LineBack_entryLineEdgeAction(LineBack * this_LineBack);
 #endif

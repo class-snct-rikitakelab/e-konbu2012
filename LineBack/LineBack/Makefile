@@ -22,7 +22,8 @@ TARGET_SOURCES := \
 		GyroVariation.c \
 		Factory.c \
 		Calibration.c \
-		PIDControl.c
+		PIDControl.c \
+		LineEdgeDetecter.c
 
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 

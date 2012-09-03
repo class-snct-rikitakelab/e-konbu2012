@@ -193,7 +193,7 @@ void RA_linetrace_PID(int forward_speed) {
 	else
 		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)GRAY_VALUE;
 
-	i_hensa = i_hensa+(hensa*0.0002);
+	i_hensa = i_hensa+(hensa*0.0002);		//0‚ª1‚Â‘½‚¢
 	d_hensa = (hensa - bf_hensa)/0.0002;
 	bf_hensa = hensa;
 
