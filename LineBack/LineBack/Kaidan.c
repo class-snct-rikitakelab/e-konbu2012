@@ -394,11 +394,14 @@ void RN_setting()
 			controlVals.turn_val=PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 
 			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
-
+			//test code
+		//	setting_mode= RN_LINEBACK;
+			//test code end
 		//if(GYRO_OFFSET - 100 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET + 100 < ecrobot_get_gyro_sensor(NXT_PORT_S1))
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
 			{
 				ecrobot_sound_tone(932, 512, VOL);
+
 				setting_mode= RN_LINEBACK;
 			}
 		//	cmd_turn = RA_wheels(cmd_turn);
@@ -662,6 +665,6 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(0,shock(STEP_BATTERY),theta*(180/M_PI)/*distance_gyro_up - distance_before_step*/,ecrobot_get_gyro_sensor(NXT_PORT_S1),
-			position_x,GyroVariation_getGyroSensorVariation(&mGyroVariation),position_y);		//ƒƒOŽæ‚è
+			position_x,position_y/*GyroVariation_getGyroSensorVariation(&mGyroVariation)*/,position_y);		//ƒƒOŽæ‚è
 	TerminateTask();
 }

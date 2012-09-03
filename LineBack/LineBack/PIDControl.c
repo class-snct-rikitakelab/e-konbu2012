@@ -3,7 +3,7 @@
 
 void PIDControl_init(PIDControl *this_PIDControl){
 	 this_PIDControl->Kp = 1.85;				//P§Œä—p
- this_PIDControl->Ki = 2.6;				//I§Œä—p
+ this_PIDControl->Ki = 1.6;				//I§Œä—p
  this_PIDControl->Kd = 0.003;
 
 }

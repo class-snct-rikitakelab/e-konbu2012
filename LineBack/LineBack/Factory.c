@@ -16,4 +16,5 @@ GyroVariation_init(&mGyroVariation);
 LineBack_init(&mLineBack);
 Calibration_init(&mCalibration);
 PIDControl_init(&mPIDControl);
+LineEdgeDetecter_init(&mLineEdgeDetecter);
 }
