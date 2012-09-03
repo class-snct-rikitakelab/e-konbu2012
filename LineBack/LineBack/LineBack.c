@@ -15,7 +15,7 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	static LINE_BACK_STATE lineBackState = STEP_FALL_DETECTING;
 	
 	ControlVals controlVals;
-int lineBackResult=0;
+	int lineBackResult=0;
 	
 	//LineBack_headToLine(this_LineBack);
 
@@ -23,17 +23,16 @@ int lineBackResult=0;
 	
 	case STEP_FALL_DETECTING :
 
-	controlVals.forward_val=RA_speed(30);
+	controlVals.forward_val=RA_speed(20);
 	controlVals.turn_val= PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 	 
 	if(LineBack_detectStepFall(&mLineBack)==1){
-	ecrobot_sound_tone(880, 512, 10);
+	//ecrobot_sound_tone(880, 512, 10);
 		lineBackState = STABLE_STOP;
 	}
-	
-
 	break;
+	
 	case STABLE_STOP :
 	if(LineBack_stableStop(&mLineBack)==1){ //’âŽ~‚ªˆÀ’è‚µ‚½‚ç‚P‚ª•Ô‚Á‚Ä‚­‚é
 	lineBackState = HEAD_TO_LINE;
@@ -62,12 +61,12 @@ int LineBack_detectStepFall(LineBack * this_LineBack){
 	}
 	*/
 
-	GyroVariation_calGyroSensorVariation(&mGyroVariation);
+	//GyroVariation_calGyroSensorVariation(&mGyroVariation);
 	if(RobotPosture_getGyroOffset(&mRobotPosture) - STEP_FALL_THRESHOLD  > ecrobot_get_gyro_sensor(NXT_PORT_S3)  || RobotPosture_getGyroOffset(&mRobotPosture) + STEP_FALL_THRESHOLD <  ecrobot_get_gyro_sensor(NXT_PORT_S3) ){
 	
 	//if(GyroVariation_getGyroSensorVariation(&mGyroVariation) > STEP_FALL_THRESHOLD || GyroVariation_getGyroSensorVariation(&mGyroVariation) < -STEP_FALL_THRESHOLD ){
 		result = 1;
-		//ecrobot_sound_tone(880, 512, 10);
+		ecrobot_sound_tone(880, 512, 10);
 		//systick_wait_ms(20);
 	}
 
@@ -103,6 +102,7 @@ int LineBack_stableStop(LineBack * this_LineBack){
 	return result;
 }
 
+#define TURN_ANGLE 90
 int LineBack_headToLine(LineBack * this_LineBack){
 	
 	ControlVals controlVals;
@@ -111,7 +111,7 @@ int LineBack_headToLine(LineBack * this_LineBack){
 	switch (headToLineState) {
 	
 		case GO_FORWARD :
-			LineBack_goForwardAction(this_LineBack,10);
+			LineBack_goForwardAction(this_LineBack,15);
 			break;
 		
 		case  CATCH_LINE :
@@ -120,20 +120,20 @@ int LineBack_headToLine(LineBack * this_LineBack){
 			break;
 	
 		case TURNING_LEFT :
-			LineBack_turningLeftAction(this_LineBack,10,-10,80);
+			LineBack_turningLeftAction(this_LineBack,10,-30,TURN_ANGLE);
 			break;
 		
 		case BACK_TO_RIGHT_EDGE:
-		LineBack_backToRightEdgeAction(this_LineBack,-15,10,90);		
+		LineBack_backToRightEdgeAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);		
 		break;
 		case ENTRY_LINE_EDGE :
 			LineBack_entryLineEdgeAction(this_LineBack);
 
 		case BACK_TO_INIT_POSITION :
-		LineBack_backToInitPositionAction(this_LineBack,-10,10,80);
+		LineBack_backToInitPositionAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);
 		break;
 		case TURNING_RIGHT :
-			LineBack_turningRightAction(this_LineBack,10,10,90);
+			LineBack_turningRightAction(this_LineBack,10,30,TURN_ANGLE);
 			break;
 		//test code from here
 		case LINE_TRACE_DEBUG :
@@ -172,7 +172,7 @@ void LineBack_entryLineEdgeAction(LineBack * this_LineBack){
 	LineBack_turning(this_LineBack,controlVals.forward_val,controlVals.turn_val);
 
 
-	if(ecrobot_get_motor_rev(NXT_PORT_B)-initRightMotorRev < -20*4 ){
+	if(ecrobot_get_motor_rev(NXT_PORT_B)-initRightMotorRev < -10*4 ){
 			ecrobot_sound_tone(420, 100, 10);
 				headToLineState = GO_FORWARD;
 			}
@@ -269,7 +269,7 @@ void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed
 void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){
 	static int lineEdgeDetectTimes = 0;
 	
-	ecrobot_sound_tone(660, 100, 30);
+	ecrobot_sound_tone(660, 100, 10);
 
 	lineEdgeDetectTimes += LineEdgeDetecter_getLineEdgeDetectPulse(&mLineEdgeDetecter);
 	LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
@@ -301,6 +301,22 @@ void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int tu
 
 			LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
 
+			if(ecrobot_get_motor_rev(NXT_PORT_B)-initRightMotorRev > aimAngle*4 ){
+
+	
+				if(lineEdgeDetectTimes==2){
+					lineEdgeDetectTimes = 0;
+					headToLineState = BACK_TO_RIGHT_EDGE;
+					}
+		
+				else {
+				ecrobot_sound_tone(420, 100, 10);
+				headToLineState = BACK_TO_INIT_POSITION;
+				}
+			}
+
+
+			/*
 			if(lineEdgeDetectTimes==2){
 					lineEdgeDetectTimes = 0;
 					headToLineState = BACK_TO_RIGHT_EDGE;
@@ -309,6 +325,7 @@ void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int tu
 			ecrobot_sound_tone(420, 100, 10);
 				headToLineState = BACK_TO_INIT_POSITION;
 			}
+			*/
 }
 
 void LineBack_turning(LineBack * this_LineBack,int forwardSpeed,int turnSpeed){

@@ -11,7 +11,7 @@
 #include "LineEdgeDetecter.h"
 
 
-#define STEP_FALL_THRESHOLD 50
+#define STEP_FALL_THRESHOLD 80
 #define CMD_FALL_DETECT_START '5'
 
 #define KI_GAIN_VAL 2.0
