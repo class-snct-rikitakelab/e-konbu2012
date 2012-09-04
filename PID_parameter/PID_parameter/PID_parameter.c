@@ -9,6 +9,8 @@
 #include "tyreal_light_ver.h"
 
 
+
+
 /*
  *	各種変数定義
  */
@@ -33,6 +35,39 @@ static int counter = 0;
 
 //速度調節係数
 #define SPEED_COUNT 10
+
+/* 車輪半径、走行体幅*/
+#define WHEEL_R		41	//[mm]
+#define MACHINE_W	162	//[mm]
+
+#define CIRCUMFERENCE	25.8	//車輪の円周
+
+#define POSITION_X0 0
+#define POSITION_Y0 0
+#define THETA_0 0
+
+/* 自己位置同定用　変数宣言 */
+float d_theta_r;					/* 現在の右モータ回転角度 [rad] */
+float d_theta_l;					/* 現在の左モータ回転角度 [rad] */
+static float d_theta_r_t;			/* 1 ステップ前の右モータ回転角度 [rad] */
+static float d_theta_l_t;			/* 1 ステップ前の左モータ回転角度 [rad] */
+float velocity_r;					/* 右車輪移動速度 [cm/s] */
+float velocity_l;					/* 左車輪移動速度 [cm/s] */
+float velocity;						/* ロボットの移動速度 [cm/s] */
+float omega;						/* ロボットの回転角角度 [rad/s] */
+static float position_x = POSITION_X0; /* ロボットの x 座標 */
+static float position_y = POSITION_Y0; /* ロボットの y 座標 */
+static float theta = THETA_0;		/* ロボットの姿勢角 */
+unsigned short int l_val;			/* 光センサ値 */
+int temp_x;							/* ロボットの x 座標（出力処理用） */
+int temp_y;							/* ロボットの y 座標（出力処理用） */
+static double omega_r;			//右車輪の回転角速度
+static double omega_l;			//左車輪の回転角速度
+unsigned char tx_buf[BT_MAX_TX_BUF_SIZE]; /* 送信バッファ */
+
+
+void self_location();
+
 
 static unsigned int GYRO_OFFSET_FIRST;
 
@@ -202,30 +237,31 @@ void RA_linetrace_PID(int forward_speed) {
 	right_motor_turn = forward_speed - cmd_turn/2;
 	left_motor_turn = forward_speed  + cmd_turn/2;
 
+
 	//オーバーフロー対策及びオーバーフロー分考慮
-	if (-128 > right_motor_turn) {
+	if (/*-128*/-100 > right_motor_turn) {
 		right_motor_turn_overflow = -(-128 - right_motor_turn);
 		right_motor_turn = -128;
-	} else if (127 < right_motor_turn) {
-		right_motor_turn_overflow = right_motor_turn - 127;
+	} else if (100/*127*/ < right_motor_turn) {
+		right_motor_turn_overflow = right_motor_turn - 100/*-127*/;
 		right_motor_turn = 127;
 	}
 
-	if (-128 > left_motor_turn) {
-		left_motor_turn_overflow = -(-128 - left_motor_turn);
+	if (/*-128*/-100 > left_motor_turn) {
+		left_motor_turn_overflow = -(/*-128*/-100 - left_motor_turn);
 		left_motor_turn = -128;
-	} else if (127 < left_motor_turn) {
-		left_motor_turn_overflow = left_motor_turn - 127;
-		left_motor_turn = 127;
+	} else if (/*127*/100 < left_motor_turn) {
+		left_motor_turn_overflow = left_motor_turn -100/*- 127*/;
+		left_motor_turn = 100/*127*/;
 	}
 
 	//出力pwm値算出
-	if(left_motor_turn + right_motor_turn_overflow >= -128 && left_motor_turn + right_motor_turn_overflow <= 127)
+	if(left_motor_turn + right_motor_turn_overflow >= -100/*-128*/ && left_motor_turn + right_motor_turn_overflow <= 100/*127*/)
 		pwm_l = (int)(left_motor_turn + right_motor_turn_overflow);
 	else
 		pwm_l = (int)left_motor_turn;
 
-	if(right_motor_turn + left_motor_turn_overflow >= -128 && right_motor_turn + left_motor_turn_overflow <= 127)
+	if(right_motor_turn + left_motor_turn_overflow >= -100/*-128*/ && right_motor_turn + left_motor_turn_overflow <= 100/*127*/)
 		pwm_r = (int)(right_motor_turn + left_motor_turn_overflow);
 	else
 		pwm_r = (int)right_motor_turn;
@@ -553,24 +589,56 @@ void RN_modesetting()
 //走行方法管理(4ms)
 TASK(ActionTask)
 {
+	/*
 	RN_modesetting();	//走行体状態
 	tailcontrol();		//尻尾コントロール
+	*/
+	nxt_motor_set_speed(NXT_PORT_C,127, 1);
+	self_location();
 	TerminateTask();
+	 
+
 }
 
 //走行状態管理(5ms)
 TASK(ActionTask2)
-{
+{/*
 	RN_setting();		//走行状態
+	*/
 	TerminateTask();
 }
 
 //ログ送信管理(50ms)
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,pwm_l,pwm_r,distance_now_slope - distance_before_slope,ecrobot_get_gyro_sensor(NXT_PORT_S1));		//ログ取り
+	logSend(velocity_l/*cmd_forward*/,0/*cmd_turn*/,pwm_l,pwm_r,distance_now_slope - distance_before_slope,velocity/*ecrobot_get_gyro_sensor(NXT_PORT_S1)*/);		//ログ取り
 	TerminateTask();
 }
+
+
+void self_location()
+{
+	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * M_PI / 180.0;
+	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * M_PI / 180.0;
+
+	omega_l = (d_theta_l - d_theta_l_t)/0.004;
+	omega_r = (d_theta_r - d_theta_r_t)/0.004;
+
+	velocity_l = (WHEEL_R * 0.1) * omega_l;
+	velocity_r = (WHEEL_R * 0.1) * omega_r;
+
+	velocity = (velocity_r + velocity_l) / 2.0;
+	omega = (velocity_r - velocity_l) / (MACHINE_W * 0.1);
+
+	d_theta_l_t = d_theta_l;
+	d_theta_r_t = d_theta_r;
+
+	theta += omega * 0.004 + THETA_0;
+	position_x += velocity * cos(theta) * 0.004 + POSITION_X0;
+	position_y += velocity * sin(theta) * 0.004 + POSITION_Y0;
+	
+}
+
 
 
 /******************************** END OF FILE ********************************/
