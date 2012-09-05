@@ -17,6 +17,9 @@
 #define KI_GAIN_VAL 2.0
 #define KD_GAIN_VAL 1.5
 
+#define TURN_ANGLE 90
+
+
 
 typedef struct {
 	
@@ -33,6 +36,12 @@ typedef enum{
 	BACK_TO_INIT_POSITION,
 	ENTRY_LINE_EDGE,
 	LINE_TRACE_DEBUG,
+
+	SELECT_METHOD,
+	GET_TURN_ANGLE,
+	TURN_VERTICAL_TO_LINE,
+	TURN_TO_LINE,
+	GO_FORWARD_TO_LINE,
 } HEAD_TO_LINE_STATE;
 
 
@@ -80,4 +89,15 @@ void LineBack_lineCatchAction(LineBack * this_LineBack);
 int LineBack_goForwardAction(LineBack *this_LineBack,int forwardSpeed);
 
 void LineBack_entryLineEdgeAction(LineBack * this_LineBack);
+
+
+
+//hybrid methods
+void LineBack_selectLineBackMethod(LineBack * this_LineBack);
+float LineBack_judePosition(LineBack * this_LineBack);
+void LineBack_killRevDiff(LineBack * this_LineBack);
+void LineBack_turnToLine(LineBack * this_LineBack,int turnAngle);
+void LineBack_goForwardToLine(LineBack * this_LineBack);
+	
 #endif
+
