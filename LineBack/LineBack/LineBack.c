@@ -18,12 +18,13 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	int lineBackResult=0;
 	
 	//LineBack_headToLine(this_LineBack);
-
+	
+	
 	switch (lineBackState){
 	
 	case STEP_FALL_DETECTING :
 
-	controlVals.forward_val=RA_speed(20);
+	controlVals.forward_val=25;/*RA_speed(25);*/
 	controlVals.turn_val= PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 	 
@@ -47,6 +48,7 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	}
 	break;
 	}
+	
 	
 return lineBackResult;
 
@@ -114,10 +116,14 @@ int LineBack_headToLine(LineBack * this_LineBack){
 			break;
 		case GET_TURN_ANGLE :
 			turn_angle = LineBack_judePosition(this_LineBack);
+			headToLineState = TURN_VERTICAL_TO_LINE;
 			break;
 		case TURN_VERTICAL_TO_LINE :
 			LineBack_killRevDiff(this_LineBack);
 			break;
+
+
+
 		case TURN_TO_LINE :
 			LineBack_turnToLine(this_LineBack,turn_angle);
 
@@ -451,6 +457,12 @@ else {
 
 float LineBack_judePosition(LineBack * this_LineBack){
 	float aimOfAngle=0;
+	ControlVals controlVals;
+	controlVals.forward_val=0;
+	controlVals.turn_val=0;
+	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
+
+
 	if((ecrobot_get_motor_rev(NXT_PORT_B)-ecrobot_get_motor_rev(NXT_PORT_C)) > 40){
 	aimOfAngle = 45; //右に
 	}
@@ -460,7 +472,7 @@ float LineBack_judePosition(LineBack * this_LineBack){
 	return  aimOfAngle;
 }
 void LineBack_killRevDiff(LineBack * this_LineBack){
-	float w_kp = 0.3;
+	float w_kp = 0.5;
 	signed long def = 0;
 	ControlVals controlVals;
 	controlVals.forward_val=0;
@@ -489,12 +501,21 @@ void LineBack_turnToLine(LineBack * this_LineBack,int turnAngle){
 	
 
 	LineBack_turning(this_LineBack,0,turnAngle);
-		
-		if(ecrobot_get_motor_rev(NXT_PORT_B) - initRightMotorRev  < turnAngle*4 ){
+
+		if(turnAngle < 0)
+		{
+		if(ecrobot_get_motor_rev(NXT_PORT_B) - initLeftMotorRev  > turnAngle*4 )
+		{
 				headToLineState = GO_FORWARD/*GO_FORWARD_TO_LINE*/; //本来はエッジ検出までの直線移動ではなく距離を指定したいが、後回し
-				onceDoFlag = 0;		
 		}
 
+		}
+		else{
+			if(ecrobot_get_motor_rev(NXT_PORT_C) - initRightMotorRev  > turnAngle*4 ){
+				headToLineState = GO_FORWARD/*GO_FORWARD_TO_LINE*/; //本来はエッジ検出までの直線移動ではなく距離を指定したいが、後回し
+			}
+		}
+		
 }
 void LineBack_goForwardToLine(LineBack * this_LineBack){
 

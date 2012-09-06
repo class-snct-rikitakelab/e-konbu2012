@@ -372,9 +372,9 @@ void RN_setting()
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 		if(Calibration_doCalibrate(&mCalibration)==1){
-			//RobotPosture_setPostureMode(&mRobotPosture,BALANCING);
-			RobotPosture_setPostureMode(&mRobotPosture,TAIL_RUNING);
-			tail_mode = RN_TAILDOWN;
+			RobotPosture_setPostureMode(&mRobotPosture,BALANCING);
+			//RobotPosture_setPostureMode(&mRobotPosture,TAIL_RUNING);
+			tail_mode = RN_TAILUP;
 			setting_mode = RN_RUN;
 			
 
@@ -389,14 +389,14 @@ void RN_setting()
 	
 			//通常走行
 		case (RN_RUN):
-			controlVals.forward_val=RA_speed(20);
+			controlVals.forward_val=RA_speed(25);
 //			controlVals.turn_val=RA_linetrace_PID(controlVals.forward_val);
 
 			controlVals.turn_val=PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 
 			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 			//test code
-			setting_mode= RN_LINEBACK;
+			//setting_mode= RN_LINEBACK;
 			//test code end
 		//if(GYRO_OFFSET - 100 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET + 100 < ecrobot_get_gyro_sensor(NXT_PORT_S1))
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
