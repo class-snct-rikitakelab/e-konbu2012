@@ -8,13 +8,14 @@
 #include "Calibration.h"
 #include "PIDControl.h"
 #include "LineEdgeDetecter.h"
+#include "TailControl.h"
 
 LineBack mLineBack;
  RobotPosture mRobotPosture;
  GyroVariation mGyroVariation;
  Calibration mCalibration;
  PIDControl mPIDControl;
-//LineBack mLineBack;
+ TailControl mTailControl;
 
 LineEdgeDetecter mLineEdgeDetecter;
 

@@ -1,6 +1,7 @@
+#include "Factory.h"
 #include "RobotPosutre.h"
 
-
+#include "TailControl.h"
 
  
 void RobotPosture_init(RobotPosture *this_RobotPosture){
@@ -40,7 +41,7 @@ S8 pwm_l=0,pwm_r=0;
 			break;
 
 			//バランサーOFF(尻尾走行)
-		case (TAIL_RUNING):
+		case (TAIL_RUNNING):
 			nxt_motor_set_speed(NXT_PORT_C, controlVals.forward_val + controlVals.turn_val/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, controlVals.forward_val - controlVals.turn_val/2, 1);
 			break;
@@ -64,4 +65,13 @@ extern void RobotPosture_setGyroOffset(RobotPosture *this_RobotPosture,U32 gyroO
 extern U32 RobotPosture_getGyroOffset(RobotPosture *this_RobotPosture){
 
 	return this_RobotPosture->gyroOffset;
+}
+extern void RobotPosuture_changeTailRunning(RobotPosture *this_RobotPosture){
+	
+	TailControl_TailStateChange(&mTailControl,TAIL_DOWN);
+	RobotPosture_setGyroOffset(this_RobotPosture,this_RobotPosture->gyroOffset+200);
+	
+	RobotPosture_setPostureMode(this_RobotPosture,TAIL_RUNNING);
+	systick_wait_ms(500);
+	RobotPosture_setGyroOffset(this_RobotPosture,this_RobotPosture->gyroOffset-200);
 }

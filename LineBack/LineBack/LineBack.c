@@ -17,14 +17,14 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	ControlVals controlVals;
 	int lineBackResult=0;
 	
-	//LineBack_headToLine(this_LineBack);
+	LineBack_headToLine(this_LineBack);
 	
-	
+	/*
 	switch (lineBackState){
 	
 	case STEP_FALL_DETECTING :
 
-	controlVals.forward_val=25;/*RA_speed(25);*/
+	controlVals.forward_val=25;//RA_speed(25);
 	controlVals.turn_val= PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 	RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 	 
@@ -36,7 +36,8 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	
 	case STABLE_STOP :
 	if(LineBack_stableStop(&mLineBack)==1){ //’âŽ~‚ªˆÀ’è‚µ‚½‚ç‚P‚ª•Ô‚Á‚Ä‚­‚é
-	lineBackState = HEAD_TO_LINE;
+	RobotPosuture_changeTailRunning(&mRobotPosture);
+		lineBackState = HEAD_TO_LINE;
 	}
 
 	break;
@@ -48,7 +49,7 @@ int LineBack_doLineBack(LineBack * this_LineBack){
 	}
 	break;
 	}
-	
+	*/
 	
 return lineBackResult;
 
@@ -68,7 +69,7 @@ int LineBack_detectStepFall(LineBack * this_LineBack){
 	
 	//if(GyroVariation_getGyroSensorVariation(&mGyroVariation) > STEP_FALL_THRESHOLD || GyroVariation_getGyroSensorVariation(&mGyroVariation) < -STEP_FALL_THRESHOLD ){
 		result = 1;
-		ecrobot_sound_tone(880, 512, 10);
+		//ecrobot_sound_tone(880, 512, 10);
 		//systick_wait_ms(20);
 	}
 

@@ -17,4 +17,5 @@ LineBack_init(&mLineBack);
 Calibration_init(&mCalibration);
 PIDControl_init(&mPIDControl);
 LineEdgeDetecter_init(&mLineEdgeDetecter);
+TailControl_init(&mTailControl);
 }

@@ -7,9 +7,8 @@
 #include "config.h"
 
 
-
  typedef enum {
-	TAIL_RUNING,
+	TAIL_RUNNING,
 	BALANCING,				//ì|óßêßå‰ON
 	BALANCEOFF				//ì|óßêßå‰OFF
 }POSTURE_MODE;
@@ -38,4 +37,5 @@ extern U32 RobotPosture_getGyroOffset(RobotPosture *this_RobotPosture);
 
 extern void setPostureMode(POSTURE_MODE mode);
 
+extern void RobotPosuture_changeTailRunning(RobotPosture *this_RobotPosture);
 #endif

@@ -23,7 +23,8 @@ TARGET_SOURCES := \
 		Factory.c \
 		Calibration.c \
 		PIDControl.c \
-		LineEdgeDetecter.c
+		LineEdgeDetecter.c \
+		TailControl.c
 
 TOPPERS_OSEK_OIL_SOURCE = prog.oil
 

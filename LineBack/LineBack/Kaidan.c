@@ -9,7 +9,7 @@
 #include "Factory.h"
 #include "Calibration.h"
 #include "PIDControl.h"
-
+#include "TailControl.h"
 
 /*
  *	各種変数定義
@@ -389,10 +389,10 @@ void RN_setting()
 	
 			//通常走行
 		case (RN_RUN):
-			controlVals.forward_val=RA_speed(25);
+			controlVals.forward_val=0/*RA_speed(25)*/;
 //			controlVals.turn_val=RA_linetrace_PID(controlVals.forward_val);
 
-			controlVals.turn_val=PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
+			controlVals.turn_val=0;//PIDControl_PIDLineTrace(&mPIDControl,controlVals.forward_val);
 
 			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 			//test code
@@ -400,9 +400,8 @@ void RN_setting()
 			//test code end
 		//if(GYRO_OFFSET - 100 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET + 100 < ecrobot_get_gyro_sensor(NXT_PORT_S1))
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
-			{
+			{	
 				ecrobot_sound_tone(932, 512, VOL);
-
 				setting_mode= RN_LINEBACK;
 			}
 		//	cmd_turn = RA_wheels(cmd_turn);
@@ -643,7 +642,8 @@ TASK(ActionTask)
 {
 	//RN_modesetting();	//走行体状態
 	RN_setting();
-	tailcontrol();		//尻尾コントロール
+	TailControl_PIDTailControl(&mTailControl);
+	//tailcontrol();		//尻尾コントロール
 	self_location();	//自己位置同定
 	TerminateTask();
 }
