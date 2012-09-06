@@ -31,8 +31,8 @@ void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4, S32 dat
             *((S16 *)(&data_log_buffer[22])) = (S16)adc2;
             *((S16 *)(&data_log_buffer[24])) = (S16)adc3;
             *((S16 *)(&data_log_buffer[26])) = (S16)adc4;
-			// *((S32 *)(&data_log_buffer[28])) = (S32)datas32; 
-         *((S32 *)(&data_log_buffer[28])) = (S32)valOfDistance; // どこの値？
+			 *((S32 *)(&data_log_buffer[28])) = (S32)datas32; 
+      //   *((S32 *)(&data_log_buffer[28])) = (S32)valOfDistance; // どこの値？
             
             ecrobot_send_bt_packet(data_log_buffer, 32);
 	

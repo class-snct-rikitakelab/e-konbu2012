@@ -645,6 +645,7 @@ TASK(ActionTask)
 	TailControl_PIDTailControl(&mTailControl);
 	//tailcontrol();		//尻尾コントロール
 	self_location();	//自己位置同定
+
 	TerminateTask();
 }
 
