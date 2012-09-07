@@ -589,11 +589,11 @@ void RN_modesetting()
 //走行方法管理(4ms)
 TASK(ActionTask)
 {
-	/*
+	
 	RN_modesetting();	//走行体状態
 	tailcontrol();		//尻尾コントロール
-	*/
-	nxt_motor_set_speed(NXT_PORT_C,127, 1);
+	
+	//nxt_motor_set_speed(NXT_PORT_C,127, 1);
 	self_location();
 	TerminateTask();
 	 
@@ -602,9 +602,9 @@ TASK(ActionTask)
 
 //走行状態管理(5ms)
 TASK(ActionTask2)
-{/*
+{
 	RN_setting();		//走行状態
-	*/
+	
 	TerminateTask();
 }
 
