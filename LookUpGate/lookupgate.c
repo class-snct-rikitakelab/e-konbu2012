@@ -735,7 +735,7 @@ void RN_setting()
 
 			if(wait_count == 200)
 			{
-				tail_mode_change(0,ANGLEOFDOWN,1,1);
+				//tail_mode_change(0,ANGLEOFDOWN,2,1);
 				
 				while(wait_count <= 1200 || t_angle <= ANGLEOFDOWN)
 				{
@@ -760,7 +760,7 @@ void RN_setting()
 			if(wait_count >= 200)
 			{
 				tailpower(15.0);
-				tail_mode_change(1,ANGLEOFLOOKUP,10,1);
+				tail_mode_change(1,ANGLEOFLOOKUP,4,1);
 				if(ecrobot_get_motor_rev(NXT_PORT_A) == ANGLEOFLOOKUP)
 					{
 						setting_mode = RN_LOOKUP_MOVE;
@@ -801,7 +801,7 @@ void RN_setting()
 			//尻尾持ち上げ補助
 			if(wait_count == 200)
 			{
-				tail_mode_change(0,ANGLEOFDOWN,10,2);
+				tail_mode_change(0,ANGLEOFDOWN,4,1);
 				
 				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
 				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
