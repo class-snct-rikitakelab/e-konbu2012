@@ -1,11 +1,11 @@
 #include "PWMGenerator.h"
 
 
-PWMValues calcBalancePWMValue(int forward_speed,int cmd_turn,PWMValues outputvalues)
+PWMValues calcBalancePWMValue(PWMValues outputvalues)
 {
 	balance_control(
-	(F32)forward_speed,
-	(F32)cmd_turn,
+	(F32)getCmdForward(),
+	(F32)getCmdTurn(),
 	(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
 	(F32)getGyroOffset(),
 	(F32)nxt_motor_get_count(NXT_PORT_C),
@@ -18,10 +18,10 @@ PWMValues calcBalancePWMValue(int forward_speed,int cmd_turn,PWMValues outputval
 }
 
 
-PWMValues calcTailPWMValue(int forward_speed,int cmd_turn,PWMValues outputvalues)
+PWMValues calcTailPWMValue(PWMValues outputvalues)
 {
-	float right_motor_turn = forward_speed - cmd_turn/2;
-	float left_motor_turn = forward_speed  + cmd_turn/2;
+	float right_motor_turn = getCmdForward() - getCmdTurn()/2;
+	float left_motor_turn = getCmdForward()  + getCmdTurn()/2;
 	float right_motor_turn_overflow = 0,left_motor_turn_overflow = 0;		//目標pwm値オーバーフロー分
 
 	//オーバーフロー対策及びオーバーフロー分考慮
@@ -55,7 +55,7 @@ PWMValues calcTailPWMValue(int forward_speed,int cmd_turn,PWMValues outputvalues
 	return outputvalues;
 }
 
-void calcPWMValues(int forward_speed,int cmd_turn)
+void calcPWMValues()
 {
 	PWMValues Runningvalues;
 
@@ -63,10 +63,10 @@ void calcPWMValues(int forward_speed,int cmd_turn)
 	case (RN_MODE_INIT):
 		break;
 	case (RN_MODE_BALANCE):
-		calcBalancePWMValue(forward_speed,cmd_turn,Runningvalues);
+		Runningvalues = calcBalancePWMValue(Runningvalues);
 		break;
 	case (RN_MODE_TAIL):
-		calcTailPWMValue(forward_speed,cmd_turn,Runningvalues);
+		Runningvalues = calcTailPWMValue(Runningvalues);
 		break;
 	case (RN_MODE_STOP):
 		Runningvalues.pwmL = 0;
@@ -89,4 +89,24 @@ void PWMGeneratorModeChange(RN_MODE changemode)
 RN_MODE getPWMGeneratorMode()
 {
 	return generatormode;
+}
+
+void setCmdForward(int forward)
+{
+	cmd_forward = forward;
+}
+
+int getCmdForward()
+{
+	return cmd_forward;
+}
+
+void setCmdTurn(int turn)
+{
+	cmd_turn = turn;
+}
+
+int getCmdTurn()
+{
+	return cmd_turn;
 }

@@ -19,7 +19,9 @@
 #include "SelfLocation.h"
 #include "TailControl.h"
 #include "Common.h"
-//#include "PWMGenerator.h"
+#include "PWMGenerator.h"
+#include "Slope.h"
+#include "CalcDistance.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

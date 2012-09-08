@@ -35,12 +35,6 @@ static int sonarflag;
 
 static int sonarvalue;
 
-/* バランスコントロールへ渡すコマンド用変数 */
-S8  cmd_forward, cmd_turn;
-/* バランスコントロールから返されるモータ制御用変数 */
-S8	pwm_l, pwm_r;
-
-
 //距離計測用変数
 int revL = 0;
 int revR = 0;
@@ -56,7 +50,7 @@ static unsigned int LV_buf = 0;		/* Light Value buffer */
  *	各種状態定義
  */
 
-
+/*
 //システム全体の状態
 typedef enum{
 	RN_MODE_INIT, 					//初期状態
@@ -64,42 +58,31 @@ typedef enum{
 	RN_MODE_TAIL,				//倒立制御OF
 	RN_MODE_STOP
 } RN_MODE;
-
+*/
 
 //キャリブレーションの状態
 typedef enum{
 	RN_SETTINGMODE_START,		//初期状態
-	RN_SPEEDZERO,				//速度ゼロキープ
 	RN_RUN,						//基本走行（ライントレース）
-	RN_LOOKUP_START,
-	RN_LOOKUP_STOP,					//ルックアップゲート準備
-	RN_LOOKUP_DOWN,				//走行体降下
-	RN_LOOKUP_MOVE,				//走行体前進
-	RN_LOOKUP_UP					//走行体復帰
+	RN_SLOPE,					//坂道
+	RN_RUN_SECOND,				//坂道後の基本走行
+	RN_LOOKUPGATE,				//ルックアップゲート
+	RN_RUN_THIRD,				//ルックアップゲート後の基本走行
+	RN_DRIFTTURN,				//ドリフトターン
 } RN_SETTINGMODE;
 
 //初期状態
-RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 
 /*
  *	各種プライベート関数定義
  */
 
-
 //各種プライベート関数
 void RN_setting();
-void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
 int RA_wheels(int turn);
-void RN_modesetting();
 int sonarcheck(int target_sonar);
-void runner_mode_change(int flag);
 void getsonarvalue(void);
-
-void self_location(void);
-unsigned char MKTrigger(void);
-signed char LVTrigger(void);
-int abs(int n);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -196,27 +179,6 @@ void getsonarvalue(void)
 	sonarvalue = ecrobot_get_sonar_sensor(NXT_PORT_S2);
 }
 
-//走行体モード変更関数（主にバランサーのON/OFF）
-void runner_mode_change(int flag)
-{
-	switch(flag){
-	case 0:
-		runner_mode = RN_MODE_INIT;			//走行体初期状態
-		break;
-	case 1:
-		runner_mode = RN_MODE_BALANCE;		//バランサーON
-		break;
-	case 2:
-		runner_mode = RN_MODE_TAIL;	//バランサーOFF
-		break;
-	case 3:
-		runner_mode = RN_MODE_STOP;
-		break;
-	default:
-		break;
-	}
-}
-
 //走行状態設定関数
 void RN_setting()
 {
@@ -228,106 +190,45 @@ void RN_setting()
 			if(RN_calibrate() == 1)
 			{
 				setting_mode = RN_RUN;
-				runner_mode = RN_MODE_TAIL;
+				PWMGeneratorModeChange(RN_MODE_TAIL);
 				TailAngleChange(ANGLEOFDOWN);
 			}
 			break;
 		
 			//通常走行状態
 		case (RN_RUN):
-			cmd_forward = RA_speed(25);
-			cmd_turn = RA_linetrace_PID(cmd_forward);
+			setCmdForward(RA_speed(40));
+			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
+			{
+				ecrobot_sound_tone(880, 512, 30);
+				setting_mode = RN_SLOPE;
+				wait_count = 0;
+			}
 			break;
+			
+		case (RN_SLOPE):
+			if(runningSlope() == 1)
+				setting_mode = RN_RUN_SECOND;
+			break;
+			
+		case (RN_RUN_SECOND):
+			setCmdForward(RA_speed(40));
+			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			break;
+
+		case (RN_LOOKUPGATE):
+			break;
+			/*
+		case (RN_RUN_THIRD):
+			break;
+
+		case (RN_DRIFTTURN):
+			break;
+			*/
 		default:
 			break;
 	}
-}
-
-//走行体状態設定関数
-void RN_modesetting()
-{
-
-	static PWMValues RunningValues;	//名前微妙
-
-	switch (runner_mode){
-
-			//走行体初期状態
-		case (RN_MODE_INIT):
-			cmd_forward = 0;
-			cmd_turn = 0;
-			break;
-
-			//バランサー
-		case (RN_MODE_BALANCE):
-			balance_control(
-				(F32)cmd_forward,
-				(F32)cmd_turn,
-				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)getGyroOffset(),
-				(F32)nxt_motor_get_count(NXT_PORT_C),
-		 		(F32)nxt_motor_get_count(NXT_PORT_B),
-				(F32)ecrobot_get_battery_voltage(),
-				&RunningValues.pwmL,
-				&RunningValues.pwmR);
-			nxt_motor_set_speed(NXT_PORT_C, RunningValues.pwmL, 1);
-			nxt_motor_set_speed(NXT_PORT_B, RunningValues.pwmR, 1);
-			break;
-
-			//バランサー無し
-		case (RN_MODE_TAIL):
-			RunningValues = calcPWMValue(cmd_forward,cmd_turn);
-			nxt_motor_set_speed(NXT_PORT_C, RunningValues.pwmL, 1);
-			nxt_motor_set_speed(NXT_PORT_B, RunningValues.pwmR, 1);
-			break;
-
-		case (RN_MODE_STOP):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			break;
-		default:
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			break;
-	}
-}
-
-PWMValues calcPWMValue(int forward_speed,int cmd_turn)
-{
-	float right_motor_turn = forward_speed - cmd_turn/2;
-	float left_motor_turn = forward_speed  + cmd_turn/2;
-	float right_motor_turn_overflow = 0,left_motor_turn_overflow = 0;		//目標pwm値オーバーフロー分
-
-	PWMValues outputvalues;
-
-	//オーバーフロー対策及びオーバーフロー分考慮
-	if (-100 > right_motor_turn) {
-		right_motor_turn_overflow = -(-100 - right_motor_turn);
-		right_motor_turn = -100;
-	} else if (100 < right_motor_turn) {
-		right_motor_turn_overflow = right_motor_turn - 100;
-		right_motor_turn = 100;
-	}
-
-	if (-100 > left_motor_turn) {
-		left_motor_turn_overflow = -(-100 - left_motor_turn);
-		left_motor_turn = -100;
-	} else if (100 < left_motor_turn) {
-		left_motor_turn_overflow = left_motor_turn -100;
-		left_motor_turn = 100;
-	}
-
-	//出力pwm値算出
-	if(left_motor_turn + right_motor_turn_overflow >= -100 && left_motor_turn + right_motor_turn_overflow <= 100)
-		outputvalues.pwmL = (int)(left_motor_turn + right_motor_turn_overflow);
-	else
-		outputvalues.pwmL = (int)left_motor_turn;
-
-	if(right_motor_turn + left_motor_turn_overflow >= -100 && right_motor_turn + left_motor_turn_overflow <= 100)
-		outputvalues.pwmR = (int)(right_motor_turn + left_motor_turn_overflow);
-	else
-		outputvalues.pwmR = (int)right_motor_turn;
-
-	return outputvalues;
 }
 
 /*
@@ -337,9 +238,10 @@ PWMValues calcPWMValue(int forward_speed,int cmd_turn)
 //走行体管理タスク(4ms)
 TASK(ActionTask)
 {
-	RN_modesetting();	//走行体状態設定
+	//RN_modesetting();	//走行体状態設定
+	calcPWMValues();
 	TailControl();			//尻尾制御
-	selflocation();	//自己位置同定
+	selflocation();			//自己位置同定
 	TerminateTask();
 }
 
