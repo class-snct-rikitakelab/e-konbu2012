@@ -2,11 +2,14 @@
 
 //尻尾角度調節関数
 
+/*
+ *	しっぽモータ制御及び出力メソッド
+ *	一定周期で呼び出すことでしっぽを制御
+ *	目標角度はcontroltailmodeに依存
+ */
 void TailControl(){
 	
 	TargetTailAngleControl();
-
-	static const float t_Kp = 1.85;
 
 	static float t_hensa = 0;
 	static float t_speed = 0;
@@ -23,6 +26,12 @@ void TailControl(){
 	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);
 }
 
+
+/*
+ *	しっぽモータ角度制御用目標値制御メソッド
+ *	制御目標値を徐々に調節
+ *	TAILUPにする場合のみ、制御を行わない
+ */
 void TargetTailAngleControl(){
 	static int counter = 0;
 
@@ -34,6 +43,7 @@ void TargetTailAngleControl(){
 		break;
 	case (RN_TAILUP):
 		target_angle = ANGLEOFUP;
+		result_angle = ANGLEOFUP;
 		break;
 	case (RN_TAILLOOKUP):
 		target_angle = ANGLEOFLOOKUP;
@@ -68,7 +78,10 @@ void TargetTailAngleControl(){
 	}
 }
 
+/*
+ *	しっぽモータ目標角度設定関数
+ *	外部からしっぽの角度を変えたい時に呼び出す
+ */
 void TailModeChange(RN_TAILMODE tail_mode){
 	controltailmode = tail_mode;	
 }
-

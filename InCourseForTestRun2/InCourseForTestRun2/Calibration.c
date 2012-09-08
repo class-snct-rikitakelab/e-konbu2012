@@ -4,8 +4,7 @@
 //キャリブレーション関数
 void RN_calibrate()
 {
-
-	tail_mode_change(0,ANGLEOFDOWN,1,2);
+	tail_mode = ANGLEOFDOWN;
 
 	//黒値
 	while(1){
@@ -33,7 +32,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//尻尾をルックアップゲート時の角度に
-	tail_mode_change(1,ANGLEOFLOOKUP,0,1);
+	tail_mode = ANGLEOFLOOKUP;
 
 	//ルックアップゲート用黒値
 	while(1){
@@ -61,7 +60,7 @@ void RN_calibrate()
 	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
 
 	//尻尾を直立停止状態の角度に
-	tail_mode_change(0,ANGLEOFDOWN,0,2);
+	tail_mode = ANGLEOFDOWN;
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
@@ -81,7 +80,7 @@ void RN_calibrate()
 		if(remote_start()==1)
 		{
 			ecrobot_sound_tone(982,512,30);
-			tail_mode_change(1,ANGLEOFUP,0,2);
+			tail_mode = ANGLEOFUP;
 			setting_mode = RN_SPEEDZERO;
 			runner_mode = RN_MODE_BALANCE;
 			break;
@@ -97,7 +96,7 @@ void RN_calibrate()
 					{
 						setting_mode = RN_SPEEDZERO;
 						runner_mode_change(2);
-						//tail_mode_change(1,ANGLEOFUP,0,2);
+						tail_mode = ANGLEOFUP;
 						break;
 					}
 			}

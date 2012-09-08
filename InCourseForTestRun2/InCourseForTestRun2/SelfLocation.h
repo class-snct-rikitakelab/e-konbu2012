@@ -1,4 +1,4 @@
-#include "MainRunningInCourse.h"
+//#include "MainRunningInCourse.h"
 
 /* 自己位置同定用変数 */
 float d_theta_r;			//1ステップ当たりの右車輪回転角度
