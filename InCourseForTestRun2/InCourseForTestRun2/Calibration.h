@@ -1,11 +1,8 @@
-//#include "MainRunningInCourse.h"
 #ifndef _CALIBRATION_H_
 #define _CALIBARTION_H_
 
 #include "TailControl.h"
 #include "ecrobot_interface.h"
-#include "kernel.h"
-#include "kernel_id.h"
 #include "RemoteStart.h"
 
 //ƒ‰ƒCƒ“ƒgƒŒ[ƒX—p–Ú•W’l
@@ -19,10 +16,13 @@ static unsigned int LOOKUP_GRAY_VALUE;		//Šp“x‚ªANGLEOFLOOKUP’n‚ÌŠDF’liŒ»İ‚Í
 static unsigned int INIT_GYRO_OFFSET;	//ƒLƒƒƒŠƒuƒŒ[ƒVƒ‡ƒ“‚Ì‚ÌƒWƒƒƒCƒƒIƒtƒZƒbƒg’l
 
 //ƒWƒƒƒCƒƒZƒ“ƒTƒIƒtƒZƒbƒgŒvZ—p•Ï”
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
+static U32 gyro_offset;    /* gyro sensor offset value */
 
 extern int RN_calibrate(void);
-extern int getGyroOffset();
-extern int getInitGyroOffset();
+extern U32 getGyroOffset();
+extern U32 getInitGyroOffset();
+extern void setGyroOffset(int setvalue);
+extern unsigned int getGrayValue();
+extern unsigned int getLookUpGrayValue();
 
 #endif

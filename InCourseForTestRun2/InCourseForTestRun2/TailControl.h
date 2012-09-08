@@ -1,4 +1,3 @@
-//#include "MainRunningInCourse.h"
 #ifndef _TAILCONTROL_H_
 #define _TAILCONTROL_H_
 

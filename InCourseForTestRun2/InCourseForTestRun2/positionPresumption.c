@@ -78,7 +78,7 @@ static int t_up = 0;				//増減値
 static int wait_count = 0;
 
 //ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
+//static U32	gyro_offset = 0;    /* gyro sensor offset value */
 
 /* 自己位置同定用変数 */
 static float x_r = 0;		//車体のX座標

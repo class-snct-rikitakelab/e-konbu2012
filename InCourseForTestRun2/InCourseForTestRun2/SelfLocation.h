@@ -8,6 +8,7 @@
 #define W_RADIUS	4.1	//[mm]
 #define W_DIST		16.2//[mm]
 
+
 /* 自己位置同定用変数 */
 float d_theta_r;			//1ステップ当たりの右車輪回転角度
 float d_theta_l;			//1ステップ当たりの左車輪回転角度

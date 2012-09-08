@@ -17,5 +17,7 @@ static float bf_hensa = 0;
 
 extern int RA_linetrace_PID(int forward_speed);
 extern void RA_hensareset();
+extern int RA_linetrace();
+extern int online();
 
 #endif

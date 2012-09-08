@@ -135,8 +135,6 @@ void ecrobot_device_initialize(void)
 //後始末処理関数（プログラム終了時呼び出し）
 void ecrobot_device_terminate(void)
 {
-	tail_mode = RN_TAILUP;							//尻尾を上げる（意味あるのか？）
-
 	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);	//光センサ終了
 	ecrobot_term_sonar_sensor(NXT_PORT_S2);			//超音波センサ終了
 	ecrobot_term_bt_connection();					//Bluetooth終了
@@ -256,7 +254,7 @@ void RN_modesetting()
 				(F32)cmd_forward,
 				(F32)cmd_turn,
 				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)gyro_offset,
+		 		(F32)getGyroOffset(),
 				(F32)nxt_motor_get_count(NXT_PORT_C),
 		 		(F32)nxt_motor_get_count(NXT_PORT_B),
 				(F32)ecrobot_get_battery_voltage(),

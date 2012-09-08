@@ -68,7 +68,7 @@ int RN_calibrate(void)
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 		{
 			ecrobot_sound_tone(932, 512, 10);
-			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			setGyroOffset((U32)ecrobot_get_gyro_sensor(NXT_PORT_S1));
 			INIT_GYRO_OFFSET = gyro_offset;
 			systick_wait_ms(500);
 			break;
@@ -111,7 +111,22 @@ U32 getGyroOffset()
 	return gyro_offset;
 }
 
+void setGyroOffset(int setvalue)
+{
+	gyro_offset = setvalue;
+}
+
 U32 getGyroOffsetInit()
 {
 	return INIT_GYRO_OFFSET;
+}
+
+unsigned int getGrayValue()
+{
+	return GRAY_VALUE;
+}
+
+unsigned int getLookUpGrayValue()
+{
+	return LOOKUP_GRAY_VALUE;
 }
