@@ -1,37 +1,31 @@
 /*
- * MainRunningInCourse.c
- * インコース走行プログラム
+ * lookupgate.c
+ * ルックアップゲート通過プログラム
  */
 
 
 #include "MainRunningInCourse.h"
+#include "math.h"
 
-/*
- *	各種定義
-*/
 
-//速度カウンタの上限値
-#define SPEED_COUNT 10
+//ジャイロ振幅値
+#define PM_GYRO 65
 
+//車輪の円周[cm]
+#define CIRCUMFERENCE 25.8			//車輪の円周
+
+
+/* 車輪半径、走行体幅*/
+#define WHEEL_R		41	//[mm]
+#define MACHINE_W	162	//[mm]
 
 /*
  *	グローバル変数
  */
 
 
-
-//速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
-static int speed_counter = 0;
-
-//尻尾制御用変数
-static int t_angle = 0;				//現在の角度
-static int t_count = 0;				//制御速度調節用カウンタ
-static int t_value = 0;				//角度目標値
-static int t_count_limit = 0;		//カウンタ最大値
-static int t_up = 0;				//増減値
-
 //全体用カウンタ（時間稼ぎ用）
-static int time_counter = 0;
+static int wait_count = 0;
 
 //超音波センサ目標値
 static int target_sonar = 20;
@@ -40,11 +34,6 @@ static int target_sonar = 20;
 static int sonarflag;
 
 static int sonarvalue;
-
-//ジャイロセンサオフセット計算用変数
-static U32	gyro_offset = 0;    /* gyro sensor offset value */
-
-char rx_buf[BT_MAX_RX_BUF_SIZE];
 
 /* バランスコントロールへ渡すコマンド用変数 */
 S8  cmd_forward, cmd_turn;
@@ -58,7 +47,6 @@ int revR = 0;
 
 int distance_before_gate;	//ルックアップゲート通過前距離
 int distance_after_gate;	//ルックアップゲート通過中距離
-
 
 //マーカーフラグ　0: OFF, 1: ON
 unsigned char m_flg = 0;
@@ -89,12 +77,9 @@ typedef enum{
 	RN_LOOKUP_UP					//走行体復帰
 } RN_SETTINGMODE;
 
-
-
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
-RN_TAILMODE tail_mode = RN_TAILUP;
 
 /*
  *	各種プライベート関数定義
@@ -103,25 +88,12 @@ RN_TAILMODE tail_mode = RN_TAILUP;
 
 //各種プライベート関数
 void RN_setting();
-int online();
-void RA_linetrace(int forward_speed, int turn_speed);
-void RA_linetrace_PID(int forward_speed);
 void logSend(S8 data1, S8 data2, S16 adc1, S16 adc2, S16 adc3, S16 adc4);
-void taildown();
-void RA_linetrace_P(int forward_speed);
-void RA_speed(int limit,int s_Kp);
 int RA_wheels(int turn);
 void RN_modesetting();
-static int remote_start(void);
 int sonarcheck(int target_sonar);
 void runner_mode_change(int flag);
-void tailpower(float value);
-void tail_mode_change(int mode,int value,int limit,int t_up);
-void RA_linetrace_PID_balanceoff(int forward_speed);
 void getsonarvalue(void);
-
-void RA_hensareset(void);
-
 
 void self_location(void);
 unsigned char MKTrigger(void);
@@ -130,6 +102,7 @@ int abs(int n);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
+
 
 //液晶ディスプレイに表示するシステム名設定
 const char target_subsystem_name[] = "InCourse";
@@ -162,8 +135,6 @@ void ecrobot_device_initialize(void)
 //後始末処理関数（プログラム終了時呼び出し）
 void ecrobot_device_terminate(void)
 {
-	tail_mode = RN_TAILUP;							//尻尾を上げる（意味あるのか？）
-
 	ecrobot_set_light_sensor_inactive(NXT_PORT_S3);	//光センサ終了
 	ecrobot_term_sonar_sensor(NXT_PORT_S2);			//超音波センサ終了
 	ecrobot_term_bt_connection();					//Bluetooth終了
@@ -208,28 +179,6 @@ int RA_wheels(int turn){
 	return turn;
 }
 
-
-//ON-OFF制御用ライン判定関数
-int online(void) {
-
-	int light_value;
-	light_value = ecrobot_get_light_sensor(NXT_PORT_S3);	//現在の輝度値
-					
-	if (LOOKUP_GRAY_VALUE > light_value)		//輝度値が目標値より大きいか判断
-		return FALSE;					//ライン外
-	else
-		return TRUE;					//ライン内
-
-}
-
-void RA_hensareset(void)
-{
-	hensa = 0;
-	i_hensa = 0;
-	d_hensa = 0;
-	bf_hensa = 0;
-}
-
 //超音波センサ状態検出関数
 int sonarcheck(int target_sonar)
 {
@@ -246,32 +195,22 @@ void getsonarvalue(void)
 	sonarvalue = ecrobot_get_sonar_sensor(NXT_PORT_S2);
 }
 
-
-
-//リモートスタート管理関数
-static int remote_start(void)
+//走行体モード変更関数（主にバランサーのON/OFF）
+void runner_mode_change(int flag)
 {
-	int i;
-	unsigned int rx_len;
-	unsigned char start = 0;		//状態フラグ
-
-	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
-	{
-		rx_buf[i] = 0; //受信バッファをクリア
+	switch(flag){
+	case 0:
+		runner_mode = RN_MODE_INIT;			//走行体初期状態
+		break;
+	case 1:
+		runner_mode = RN_MODE_BALANCE;		//バランサーON
+		break;
+	case 2:
+		runner_mode = RN_MODE_BALANCEOFF;	//バランサーOFF
+		break;
+	default:
+		break;
 	}
-
-	rx_len = ecrobot_read_bt(rx_buf, 0, BT_MAX_RX_BUF_SIZE);
-	if (rx_len > 0)
-	{
-		//受信データあり
-		if (rx_buf[0] == CMD_START)
-		{
-			start = 1; //走行開始フラグ
-		}
-		ecrobot_send_bt(rx_buf, 0, rx_len); //受信データをエコーバック
-	}
-
-	return start;
 }
 
 //走行状態設定関数
@@ -282,161 +221,17 @@ void RN_setting()
 
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
-			RN_calibrate();
-			time_counter = 0;
-			break;
-
-		case (RN_SPEEDZERO):
-			cmd_forward = 0;
-			cmd_turn = RA_wheels(cmd_turn);
-			time_counter++;
-			if(time_counter >= 100)
+			if(RN_calibrate() == 1)
 			{
 				setting_mode = RN_RUN;
-				time_counter = 0;
+				TailAngleChange(ANGLEOFDOWN);
 			}
 			break;
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID_balanceoff(25);
-			
-			setting_mode = RN_LOOKUP_START;
-			
+			RA_linetrace_PID(RA_speed(25));
 			break;
-
-		case (RN_LOOKUP_START):
-			RA_linetrace_PID_balanceoff(25);
-
-			time_counter++;
-
-			if(time_counter >= 150)					//スタート時に反応するのを防ぐ（テスト用）
-			{
-				if(sonarcheck(19) == 1)				//超音波センサが反応したかどうか
-				{
-					ecrobot_sound_tone(900,512,30);
-					setting_mode = RN_LOOKUP_STOP;
-					time_counter = 0;
-				}
-			}
-			break;
-
-			//ルックアップゲート走行準備状態
-		case (RN_LOOKUP_STOP):
-			RA_linetrace_PID_balanceoff(5);
-			//cmd_turn = RA_wheels(cmd_turn);
-
-			time_counter++;
-
-			if(time_counter == 200)
-			{
-				//tail_mode_change(0,ANGLEOFDOWN,2,1);
-				
-				while(time_counter <= 1200 || t_angle <= ANGLEOFDOWN)
-				{
-					RA_speed(-20,5);
-					cmd_turn = RA_wheels(cmd_turn);
-					time_counter++;
-				}
-				setting_mode = RN_LOOKUP_DOWN;
-				time_counter = 0;
-				runner_mode_change(2);
-			}
-
-			break;
-		
-			//ルックアップゲート走行、尻尾降下
-		case (RN_LOOKUP_DOWN):
-			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-
-			time_counter++;
-
-			if(time_counter >= 200)
-			{
-				tailpower(15.0);
-				tail_mode_change(1,ANGLEOFLOOKUP,4,1);
-				if(ecrobot_get_motor_rev(NXT_PORT_A) == ANGLEOFLOOKUP)
-					{
-						setting_mode = RN_LOOKUP_MOVE;
-						time_counter = 0;
-						revL = nxt_motor_get_count(NXT_PORT_C);
-						revR = nxt_motor_get_count(NXT_PORT_B);
-						distance_before_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-					}
-			}
-
-			break;
-
-			//ルックアップゲート走行、尻尾降下状態で前進
-		case (RN_LOOKUP_MOVE):
-
-//			RA_linetrace(30,20);
-			RA_linetrace_PID_balanceoff(25);
-			revL = nxt_motor_get_count(NXT_PORT_C);
-			revR = nxt_motor_get_count(NXT_PORT_B);
-			distance_after_gate = fabs(CIRCUMFERENCE/360.0 * ((revL+revR)/2.0));
-			
-			if(distance_after_gate - distance_before_gate > 30)
-			{	
-				setting_mode = RN_LOOKUP_UP;
-			}
-			
-			break;
-
-			//ルックアップゲート走行、前進後倒立状態へ復帰
-		case (RN_LOOKUP_UP):
-			if(time_counter < 200)
-			{
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			}
-			time_counter++;
-
-			//尻尾持ち上げ補助
-			if(time_counter == 200)
-			{
-				tail_mode_change(0,ANGLEOFDOWN,4,1);
-				
-				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
-			}
-
-			if(t_angle == ANGLEOFDOWN)
-			{
-				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
-			}
-			/*
-			if(t_angle == ANGLEOFDOWN && time_counter >= 1000)
-			{
-				tail_mode_change(1,ANGLEOFPUSH,0,10);
-				nxt_motor_set_speed(NXT_PORT_C, 0, 1);
-				nxt_motor_set_speed(NXT_PORT_B, 0, 1);
-			}
-			*/
-			if(t_angle == ANGLEOFDOWN && time_counter >= 1050)
-			{
-				tailpower(1.85);			
-
-				//tail_mode_change(1,ANGLEOFUP,0,2);
-
-				ecrobot_set_motor_rev(NXT_PORT_B,0);
-				ecrobot_set_motor_rev(NXT_PORT_C,0);
-				ecrobot_set_motor_speed(NXT_PORT_B,0);
-				ecrobot_set_motor_speed(NXT_PORT_C,0);
-				/*
-				runner_mode_change(1);
-				RA_hensareset();
-				balance_init();
-				time_counter=0;
-				cmd_forward=0;
-				*/
-				setting_mode = RN_LOOKUP_START;
-			}
-			
-			break;
-
 		default:
 			break;
 	}
@@ -459,7 +254,7 @@ void RN_modesetting()
 				(F32)cmd_forward,
 				(F32)cmd_turn,
 				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
-		 		(F32)gyro_offset,
+		 		(F32)getGyroOffset(),
 				(F32)nxt_motor_get_count(NXT_PORT_C),
 		 		(F32)nxt_motor_get_count(NXT_PORT_B),
 				(F32)ecrobot_get_battery_voltage(),
@@ -489,7 +284,7 @@ void RN_modesetting()
 TASK(ActionTask)
 {
 	RN_modesetting();	//走行体状態設定
-	taildown();			//尻尾制御
+	TailControl();			//尻尾制御
 	self_location();	//自己位置同定
 	TerminateTask();
 }
@@ -511,8 +306,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,BLACK_VALUE,0,		//Bluetoothを用いてデータ送信
-			x_r,y_r);
+	logSend(cmd_forward,cmd_turn,dist,theta,x_r,y_r);			//Bluetoothを用いてデータ送信
 
 	getsonarvalue();
 

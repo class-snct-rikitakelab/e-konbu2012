@@ -4,12 +4,6 @@
  */
 
 #include "PID_parameter.h"
-#include "logSend.h"
-#include "math.h"
-#include "tyreal_light_ver.h"
-
-
-
 
 /*
  *	各種変数定義
@@ -24,10 +18,6 @@ static unsigned int GRAY_VALUE;		//灰色値（現在は黒と白の平均値）
 #define CIRCUMFERENCE 25.8			//車輪の円周
 
 static int counter = 0;
-
-//尻尾設定角度
-#define ANGLEOFDOWN 95			//降下目標角度
-#define ANGLEOFUP 0					//上昇目標角度
 
 #define CMD_STOP '3'
 
@@ -120,19 +110,12 @@ typedef enum{
 } RN_SETTINGMODE;
 
 
-//尻尾の状態
-typedef enum{
-	RN_TAILDOWN,				//尻尾降下
-	RN_TAILUP,					//尻尾上昇
-} RN_TAILMODE;
-
-
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 //RN_SETTINGMODE setting_mode = RN_TYREAL;
 
-RN_TAILMODE tail_mode = RN_TAILDOWN;
+//RN_TAILMODE tail_mode = RN_TAILDOWN;
 
 /*	
  *	各種関数定義
@@ -144,7 +127,7 @@ void RN_setting();
 int online();
 void RA_linetrace(int forward_speed, int turn_speed);
 void RA_linetrace_PID(int forward_speed);
-void tailcontrol();
+//void tailcontrol();
 int RA_speed(int forward_speed);
 void RN_modesetting();
 static int remote_start(void);
@@ -177,7 +160,6 @@ void ecrobot_device_initialize(void)
 //後始末処理
 void ecrobot_device_terminate(void)
 {
-	tail_mode = RN_TAILUP;
 	ecrobot_set_motor_speed(NXT_PORT_A, 0);
 	ecrobot_set_motor_speed(NXT_PORT_B, 0);
 	ecrobot_set_motor_speed(NXT_PORT_C, 0);
@@ -294,7 +276,7 @@ int RA_speed(int forward_speed){
 
 	return result_speed;
 }
-
+/*
 //尻尾角度コントロール関数
 void tailcontrol(){
 
@@ -326,12 +308,12 @@ void tailcontrol(){
 	ecrobot_set_motor_speed(NXT_PORT_A, t_speed);
 
 }
-
+*/
 
 //走行設定関数
 void RN_setting()
 {
-	int speed = 120;
+	int speed = 100;
 
 	static int time_count = 0;
 
@@ -461,7 +443,7 @@ static int right()
 //キャリブレーション関数
 void RN_calibrate()
 {
-
+	TailModeChange(RN_TAILDOWN);
 	//黒値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
@@ -472,6 +454,8 @@ void RN_calibrate()
 			break;
 		}
 	}
+
+	TailModeChange(RN_TAILLOOKUP);
 
 	//白値
 	while(1){
@@ -484,6 +468,7 @@ void RN_calibrate()
 		}
 	}
 
+	TailModeChange(RN_TAILDOWN);
 	//灰色値計算
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
@@ -511,6 +496,7 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_BALANCEOFF;
+						TailModeChange(RN_TAILDOWN);
 						break;
 					}
 				}
@@ -591,8 +577,7 @@ TASK(ActionTask)
 {
 	
 	RN_modesetting();	//走行体状態
-	tailcontrol();		//尻尾コントロール
-	
+	TailControl();		//尻尾コントロール
 	//nxt_motor_set_speed(NXT_PORT_C,127, 1);
 	self_location();
 	TerminateTask();

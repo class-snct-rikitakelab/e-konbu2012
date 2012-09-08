@@ -1,3 +1,4 @@
+//#include "MainRunningInCourse.h"
 #ifndef _TAILCONTROL_H_
 #define _TAILCONTROL_H_
 
@@ -14,8 +15,8 @@
 #define ANGLEOFSTAND	100	//íºóßèÛë‘
 #define ANGLEOFPUSH		120	//ëñçsëÃíµÇÀè„Ç∞
 
-#define TAIL_ANGLE_COUNT 2
-/*
+#define TAIL_ANGLE_COUNT 5
+
 //êKîˆÇÃèÛë‘
 typedef enum{
 	RN_TAILDOWN,				//êKîˆç~â∫
@@ -24,18 +25,17 @@ typedef enum{
 	RN_TAILSTAND,
 	RN_TAILPUSH,
 } RN_TAILMODE;
-*/
+
 //êKîˆPIêßå‰ópåWêî
 static float t_Kp = 8.85;			//Pêßå‰óp
 static float t_Ki = 0;				//Iêßå‰óp
 
 static int result_angle = 0;
-static int target_angle = ANGLEOFZERO;
 
-extern void TailControl();
-extern void TargetTailAngleControl();
-extern void TailAngleChange(int angle);
+RN_TAILMODE controltailmode = ANGLEOFZERO;
 
-//RN_TAILMODE controltailmode = ANGLEOFZERO;
+extern void TailControl(void);
+extern void TargetTailAngleControl(void);
+extern void TailModeChange(RN_TAILMODE tail_mode);
 
 #endif
