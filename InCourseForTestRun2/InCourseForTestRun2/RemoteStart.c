@@ -6,7 +6,7 @@
  *	ˆø”:–³‚µ
  *	•Ô‚è’l:
  */
-static int remote_start(void)
+int remote_start(void)
 {
 	int i;
 	unsigned int rx_len;

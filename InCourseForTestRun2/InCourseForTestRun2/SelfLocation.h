@@ -37,5 +37,7 @@ static float theta = 0;		//ŽÔ‘Ì‚ÌŠp“x
 static float R = 0;			//‹È—¦”¼Œa
 
 extern void selflocation(void);
+float deg2rad(float degree);
+float rad2deg(float radian);
 
 #endif

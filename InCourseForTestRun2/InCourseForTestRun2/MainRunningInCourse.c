@@ -61,7 +61,8 @@ static unsigned int LV_buf = 0;		/* Light Value buffer */
 typedef enum{
 	RN_MODE_INIT, 					//初期状態
 	RN_MODE_BALANCE,				//倒立制御ON
-	RN_MODE_BALANCEOFF				//倒立制御OF
+	RN_MODE_TAIL,				//倒立制御OF
+	RN_MODE_STOP
 } RN_MODE;
 
 
@@ -206,7 +207,10 @@ void runner_mode_change(int flag)
 		runner_mode = RN_MODE_BALANCE;		//バランサーON
 		break;
 	case 2:
-		runner_mode = RN_MODE_BALANCEOFF;	//バランサーOFF
+		runner_mode = RN_MODE_TAIL;	//バランサーOFF
+		break;
+	case 3:
+		runner_mode = RN_MODE_STOP;
 		break;
 	default:
 		break;
@@ -224,13 +228,15 @@ void RN_setting()
 			if(RN_calibrate() == 1)
 			{
 				setting_mode = RN_RUN;
+				runner_mode = RN_MODE_TAIL;
 				TailAngleChange(ANGLEOFDOWN);
 			}
 			break;
 		
 			//通常走行状態
 		case (RN_RUN):
-			RA_linetrace_PID(RA_speed(25));
+			cmd_forward = RA_speed(25);
+			cmd_turn = RA_linetrace_PID(cmd_forward);
 			break;
 		default:
 			break;
@@ -240,6 +246,9 @@ void RN_setting()
 //走行体状態設定関数
 void RN_modesetting()
 {
+
+	static PWMValues RunningValues;	//名前微妙
+
 	switch (runner_mode){
 
 			//走行体初期状態
@@ -258,16 +267,23 @@ void RN_modesetting()
 				(F32)nxt_motor_get_count(NXT_PORT_C),
 		 		(F32)nxt_motor_get_count(NXT_PORT_B),
 				(F32)ecrobot_get_battery_voltage(),
-				&pwm_l,
-				&pwm_r);
-			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
-			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
+				&RunningValues.pwmL,
+				&RunningValues.pwmR);
+			nxt_motor_set_speed(NXT_PORT_C, RunningValues.pwmL, 1);
+			nxt_motor_set_speed(NXT_PORT_B, RunningValues.pwmR, 1);
 			break;
 
 			//バランサー無し
-		case (RN_MODE_BALANCEOFF):
+		case (RN_MODE_TAIL):
+			RunningValues = calcPWMValue(cmd_forward,cmd_turn);
+			nxt_motor_set_speed(NXT_PORT_C, RunningValues.pwmL, 1);
+			nxt_motor_set_speed(NXT_PORT_B, RunningValues.pwmR, 1);
 			break;
 
+		case (RN_MODE_STOP):
+			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
+			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
+			break;
 		default:
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
@@ -275,6 +291,44 @@ void RN_modesetting()
 	}
 }
 
+PWMValues calcPWMValue(int forward_speed,int cmd_turn)
+{
+	float right_motor_turn = forward_speed - cmd_turn/2;
+	float left_motor_turn = forward_speed  + cmd_turn/2;
+	float right_motor_turn_overflow = 0,left_motor_turn_overflow = 0;		//目標pwm値オーバーフロー分
+
+	PWMValues outputvalues;
+
+	//オーバーフロー対策及びオーバーフロー分考慮
+	if (-100 > right_motor_turn) {
+		right_motor_turn_overflow = -(-100 - right_motor_turn);
+		right_motor_turn = -100;
+	} else if (100 < right_motor_turn) {
+		right_motor_turn_overflow = right_motor_turn - 100;
+		right_motor_turn = 100;
+	}
+
+	if (-100 > left_motor_turn) {
+		left_motor_turn_overflow = -(-100 - left_motor_turn);
+		left_motor_turn = -100;
+	} else if (100 < left_motor_turn) {
+		left_motor_turn_overflow = left_motor_turn -100;
+		left_motor_turn = 100;
+	}
+
+	//出力pwm値算出
+	if(left_motor_turn + right_motor_turn_overflow >= -100 && left_motor_turn + right_motor_turn_overflow <= 100)
+		outputvalues.pwmL = (int)(left_motor_turn + right_motor_turn_overflow);
+	else
+		outputvalues.pwmL = (int)left_motor_turn;
+
+	if(right_motor_turn + left_motor_turn_overflow >= -100 && right_motor_turn + left_motor_turn_overflow <= 100)
+		outputvalues.pwmR = (int)(right_motor_turn + left_motor_turn_overflow);
+	else
+		outputvalues.pwmR = (int)right_motor_turn;
+
+	return outputvalues;
+}
 
 /*
  *	各種タスク

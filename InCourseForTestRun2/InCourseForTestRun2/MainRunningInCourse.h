@@ -19,6 +19,13 @@
 #include "SelfLocation.h"
 #include "TailControl.h"
 
+typedef struct {
+S8 pwmL;
+S8 pwmR;
+} PWMValues;
+
+extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
+
 #endif
 
 

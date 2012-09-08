@@ -19,7 +19,8 @@ TARGET_SOURCES := \
 	SelfLocation.c \
 	SpeedControl.c \
 	TailControl.c \
-	RemoteStart.c
+	RemoteStart.c \
+	LogSend.c
 
 
 
