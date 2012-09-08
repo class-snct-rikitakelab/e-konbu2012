@@ -79,3 +79,4 @@ float SelfLocation_GeyDirection(SelfLocation * this_SelfLocation)
 {
 	return this_SelfLocation->direction;
 }
+

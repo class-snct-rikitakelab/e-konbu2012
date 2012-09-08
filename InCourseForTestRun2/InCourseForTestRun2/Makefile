@@ -15,12 +15,19 @@ TARGET_SOURCES := \
 	balancer_param.c \
 	MainRunningInCourse.c \
 	Calibration.c \
-	DriftTurn.c \
 	LightPIDControl.c \
-	LookUpGate.c \
 	SelfLocation.c \
 	SpeedControl.c \
-	TailControl.c
+	TailControl.c \
+	RemoteStart.c \
+	LogSend.c \
+	PWMGenerator.c \
+	Slope.c \
+	CalcDistance.c \
+	LookUpGate.c \
+	Sonar.c
+
+
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

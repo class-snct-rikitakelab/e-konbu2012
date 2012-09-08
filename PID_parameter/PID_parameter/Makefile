@@ -16,7 +16,8 @@ TARGET_SOURCES := \
 	PID_parameter.c \
 	LogSend.c \
 	tyreal_light_ver.c \
-	NXTButton.c
+	NXTButton.c \
+	TailControl.c
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

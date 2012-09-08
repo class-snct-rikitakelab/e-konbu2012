@@ -4,4 +4,9 @@
 #include "ecrobot_interface.h"
 #include "balancer.h"
 
+#include "logSend.h"
+#include "math.h"
+#include "tyreal_light_ver.h"
+#include "TailControl.h"
+
 
