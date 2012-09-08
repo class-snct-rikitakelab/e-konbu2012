@@ -37,3 +37,4 @@ float rad2deg(float radian){
 	float degree = 180.0 / M_PI * radian;
 	return degree;
 }
+

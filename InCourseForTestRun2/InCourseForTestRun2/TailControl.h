@@ -26,7 +26,7 @@ typedef enum{
 } RN_TAILMODE;
 */
 //尻尾PI制御用係数
-static float t_Kp = 8.85;			//P制御用
+static float t_Kp = 3.85;			//P制御用
 static float t_Ki = 0;				//I制御用
 
 static int result_angle = 0;

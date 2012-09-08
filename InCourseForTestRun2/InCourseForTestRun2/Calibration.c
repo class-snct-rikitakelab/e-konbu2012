@@ -116,7 +116,7 @@ void setGyroOffset(int setvalue)
 	gyro_offset = setvalue;
 }
 
-U32 getGyroOffsetInit()
+U32 getInitGyroOffset()
 {
 	return INIT_GYRO_OFFSET;
 }

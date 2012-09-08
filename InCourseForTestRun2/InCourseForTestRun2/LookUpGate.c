@@ -1,6 +1,9 @@
 #include "LookUpGate.h"
 
-		case (RN_LOOKUP_START):
+void runningLookUpGate(){
+
+	switch(runningmode){
+		case (LOOKUPGATE_START):
 			RA_linetrace_PID_balanceoff(25);
 
 			wait_count++;
@@ -17,7 +20,7 @@
 			break;
 
 			//ルックアップゲート走行準備状態
-		case (RN_LOOKUP_STOP):
+		case (LOOKUPGATE_STOP):
 			RA_linetrace_PID_balanceoff(5);
 			//cmd_turn = RA_wheels(cmd_turn);
 
@@ -41,7 +44,7 @@
 			break;
 		
 			//ルックアップゲート走行、尻尾降下
-		case (RN_LOOKUP_DOWN):
+		case (LOOKUPGATE_DOWN):
 			nxt_motor_set_speed(NXT_PORT_C, 0, 1);
 			nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 
@@ -64,7 +67,7 @@
 			break;
 
 			//ルックアップゲート走行、尻尾降下状態で前進
-		case (RN_LOOKUP_MOVE):
+		case (LOOKUPGATE_MOVE):
 
 //			RA_linetrace(30,20);
 			RA_linetrace_PID_balanceoff(25);
@@ -80,7 +83,7 @@
 			break;
 
 			//ルックアップゲート走行、前進後倒立状態へ復帰
-		case (RN_LOOKUP_UP):
+		case (LOOKUPGATE_UP):
 			if(wait_count < 200)
 			{
 				nxt_motor_set_speed(NXT_PORT_C, 0, 1);

@@ -16,9 +16,18 @@ typedef enum{
 
 RN_MODE generatormode = RN_MODE_STOP;
 
-extern void calcPWMValues(int forward_speed,int cmd_turn);
+static int cmd_forward;
+static int cmd_turn;
+
+extern void calcPWMValues();
+extern PWMValues calcTailPWMValue(PWMValues outputvalues);
+extern PWMValues calcBalancePWMValue(PWMValues outputvalues);
 extern void PWMGeneratorModeChange(RN_MODE changemode);
-RN_MODE getPWMGeneratorMode();
+extern RN_MODE getPWMGeneratorMode();
+extern void setCmdForward(int forward);
+extern void setCmdTurn(int turn);
+extern int getCmdForward();
+extern int getCmdTurn();
 
 #endif
 

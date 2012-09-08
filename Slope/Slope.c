@@ -2,17 +2,10 @@
  * Slope.c
  * â“¹ƒvƒƒOƒ‰ƒ€
  */
-<<<<<<< HEAD
-#include "kernel.h"
-#include "kernel_id.h"
-#include "ecrobot_interface.h"
-
-=======
 
 #include "kernel.h"
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
->>>>>>> e6bc6e725dbd44c49f00597f8bac65d738124e65
 #include "Slope.h"
 #include "Factory.h"
 

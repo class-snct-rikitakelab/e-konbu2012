@@ -21,6 +21,9 @@ TARGET_SOURCES := \
 	TailControl.c \
 	RemoteStart.c \
 	LogSend.c \
+	PWMGenerator.c \
+	Slope.c \
+	CalcDistance.c
 
 
 
