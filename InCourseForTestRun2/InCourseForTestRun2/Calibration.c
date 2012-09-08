@@ -69,7 +69,7 @@ int RN_calibrate(void)
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
-			GYRO_OFFSET_INIT = gyro_offset;
+			INIT_GYRO_OFFSET = gyro_offset;
 			systick_wait_ms(500);
 			break;
 		}
@@ -113,5 +113,5 @@ U32 getGyroOffset()
 
 U32 getGyroOffsetInit()
 {
-	return GYRO_OFFSET_INIT;
+	return INIT_GYRO_OFFSET;
 }

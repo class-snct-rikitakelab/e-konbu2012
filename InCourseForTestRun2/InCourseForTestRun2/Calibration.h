@@ -16,7 +16,7 @@ static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
 static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
 static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
 
-static unsigned int GYRO_OFFSET_INIT;	//キャリブレーション時ののジャイロオフセット値
+static unsigned int INIT_GYRO_OFFSET;	//キャリブレーション時ののジャイロオフセット値
 
 //ジャイロセンサオフセット計算用変数
 static U32	gyro_offset = 0;    /* gyro sensor offset value */
