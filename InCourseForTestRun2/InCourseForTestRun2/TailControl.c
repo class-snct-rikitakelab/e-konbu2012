@@ -6,8 +6,6 @@ void TailControl(){
 	
 	TargetTailAngleControl();
 
-	static const float t_Kp = 1.85;
-
 	static float t_hensa = 0;
 	static float t_speed = 0;
 

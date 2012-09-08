@@ -2,7 +2,7 @@
 
 
 //©ŒÈˆÊ’u“¯’èŠÖ”
-void self_location(){
+void selflocation(){
 	static float dist_t = 0.0;
 	static float theta_t = 0.0;
 

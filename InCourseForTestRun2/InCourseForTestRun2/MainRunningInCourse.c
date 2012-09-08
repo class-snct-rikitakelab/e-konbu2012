@@ -339,7 +339,7 @@ TASK(ActionTask)
 {
 	RN_modesetting();	//‘–s‘Ìó‘Ôİ’è
 	TailControl();			//K”ö§Œä
-	self_location();	//©ŒÈˆÊ’u“¯’è
+	selflocation();	//©ŒÈˆÊ’u“¯’è
 	TerminateTask();
 }
 

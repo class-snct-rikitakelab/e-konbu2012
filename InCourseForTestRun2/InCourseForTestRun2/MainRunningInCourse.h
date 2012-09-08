@@ -18,11 +18,8 @@
 #include "RemoteStart.h"
 #include "SelfLocation.h"
 #include "TailControl.h"
-
-typedef struct {
-S8 pwmL;
-S8 pwmR;
-} PWMValues;
+#include "Common.h"
+//#include "PWMGenerator.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

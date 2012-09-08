@@ -20,7 +20,7 @@ TARGET_SOURCES := \
 	SpeedControl.c \
 	TailControl.c \
 	RemoteStart.c \
-	LogSend.c
+	LogSend.c \
 
 
 
