@@ -10,21 +10,6 @@
 //ジャイロ振幅値
 #define PM_GYRO 65
 
-
-static unsigned int GYRO_OFFSET;
-
-
-//速度カウンタの上限値
-static int SPEED_COUNT = 60;
-
-//速度調節カウンタ（カウンタが上限に達する毎に速度が1上昇
-static int speed_counter = 0;
-
-
-
-
-
-
 //目標曲率半径
 static float trgt_R = 0;
 

@@ -9,26 +9,6 @@
 #include "SelfLocation"
 #include "Calibration.h"
 
-/*
- *	各種定義
-*/
-
-//ジャイロ振幅値
-#define PM_GYRO 65
-
-
-
-
-//速度カウンタの上限値
-static int SPEED_COUNT = 60;　//区間に応じてた速度　坂道での原則など
-
-//目標曲率半径
-static float trgt_R = 0;
-
-//マーカーフラグ　0: OFF, 1: ON
-unsigned char m_flg = 0;
-static unsigned int LV_buf = 0;		/* Light Value buffer */
-
 
 
 
@@ -166,7 +146,7 @@ void setSection_in(){
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_CORNER;
 		}
-		SPEED_COUNT = 50;
+	
 		trgt_R = 0.0;
 		break;
 	case (FST_CORNER):		//坂道終点→第一カーブ
@@ -175,7 +155,7 @@ void setSection_in(){
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_STRAIGHT;
 		}
-		SPEED_COUNT = 60;
+
 		trgt_R = 67.59;
 		break;
 	case (FST_STRAIGHT):	//第一カーブ終点→第一ストレート
@@ -274,7 +254,6 @@ void setSection_out(){
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_CORNER;
 		}
-		SPEED_COUNT = 50;
 		trgt_R = 0.0;
 		break;
 	case (FST_CORNER):		//坂道終点→第一カーブ
@@ -283,7 +262,7 @@ void setSection_out(){
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_STRAIGHT;
 		}
-		SPEED_COUNT = 60;
+		
 		trgt_R = 67.59;
 		break;
 	case (FST_STRAIGHT):	//第一カーブ終点→第一ストレート
