@@ -1,4 +1,6 @@
-//#include "MainRunningInCourse.h"
+#ifndef _LIGHTPIDCONTROL_H_
+#define _LIGHTPIDCONTROL_H_
+
 #include "ecrobot_interface.h"
 #include "Calibration.h"
 
@@ -15,3 +17,5 @@ static float bf_hensa = 0;
 
 extern int RA_linetrace_PID(int forward_speed);
 extern void RA_hensareset();
+
+#endif

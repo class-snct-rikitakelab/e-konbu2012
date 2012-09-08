@@ -26,28 +26,6 @@ void TailControl(){
 void TargetTailAngleControl(){
 	static int counter = 0;
 
-	int target_angle;
-
-	switch(controltailmode){
-	case (RN_TAILDOWN):
-		target_angle = ANGLEOFDOWN;
-		break;
-	case (RN_TAILUP):
-		target_angle = ANGLEOFUP;
-		break;
-	case (RN_TAILLOOKUP):
-		target_angle = ANGLEOFLOOKUP;
-		break;
-	case (RN_TAILSTAND):
-		target_angle = ANGLEOFSTAND;
-		break;
-	case (RN_TAILPUSH):
-		target_angle = ANGLEOFPUSH;
-		break;
-	default:
-		break;
-	}
-
 	counter++;
 
 	if(counter >= TAIL_ANGLE_COUNT)
@@ -68,7 +46,7 @@ void TargetTailAngleControl(){
 	}
 }
 
-void TailModeChange(RN_TAILMODE tail_mode){
-	controltailmode = tail_mode;	
+void TailAngleChange(int angle){
+	target_angle = angle;	
 }
 

@@ -16,7 +16,7 @@
 #define ANGLEOFPUSH		120	//‘–s‘Ì’µ‚Ëã‚°
 
 #define TAIL_ANGLE_COUNT 2
-
+/*
 //K”ö‚Ìó‘Ô
 typedef enum{
 	RN_TAILDOWN,				//K”ö~‰º
@@ -25,13 +25,18 @@ typedef enum{
 	RN_TAILSTAND,
 	RN_TAILPUSH,
 } RN_TAILMODE;
-
+*/
 //K”öPI§Œä—pŒW”
-static float t_Kp = 1.85;			//P§Œä—p
+static float t_Kp = 8.85;			//P§Œä—p
 static float t_Ki = 0;				//I§Œä—p
 
 static int result_angle = 0;
+static int target_angle = ANGLEOFZERO;
 
-RN_TAILMODE controltailmode = ANGLEOFZERO;
+extern void TailControl();
+extern void TargetTailAngleControl();
+extern void TailAngleChange(int angle);
+
+//RN_TAILMODE controltailmode = ANGLEOFZERO;
 
 #endif

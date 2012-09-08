@@ -496,7 +496,7 @@ void RN_calibrate()
 					{
 						setting_mode = RN_RUN;
 						runner_mode = RN_MODE_BALANCEOFF;
-						TailModeChange(RN_TAILUP);
+						TailModeChange(RN_TAILDOWN);
 						break;
 					}
 				}

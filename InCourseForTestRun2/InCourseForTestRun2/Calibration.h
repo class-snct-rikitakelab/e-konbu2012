@@ -1,8 +1,12 @@
 //#include "MainRunningInCourse.h"
+#ifndef _CALIBRATION_H_
+#define _CALIBARTION_H_
+
 #include "TailControl.h"
 #include "ecrobot_interface.h"
 #include "kernel.h"
 #include "kernel_id.h"
+#include "RemoteStart.h"
 
 //ライントレース用目標値
 static unsigned int BLACK_VALUE;	//黒値
@@ -12,4 +16,13 @@ static unsigned int LOOKUP_BLACK_VALUE;		//角度がANGLEOFLOOKUP時の黒値
 static unsigned int LOOKUP_WHITE_VALUE;		//角度がANGLEOFLOOKUP時の白値
 static unsigned int LOOKUP_GRAY_VALUE;		//角度がANGLEOFLOOKUP地の灰色値（現在は黒と白の平均値）
 
-extern void RN_calibrate(void);
+static unsigned int GYRO_OFFSET_INIT;	//キャリブレーション時ののジャイロオフセット値
+
+//ジャイロセンサオフセット計算用変数
+static U32	gyro_offset = 0;    /* gyro sensor offset value */
+
+extern int RN_calibrate(void);
+extern int getGyroOffset();
+extern int getInitGyroOffset();
+
+#endif

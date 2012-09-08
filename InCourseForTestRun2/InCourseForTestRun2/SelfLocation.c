@@ -1,25 +1,39 @@
 #include "SelfLocation.h"
 
+
 //é©å»à íuìØíËä÷êî
-void self_location()
-{
-	d_theta_l = (float)nxt_motor_get_count(NXT_PORT_C) * PI / 180.0;
-	d_theta_r = (float)nxt_motor_get_count(NXT_PORT_B) * PI / 180.0;
+void self_location(){
+	static float dist_t = 0.0;
+	static float theta_t = 0.0;
 
-	omega_l = (d_theta_l - d_theta_l_t)/0.004;
-	omega_r = (d_theta_r - d_theta_r_t)/0.004;
+	float fi_l = (float)nxt_motor_get_count(NXT_PORT_C);
+	float fi_r = (float)nxt_motor_get_count(NXT_PORT_B);
+	float dist_l = deg2rad(fi_l * W_RADIUS);
+	float dist_r = deg2rad(fi_r * W_RADIUS);
 
-	v_l = (WHEEL_R * 0.1) * omega_l;
-	v_r = (WHEEL_R * 0.1) * omega_r;
+	dist = (dist_l + dist_r) / 2.0;
+	theta = W_RADIUS / W_DIST * (fi_r - fi_l);
+	x_r += (dist - dist_t) * sin(deg2rad(theta));
+	y_r += (dist - dist_t) * cos(deg2rad(theta));
+	if(!(theta == theta_t)){
+		R = rad2deg((dist - dist_t) / (theta - theta_t));
+	}
+	else{
+		R = 0.0;
+	}
+		
+	dist_t = dist;
+	theta_t = theta;
+}
 
-	v = (v_r + v_l) / 2.0;
-	omega = (v_r - v_l) / (MACHINE_W * 0.1);
 
-	d_theta_l_t = d_theta_l;
-	d_theta_r_t = d_theta_r;
+float deg2rad(float degree){
+	float radian = M_PI / 180.0 * degree;
+	return radian;
+}
 
-	theta_R += omega * 0.004 + theta_R_zero;
-	x_r += v * cos(theta_R) * 0.004 + x_r_zero;
-	y_r += v * sin(theta_R) * 0.004 + y_r_zero;
-	
+
+float rad2deg(float radian){
+	float degree = 180.0 / M_PI * radian;
+	return degree;
 }

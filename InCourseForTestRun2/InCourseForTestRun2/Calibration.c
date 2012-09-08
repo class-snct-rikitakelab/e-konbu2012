@@ -1,10 +1,11 @@
 #include "Calibration.h"
 
-
 //キャリブレーション関数
-void RN_calibrate()
+int RN_calibrate(void)
 {
-	tail_mode = ANGLEOFDOWN;
+	int calibrationendflag = 0;
+
+	TailAngleChange(ANGLEOFDOWN);
 
 	//黒値
 	while(1){
@@ -32,7 +33,7 @@ void RN_calibrate()
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 
 	//尻尾をルックアップゲート時の角度に
-	tail_mode = ANGLEOFLOOKUP;
+	TailAngleChange(ANGLEOFLOOKUP);
 
 	//ルックアップゲート用黒値
 	while(1){
@@ -60,7 +61,7 @@ void RN_calibrate()
 	LOOKUP_GRAY_VALUE=(LOOKUP_BLACK_VALUE+LOOKUP_WHITE_VALUE)/2;
 
 	//尻尾を直立停止状態の角度に
-	tail_mode = ANGLEOFDOWN;
+	TailAngleChange(ANGLEOFDOWN);
 
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
@@ -68,6 +69,7 @@ void RN_calibrate()
 		{
 			ecrobot_sound_tone(932, 512, 10);
 			gyro_offset += (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1);
+			GYRO_OFFSET_INIT = gyro_offset;
 			systick_wait_ms(500);
 			break;
 		}
@@ -80,9 +82,7 @@ void RN_calibrate()
 		if(remote_start()==1)
 		{
 			ecrobot_sound_tone(982,512,30);
-			tail_mode = ANGLEOFUP;
-			setting_mode = RN_SPEEDZERO;
-			runner_mode = RN_MODE_BALANCE;
+			calibrationendflag = 1;
 			break;
 		}
 
@@ -94,15 +94,24 @@ void RN_calibrate()
 			{
 					if (ecrobot_get_touch_sensor(NXT_PORT_S4) != TRUE)
 					{
-						setting_mode = RN_SPEEDZERO;
-						runner_mode_change(2);
-						tail_mode = ANGLEOFUP;
+						calibrationendflag = 1;
 						break;
 					}
 			}
 			break;
 		}
-
 	}
+	
+	return calibrationendflag;
 
+}
+
+U32 getGyroOffset()
+{
+	return gyro_offset;
+}
+
+U32 getGyroOffsetInit()
+{
+	return GYRO_OFFSET_INIT;
 }
