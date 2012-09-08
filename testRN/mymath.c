@@ -21,7 +21,7 @@ float abs(float value)
 {
 	float result=0;
 
-	float(value>=0){
+	if(value>=0){
 	result=value;
 	}
 	else {
