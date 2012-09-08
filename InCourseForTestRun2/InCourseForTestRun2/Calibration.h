@@ -1,5 +1,5 @@
 #ifndef _CALIBRATION_H_
-#define _CALIBARTION_H_
+#define _CALIBRATION_H_
 
 #include "TailControl.h"
 #include "ecrobot_interface.h"

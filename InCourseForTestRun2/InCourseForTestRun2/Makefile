@@ -23,7 +23,9 @@ TARGET_SOURCES := \
 	LogSend.c \
 	PWMGenerator.c \
 	Slope.c \
-	CalcDistance.c
+	CalcDistance.c \
+	LookUpGate.c \
+	Sonar.c
 
 
 

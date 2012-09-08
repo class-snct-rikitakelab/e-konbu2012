@@ -22,6 +22,8 @@
 #include "PWMGenerator.h"
 #include "Slope.h"
 #include "CalcDistance.h"
+#include "LookUpGate.h"
+#include "Sonar.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

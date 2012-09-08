@@ -9,15 +9,26 @@
 int RA_linetrace_PID(int forward_speed) {
 
 	int cmd_turn;
-
+	if(graybase == 0)
+	{
 	//光センサ値と目標輝度値の偏差算出
 	if(forward_speed > 0)
 		hensa = (float)getGrayValue() - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
 	else
 		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)getGrayValue();
+	}
 
-	i_hensa = i_hensa+(hensa*0.0004);		//0が1つ多い
-	d_hensa = (hensa - bf_hensa)/0.0004;
+	else
+	{
+		//光センサ値と目標輝度値の偏差算出
+	if(forward_speed > 0)
+		hensa = (float)getLookUpGrayValue() - (float)ecrobot_get_light_sensor(NXT_PORT_S3);
+	else
+		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)getLookUpGrayValue();
+	}
+
+	i_hensa = i_hensa+(hensa*0.004);		//0が1つ多い
+	d_hensa = (hensa - bf_hensa)/0.004;
 	bf_hensa = hensa;
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
@@ -69,4 +80,11 @@ int online(void) {
 	else
 		return TRUE;					//ライン内
 
+}
+
+void changeGray(){
+	if(graybase == 0)
+		graybase = 1;
+	else if(graybase == 1)
+		graybase = 0;
 }

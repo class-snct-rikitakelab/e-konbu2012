@@ -7,7 +7,6 @@
 //ŽÔ—Ö‚Ì‰~Žü[cm]
 #define CIRCUMFERENCE 25.8			//ŽÔ—Ö‚Ì‰~Žü
 
-
 extern int getDistance();
 
 #endif

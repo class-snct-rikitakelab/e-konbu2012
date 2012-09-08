@@ -24,41 +24,9 @@
  */
 
 
-//全体用カウンタ（時間稼ぎ用）
-static int wait_count = 0;
-
-//超音波センサ目標値
-static int target_sonar = 20;
-
-//超音波センサ用フラグ
-static int sonarflag;
-
-static int sonarvalue;
-
-//距離計測用変数
-int revL = 0;
-int revR = 0;
-
-int distance_before_gate;	//ルックアップゲート通過前距離
-int distance_after_gate;	//ルックアップゲート通過中距離
-
-//マーカーフラグ　0: OFF, 1: ON
-unsigned char m_flg = 0;
-static unsigned int LV_buf = 0;		/* Light Value buffer */
-
 /*
  *	各種状態定義
  */
-
-/*
-//システム全体の状態
-typedef enum{
-	RN_MODE_INIT, 					//初期状態
-	RN_MODE_BALANCE,				//倒立制御ON
-	RN_MODE_TAIL,				//倒立制御OF
-	RN_MODE_STOP
-} RN_MODE;
-*/
 
 //キャリブレーションの状態
 typedef enum{
@@ -81,8 +49,6 @@ RN_SETTINGMODE setting_mode = RN_SETTINGMODE_START;
 //各種プライベート関数
 void RN_setting();
 int RA_wheels(int turn);
-int sonarcheck(int target_sonar);
-void getsonarvalue(void);
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -163,26 +129,12 @@ int RA_wheels(int turn){
 	return turn;
 }
 
-//超音波センサ状態検出関数
-int sonarcheck(int target_sonar)
-{
-	if(sonarvalue <= target_sonar)	//超音波センサの値が目標値以下か判断しフラグ変更
-	{
-		return 1;
-	}
-	else
-		return 0;
-}
 
-void getsonarvalue(void)
-{
-	sonarvalue = ecrobot_get_sonar_sensor(NXT_PORT_S2);
-}
 
 //走行状態設定関数
 void RN_setting()
 {
-
+	static int timecounter = 0;
 	switch (setting_mode){
 
 			//キャリブレーション状態
@@ -197,13 +149,13 @@ void RN_setting()
 		
 			//通常走行状態
 		case (RN_RUN):
-			setCmdForward(RA_speed(40));
+			setCmdForward(RA_speed(80));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500)
+			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
-				wait_count = 0;
+				timecounter = 0;
 			}
 			break;
 			
@@ -213,22 +165,29 @@ void RN_setting()
 			break;
 			
 		case (RN_RUN_SECOND):
-			setCmdForward(RA_speed(40));
+			setCmdForward(RA_speed(60));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			if(timecounter > 1500)
+				setting_mode = RN_LOOKUPGATE;
 			break;
 
 		case (RN_LOOKUPGATE):
+			if(runningLookUpGate() == 1)
+				setting_mode = RN_RUN_THIRD;
+			break;
+			
+		case (RN_RUN_THIRD):
+			setCmdForward(RA_speed(60));
+			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			break;
 			/*
-		case (RN_RUN_THIRD):
-			break;
-
 		case (RN_DRIFTTURN):
 			break;
 			*/
 		default:
 			break;
 	}
+	timecounter++;
 }
 
 /*
@@ -262,9 +221,9 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(cmd_forward,cmd_turn,dist,theta,x_r,y_r);			//Bluetoothを用いてデータ送信
+	logSend(0,cmd_turn,dist,getDistance(),getInitGyroOffset(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
-	getsonarvalue();
+	getSonarValue();
 
 	TerminateTask();
 }

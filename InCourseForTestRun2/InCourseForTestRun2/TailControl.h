@@ -14,7 +14,7 @@
 #define ANGLEOFSTAND	100	//直立状態
 #define ANGLEOFPUSH		120	//走行体跳ね上げ
 
-#define TAIL_ANGLE_COUNT 2
+#define TAIL_ANGLE_COUNT 5
 /*
 //尻尾の状態
 typedef enum{
@@ -26,7 +26,7 @@ typedef enum{
 } RN_TAILMODE;
 */
 //尻尾PI制御用係数
-static float t_Kp = 3.85;			//P制御用
+static float t_Kp = 5.85;			//P制御用
 static float t_Ki = 0;				//I制御用
 
 static int result_angle = 0;

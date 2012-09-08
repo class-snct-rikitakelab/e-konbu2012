@@ -58,6 +58,8 @@ PWMValues calcTailPWMValue(PWMValues outputvalues)
 void calcPWMValues()
 {
 	PWMValues Runningvalues;
+	Runningvalues.pwmL = 0;
+	Runningvalues.pwmR = 0;
 
 	switch(generatormode){
 	case (RN_MODE_INIT):

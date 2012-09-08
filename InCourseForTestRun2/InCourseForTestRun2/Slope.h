@@ -12,12 +12,12 @@
 //キャリブレーションの状態
 typedef enum{
 	SLOPE_START,
-	SLOPE_DOWN,
 	SLOPE_TOP,
+	SLOPE_DOWN,
 	SLOPE_END,
 } SLOPEMODE;
 
-SLOPEMODE runningslope;
+SLOPEMODE runningslope = SLOPE_START;
 
 extern int runningSlope();
 

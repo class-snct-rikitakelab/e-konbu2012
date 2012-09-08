@@ -2,6 +2,12 @@
 #define _LOOKUPGATE_H_
 
 #include "LightPIDControl.h"
+#include "CalcDistance.h"
+#include "LightPIDControl.h"
+#include "SpeedControl.h"
+#include "TailControl.h"
+#include "PWMGenerator.h"
+#include "Sonar.h"
 
 //キャリブレーションの状態
 typedef enum{
@@ -14,6 +20,6 @@ typedef enum{
 
 LOOKUPGATEMODE runningmode = LOOKUPGATE_START;
 
-extern void runningLookUpGate();
+extern int runningLookUpGate();
 
 #endif
