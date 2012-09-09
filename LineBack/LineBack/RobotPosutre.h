@@ -10,7 +10,8 @@
  typedef enum {
 	TAIL_RUNNING,
 	BALANCING,				//“|—§§ŒäON
-	BALANCEOFF				//“|—§§ŒäOFF
+	BALANCEOFF,			//“|—§§ŒäOFF
+	CONS_TURN_BALANCING, //“|—§•Ðƒ^ƒCƒ„ŒÅ’èù‰ñ“®ìŽÀs
 }POSTURE_MODE;
 
 //‰Šúó‘Ô

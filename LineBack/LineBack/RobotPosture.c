@@ -15,7 +15,9 @@ void RobotPosture_init(RobotPosture *this_RobotPosture){
 void RobotPosture_robotPostureControl(RobotPosture *this_RobotPosture,ControlVals controlVals)
 {
 S8 pwm_l=0,pwm_r=0;
+S8 adjusted_turn = 0;
 
+static S8 buf_pwm_l= 0,buf_pwm_r =0;
 	switch (this_RobotPosture->postureMode){
 
 			//初期状態
@@ -40,6 +42,27 @@ S8 pwm_l=0,pwm_r=0;
 			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
 			break;
 
+		case (CONS_TURN_BALANCING) :
+			if(controlVals.turn_val >= 0){
+				adjusted_turn = controlVals.turn_val  - buf_pwm_l;
+			}
+			else {
+				adjusted_turn = controlVals.turn_val  - buf_pwm_l;
+			}
+			balance_control(
+				(F32)controlVals.forward_val,
+				(F32)adjusted_turn,
+				(F32)ecrobot_get_gyro_sensor(NXT_PORT_S1),
+		 		(F32)this_RobotPosture->gyroOffset,
+				(F32)nxt_motor_get_count(NXT_PORT_C),
+		 		(F32)nxt_motor_get_count(NXT_PORT_B),
+				(F32)ecrobot_get_battery_voltage(),
+				&pwm_l,
+				&pwm_r);
+			nxt_motor_set_speed(NXT_PORT_C, pwm_l, 1);
+			nxt_motor_set_speed(NXT_PORT_B, pwm_r, 1);
+			break;
+
 			//バランサーOFF(尻尾走行)
 		case (TAIL_RUNNING):
 			nxt_motor_set_speed(NXT_PORT_C, controlVals.forward_val + controlVals.turn_val/2, 1);
@@ -49,6 +72,11 @@ S8 pwm_l=0,pwm_r=0;
 		default:
 			break;
 	}
+
+	//PWM値補正実行のために一回前のPWM値を保存
+	buf_pwm_l= pwm_l;
+	buf_pwm_r = pwm_r;
+
 }
 
 void RobotPosture_setPostureMode(RobotPosture *this_RobotPosture,POSTURE_MODE mode){

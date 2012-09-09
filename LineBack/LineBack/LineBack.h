@@ -53,7 +53,7 @@ typedef enum{
 
 
 //headToLineŠÖ”“à•”‚Ìó‘Ô‚ğ•\‚·•Ï”
- static HEAD_TO_LINE_STATE headToLineState= GET_TURN_ANGLE;
+ static HEAD_TO_LINE_STATE headToLineState= TURNING_LEFT;
 
 
 

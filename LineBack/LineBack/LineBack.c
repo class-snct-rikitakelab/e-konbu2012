@@ -8,11 +8,10 @@ void LineBack_init(LineBack * this_LineBack){
 }
 
 int LineBack_doLineBack(LineBack * this_LineBack){
-/* return val 1 @ ライン復帰成功
-   return val 0 @ ライン復帰未完
-   return val -1@ ライン復帰失敗
-   */
-	static LINE_BACK_STATE lineBackState = STEP_FALL_DETECTING;
+/* return val 1 @ ライン復帰成功*/
+	//static LINE_BACK_STATE lineBackState = STEP_FALL_DETECTING;
+	
+	static LINE_BACK_STATE lineBackState =STEP_FALL_DETECTING;
 	
 	ControlVals controlVals;
 	int lineBackResult=0;
@@ -133,26 +132,24 @@ int LineBack_headToLine(LineBack * this_LineBack){
 			break;
 		//___________________________		
 
-
-		case GO_FORWARD :
-			LineBack_goForwardAction(this_LineBack,15);
-			break;
-		
-		case  CATCH_LINE :
-			
-			LineBack_lineCatchAction(this_LineBack);
-			break;
-	
+		//ライン右側に落下した場合の処理の流れで並んでいる。
 		case TURNING_LEFT :
 			LineBack_turningLeftAction(this_LineBack,10,-30,TURN_ANGLE);
 			break;
-		
 		case BACK_TO_RIGHT_EDGE:
 		LineBack_backToRightEdgeAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);		
 		break;
 		case ENTRY_LINE_EDGE :
 			LineBack_entryLineEdgeAction(this_LineBack);
-
+			break;
+		case GO_FORWARD :
+			LineBack_goForwardAction(this_LineBack,15);
+			break;
+		case  CATCH_LINE :
+			LineBack_lineCatchAction(this_LineBack);
+			break;
+		//ここまで
+		
 		case BACK_TO_INIT_POSITION :
 		LineBack_backToInitPositionAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);
 		break;
@@ -173,7 +170,7 @@ int LineBack_headToLine(LineBack * this_LineBack){
 		
 	return 0;
 }
-
+//右エッジ検出後からさらに右に旋回し、ラインに直進する体勢を整える。
 void LineBack_entryLineEdgeAction(LineBack * this_LineBack){
 
 	ControlVals controlVals;
@@ -300,7 +297,7 @@ void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,in
 
 		if(lineEdgeDetectTimes==2){
 			lineEdgeDetectTimes = 0;	
-			headToLineState = ENTRY_LINE_EDGE;
+			headToLineState = ENTRY_LINE_EDGE; //右エッジ検出後からさらに右に旋回する。
 			}
 }
 
@@ -390,18 +387,7 @@ int LineBack_goForwardAction(LineBack *this_LineBack,int forwardSpeed) {
 return 0;
 
 }
-/*
-int LineBack_detectLineEdge(LineBack * this_LineBack) {
-	int result=0;
 
-	if((float)ecrobot_get_light_sensor(NXT_PORT_S3)  < Calibration_getGrayValue(&mCalibration) + 1  
-	&& (float)ecrobot_get_light_sensor(NXT_PORT_S3)  > Calibration_getGrayValue(&mCalibration) - 20 ){
-		result=1;
-	}
-
-return result;
-}
-*/
 
 int LineBack_successLineBack(LineBack * this_LineBack){
 
@@ -468,10 +454,11 @@ float LineBack_judePosition(LineBack * this_LineBack){
 	aimOfAngle = 45; //右に
 	}
 	else {
-		aimOfAngle = -45; //右に
+		aimOfAngle = -45; //左に
 	}
 	return  aimOfAngle;
 }
+
 void LineBack_killRevDiff(LineBack * this_LineBack){
 	float w_kp = 0.5;
 	signed long def = 0;

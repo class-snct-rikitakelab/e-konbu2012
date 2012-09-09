@@ -183,7 +183,7 @@ void ecrobot_device_initialize(void)
 //後始末処理
 void ecrobot_device_terminate(void)
 {
-	tail_mode = RN_TAILUP;
+	tail_mode = RN_TAILDOWN;
 	ecrobot_set_motor_speed(NXT_PORT_A, 0);
 	ecrobot_set_motor_speed(NXT_PORT_B, 0);
 	ecrobot_set_motor_speed(NXT_PORT_C, 0);
@@ -372,18 +372,19 @@ void RN_setting()
 			//走行開始前
 		case (RN_SETTINGMODE_START):
 		if(Calibration_doCalibrate(&mCalibration)==1){
-			RobotPosture_setPostureMode(&mRobotPosture,BALANCING);
-			//RobotPosture_setPostureMode(&mRobotPosture,TAIL_RUNING);
+			//RobotPosture_setPostureMode(&mRobotPosture,TAIL_RUNNING);
+			RobotPosture_setPostureMode(&mRobotPosture,CONS_TURN_BALANCING);
+			//RobotPosture_setPostureMode(&mRobotPosture,BALANCING);
 			tail_mode = RN_TAILUP;
 			setting_mode = RN_RUN;
 			
 
 		}
 			//		RN_calibrate();		//キャリブレーション
-			
+			/*
 			ecrobot_set_motor_speed(NXT_PORT_A,0);
 			ecrobot_set_motor_speed(NXT_PORT_B,0);
-			ecrobot_set_motor_speed(NXT_PORT_C,0);
+			ecrobot_set_motor_speed(NXT_PORT_C,0);*/
 			break;
 
 	
@@ -396,8 +397,8 @@ void RN_setting()
 
 			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
 			//test code
-			//setting_mode= RN_LINEBACK;
-			//test code end
+			setting_mode= RN_LINEBACK;
+			//test code edd
 		//if(GYRO_OFFSET - 100 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET + 100 < ecrobot_get_gyro_sensor(NXT_PORT_S1))
 				if(LineBack_debugLineBackSignalReceive(&mLineBack) == 1)
 			{	
@@ -641,9 +642,10 @@ void self_location()
 TASK(ActionTask)
 {
 	//RN_modesetting();	//走行体状態
+	//tailcontrol();	
 	RN_setting();
 	TailControl_PIDTailControl(&mTailControl);
-	//tailcontrol();		//尻尾コントロール
+			//尻尾コントロール
 	self_location();	//自己位置同定
 
 	TerminateTask();
@@ -651,7 +653,7 @@ TASK(ActionTask)
 
 //走行状態管理(5ms)
 TASK(ActionTask2)
-{
+{		
 	battery_average_check();
 	TerminateTask();
 }

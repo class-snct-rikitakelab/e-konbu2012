@@ -63,8 +63,8 @@ int LineEdgeDetecter_detectBlack(LineEdgeDetecter *this_LineEdgeDetecter){
 int LineEdgeDetecter_detectLineEdge(LineEdgeDetecter *this_LineEdgeDetecter){
 	int result=0;
 
-	if((float)ecrobot_get_light_sensor(NXT_PORT_S3)  < Calibration_getGrayValue(&mCalibration) + 1  
-	&& (float)ecrobot_get_light_sensor(NXT_PORT_S3)  > Calibration_getGrayValue(&mCalibration) - 20 ){
+	if((float)ecrobot_get_light_sensor(NXT_PORT_S3)  < Calibration_getGrayValue(&mCalibration) + 10  
+	&& (float)ecrobot_get_light_sensor(NXT_PORT_S3)  > Calibration_getGrayValue(&mCalibration) - 10 ){
 		result=1;
 	}
 return result;
