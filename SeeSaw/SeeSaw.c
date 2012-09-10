@@ -59,14 +59,14 @@ static float bf_hensa = 0;
 
 
 //ライントレース時PID制御用係数
-/*
+
 static float Kp = 0.648;
 static float Ki = 1.8;
 static float Kd = 0.0405;
-*/
-static float Kp = 1.85;				//P制御用
-static float Ki = 2.6;				//I制御用
-static float Kd = 0.003;			//D制御用
+
+//static float Kp = 2.186;				//P制御用
+//static float Ki = 0.8;				//I制御用
+//static float Kd = 0.08;			//D制御用
 static int wait_count = 0;
 
 static double min_vol;
@@ -486,7 +486,7 @@ void RN_setting()
 
 			//通常走行
 		case (RN_RUN):
-			RA_linetrace_PID(20);
+			RA_linetrace_PID(40);
 			
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{

@@ -135,6 +135,10 @@ int RA_wheels(int turn){
 void RN_setting()
 {
 	static int timecounter = 0;
+	float weight = 0.6;
+	static int markerflag = 0;
+
+
 	switch (setting_mode){
 
 			//キャリブレーション状態
@@ -146,28 +150,35 @@ void RN_setting()
 				TailAngleChange(ANGLEOFDOWN);
 			}
 			break;
-		
+	
 			//通常走行状態
 		case (RN_RUN):
 			setCmdForward(RA_speed(80));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
+			setSection_in();
+			
+			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 1000)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
 				timecounter = 0;
 			}
+			
 			break;
 			
 		case (RN_SLOPE):
+			setSection_in();
 			if(runningSlope() == 1)
 				setting_mode = RN_RUN_SECOND;
 			break;
 			
 		case (RN_RUN_SECOND):
-			setCmdForward(RA_speed(60));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(timecounter > 1500)
+			setSection_in();
+			setCmdForward(RA_speed(80));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
+			if(markerDetector() == 1)
+				markerflag+=1;
+			if(markerflag == 2)
 				setting_mode = RN_LOOKUPGATE;
 			break;
 
@@ -200,7 +211,7 @@ TASK(ActionTask)
 	//RN_modesetting();	//走行体状態設定
 	calcPWMValues();
 	TailControl();			//尻尾制御
-	selflocation();			//自己位置同定
+	self_location();			//自己位置同定
 	TerminateTask();
 }
 
@@ -221,10 +232,11 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(0,cmd_turn,dist,getDistance(),getInitGyroOffset(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
+	logSend(markerDetector(),cmd_turn,dist,getDistance(),getInitGyroOffset(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
 	getSonarValue();
-
+	//if(markerDetector() == 1)
+		//ecrobot_sound_tone(920, 512, 30);
 	TerminateTask();
 }
 

@@ -24,6 +24,9 @@
 #include "CalcDistance.h"
 #include "LookUpGate.h"
 #include "Sonar.h"
+#include "MarkerDetector.h"
+#include "mymath.h"
+#include "runnerForTestRun.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

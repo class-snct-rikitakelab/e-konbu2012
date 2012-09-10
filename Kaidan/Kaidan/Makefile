@@ -13,7 +13,7 @@ USER_LIB = nxtway_gs_balancer
 # User application source
 TARGET_SOURCES := \
 		balancer_param.c \
-		Kaidan_taskcheck.c \
+		Kaidan_balance.c \
 		logSend.c \
 		tyreal_light_ver.c \
 		NXTButton.c

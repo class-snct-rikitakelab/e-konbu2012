@@ -48,8 +48,8 @@ static unsigned int GYRO_OFFSET;
 #define WHEEL_R		41
 #define MACHINE_W	162
 
-#define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.95		//ラインから脱した際の光センサの値(570)
-#define RIGHT_ANGLE_AIM 240				//回転角度(160)
+#define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.96		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_AIM 120				//回転角度(160)
 
 /*
  *	状態定義

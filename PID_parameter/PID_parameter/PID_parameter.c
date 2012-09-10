@@ -313,7 +313,7 @@ void tailcontrol(){
 //‘–sİ’èŠÖ”
 void RN_setting()
 {
-	int speed = 100;
+	int speed = 60;
 
 	static int time_count = 0;
 

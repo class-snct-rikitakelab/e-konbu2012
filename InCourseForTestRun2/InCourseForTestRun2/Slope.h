@@ -8,6 +8,7 @@
 #include "SpeedControl.h"
 #include "CalcDistance.h"
 #include "Calibration.h"
+#include "runnerForTestRun.h"
 
 //キャリブレーションの状態
 typedef enum{

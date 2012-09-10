@@ -12,19 +12,21 @@ int runningSlope()
 
 	int slopeendflag = 0;
 
+	int weight = 1.0;
+
 	switch(runningslope){
 		case (SLOPE_START):
 			if(timecounter == 0)
-				distanceslopestart = getDistance();
+				distanceslopestart = getNowDistance();
 
-			distanceslopeup = getDistance();
+			distanceslopeup = getNowDistance();
 
-			setCmdForward(RA_speed(70));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdForward(RA_speed(80));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
 
-			if(distanceslopeup - distanceslopestart > 30 && timecounter > 300)
+			if(distanceslopeup - distanceslopestart > 10 && timecounter > 300)
 			{
-				ecrobot_sound_tone(880, 512, 50);
+				ecrobot_sound_tone(800, 512, 20);
 				runningslope = SLOPE_TOP;
 				timecounter = 0;
 			}
@@ -33,11 +35,11 @@ int runningSlope()
 
 		case (SLOPE_TOP):
 			setCmdForward(RA_speed(60));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
 
-			if(getInitGyroOffset() + 30 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 300)
+			if(getInitGyroOffset() + 30 < (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)/* && timecounter > 300*/)
 			{
-				ecrobot_sound_tone(880, 512, 50);
+				ecrobot_sound_tone(820, 512, 20);
 				runningslope = SLOPE_DOWN;
 				timecounter = 0;
 			}
@@ -45,28 +47,28 @@ int runningSlope()
 
 		case (SLOPE_DOWN):
 			if(timecounter == 0)
-				distanceslopetop = getDistance();
+				distanceslopetop = getNowDistance();
 
-			distanceslopedown = getDistance();
+			distanceslopedown = getNowDistance();
 
 			setCmdForward(RA_speed(60));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
 
-			if(distanceslopedown - distanceslopetop > 30 && timecounter > 300)
+			if(distanceslopedown - distanceslopetop > 30/* && timecounter > 300*/)
 			{
 				runningslope = SLOPE_END;
 				timecounter = 0;
-				ecrobot_sound_tone(880, 512, 50);
+				ecrobot_sound_tone(840, 512, 20);
 			}
 			break;
 
 		case (SLOPE_END):
-			setCmdForward(RA_speed(70));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-
-			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 300)
+			setCmdForward(RA_speed(80));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
+			
+			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)/* && timecounter > 300*/)
 			{
-				ecrobot_sound_tone(940, 512, 30);
+				ecrobot_sound_tone(900, 512, 20);
 				slopeendflag = 1;
 				timecounter = 0;
 			}

@@ -10,7 +10,7 @@ int runningLookUpGate(){
 
 	switch(runningmode){
 		case (LOOKUPGATE_START):
-			setCmdForward(RA_speed(60));
+			setCmdForward(RA_speed(40));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 
 			timecounter++;
@@ -55,7 +55,7 @@ int runningLookUpGate(){
 					{
 						runningmode = LOOKUPGATE_MOVE;
 						timecounter = 0;
-						distance_before_gate = getDistance();
+						distance_before_gate = getNowDistance();
 						changeGray();
 					}
 			}
@@ -68,7 +68,7 @@ int runningLookUpGate(){
 			setCmdForward(RA_speed(25));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 
-			distance_after_gate = getDistance();
+			distance_after_gate = getNowDistance();
 			
 			if(distance_after_gate - distance_before_gate > 30)
 			{	
@@ -91,23 +91,23 @@ int runningLookUpGate(){
 			{
 				TailAngleChange(ANGLEOFDOWN);
 				
-				ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
+				//ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
+				//ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
 			}
-		
+		/*
 			if(ecrobot_get_motor_rev(NXT_PORT_A) < ANGLEOFDOWN+5)
 			{
 				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
 				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
 			}
-			
+			*/
 			if(ecrobot_get_motor_rev(NXT_PORT_A) < ANGLEOFDOWN+5 && timecounter >= 1050)
 			{
 
-				ecrobot_set_motor_rev(NXT_PORT_B,0);
-				ecrobot_set_motor_rev(NXT_PORT_C,0);
-				ecrobot_set_motor_speed(NXT_PORT_B,0);
-				ecrobot_set_motor_speed(NXT_PORT_C,0);
+				//ecrobot_set_motor_rev(NXT_PORT_B,0);
+				//ecrobot_set_motor_rev(NXT_PORT_C,0);
+				//ecrobot_set_motor_speed(NXT_PORT_B,0);
+				//ecrobot_set_motor_speed(NXT_PORT_C,0);
 				changeGray();
 				lookupgateendflag = 1;
 			}

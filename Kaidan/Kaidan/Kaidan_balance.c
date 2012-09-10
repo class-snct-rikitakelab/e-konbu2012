@@ -428,13 +428,13 @@ void RN_setting()
 
 		case (RN_STEP_TURN_FORWARD):
 			RA_linetrace_PID(20);
-			
+			/*
 			if(GYRO_OFFSET_INIT - 50 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || GYRO_OFFSET_INIT + 50 < ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 200)
 			{
 				//GYRO_OFFSET_INIT += 7;
 				setting_mode = RN_STOP;
 			}
-			
+			*/
 			break;
 				//ã≠êßí‚é~
 		case(RN_STOP):
@@ -715,6 +715,6 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(velocity,0,GRAY_VALUE,distance_second - distance_stay,
-			position_x,position_y,0);		//ÉçÉOéÊÇË
+			position_x,position_y,0,0);		//ÉçÉOéÊÇË
 	TerminateTask();
 }

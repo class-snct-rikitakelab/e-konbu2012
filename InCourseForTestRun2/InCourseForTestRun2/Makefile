@@ -25,7 +25,10 @@ TARGET_SOURCES := \
 	Slope.c \
 	CalcDistance.c \
 	LookUpGate.c \
-	Sonar.c
+	Sonar.c \
+	MarkerDetector.c \
+	mymath.c \
+	runnerForTestRun.c
 
 
 
