@@ -3,7 +3,7 @@
 #include "../DrivenPart/TailAngleCtrl.h"
 #include "../DrivenPart/WheelMotorCtrl.h"
 #include "../DirectorPart/Running.h"
-#include "../Factory.h"
+#include "../Common/Factory.h"
 /**
  * ŽÔ‘Ì‹ì“®ŽwŽ¦Ší
  */

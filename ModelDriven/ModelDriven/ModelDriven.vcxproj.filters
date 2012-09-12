@@ -3,9 +3,6 @@
   <ItemGroup>
     <ClCompile Include="balancer_param.c" />
     <ClCompile Include="WLReceiver.c" />
-    <ClCompile Include="Factory.c">
-      <Filter>SorceCode</Filter>
-    </ClCompile>
     <ClCompile Include="Calibration.c">
       <Filter>SorceCode</Filter>
     </ClCompile>
@@ -111,6 +108,9 @@
     <ClCompile Include="NXTHardWare\SonorSensor.c">
       <Filter>NXTHardware</Filter>
     </ClCompile>
+    <ClCompile Include="Common\Factory.c">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calibration.h">
@@ -126,9 +126,6 @@
       <Filter>headFile</Filter>
     </ClInclude>
     <ClInclude Include="SelfLocation.h">
-      <Filter>headFile</Filter>
-    </ClInclude>
-    <ClInclude Include="Factory.h">
       <Filter>headFile</Filter>
     </ClInclude>
     <ClInclude Include="TailControl.h">
@@ -227,11 +224,14 @@
     <ClInclude Include="NXTHardWare\SonorSensor.h">
       <Filter>NXTHardware</Filter>
     </ClInclude>
-    <ClInclude Include="DrivenPart\RUN_MODE.h">
-      <Filter>DrivenPart</Filter>
+    <ClInclude Include="Common\RUN_MODE.h">
+      <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="DrivenPart\TARG_CTRL_METHOD.h">
-      <Filter>DrivenPart</Filter>
+    <ClInclude Include="Common\TARG_CTRL_METHOD.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Factory.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +261,9 @@
     </Filter>
     <Filter Include="SorceCode">
       <UniqueIdentifier>{d5de968a-76b5-4801-bb05-5dd03fa071a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{1afaaa71-a98b-4f90-b6ad-5a42ddd3b4e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

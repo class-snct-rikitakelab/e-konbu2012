@@ -10,13 +10,18 @@
 #include "../DrivenPart/WheelMotor.h"
 #include "../DrivenPart/S8.h"
 #include "../NXTHardWare/GyroSensor.h"
-#include "RUN_MODE.h"
-#include "TARG_CTRL_METHOD.h"
+#include "../Common/RUN_MODE.h"
+#include "../Common/TARG_CTRL_METHOD.h"
 
 /**
  * 車輪モータ制御
  */
 typedef struct {
+	/**
+	ジャイロオフセット
+	*/
+	U16 gyroOffset;
+
 	/**
 	 * 走行モード
 	 */
@@ -53,17 +58,18 @@ typedef struct {
 	/**
 	 * 倒立制御用モータ制御量を算出する
 	 */
-	void WheelMotorCtrl_calcBalancingMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtrl, S8 rightMotorCtrlVal, S8 leftMotorCtrlVal);
-
+	void WheelMotorCtrl_calcBalancingMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtrl,int forward,int turn,int gyroOffset);
 	/**
 	 * 尻尾走行用モータ制御量を算出する
 	 */
-	void WheelMotorCtrl_calcTailRunningMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtrl, S8 rightMotorCtrlVal, S8 leftMotorCtrlVal);
-
+	void WheelMotorCtrl_calcTailRunningMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtrl,int forward,int turn);
+	
 	/**
 	 * 動作目標値を設定する
 	 */
-	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl, StrategyPart::TargetDrivenParm parm);
+	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl, TargetDrivenParm parm);
+	
+	S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl);
 
 
 #endif

@@ -1,3 +1,6 @@
+#ifndef __WheelMotor
+#define __WheelMotor
+
 #include "ecrobot_interface.h"
 
 /**
@@ -13,3 +16,5 @@ typedef struct {
 	void WheelMotor_driveMotor(WheelMotor *this_WheelMotor, S8 motorCtrlVal);
 
 	void WheelMotor_init(WheelMotor *this_WheelMotor,U32 port);
+
+#endif

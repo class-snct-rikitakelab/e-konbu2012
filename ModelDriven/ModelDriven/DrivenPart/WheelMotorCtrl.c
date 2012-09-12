@@ -1,4 +1,5 @@
 #include "WheelMotorCtrl.h"
+#include "../Common/Factory.h"
 
 void WheelMotorCtrl_init(WheelMotorCtrl *this_WheelMotorCtrl){
 	
@@ -6,10 +7,30 @@ void WheelMotorCtrl_init(WheelMotorCtrl *this_WheelMotorCtrl){
 	this_WheelMotorCtrl->targCtrlMethod  = LIGHT_PID;
 	this_WheelMotorCtrl->rightMotorCtrlVal = 0;
 	this_WheelMotorCtrl->leftMotorCtrlVal = 0;
-	
+	this_WheelMotorCtrl->gyroOffset = 0;
 
 }
 void WheelMotorCtrl_doMotorCtrl(WheelMotorCtrl *this_WheelMotorCtrl){
+	S8 turn = 0;
+	S8 forward = 0;
+	switch (this_WheelMotorCtrl->runMode){
+	case  TAIL_RUNNING :
+		forward = ForwardValRevise_riveseForwardVal(&mForwardValRevise);
+		turn = WheelMotorCtrl_calTurnVal(this_WheelMotorCtrl);
+		WheelMotorCtrl_calcTailRunningMotorCtrlVal(this_WheelMotorCtrl,forward,turn);
+		break;
+	case BALANCING :
+		forward = ForwardValRevise_riveseForwardVal(&mForwardValRevise);
+		turn = WheelMotorCtrl_calTurnVal(this_WheelMotorCtrl);
+		WheelMotorCtrl_calcBalancingMotorCtrlVal(this_WheelMotorCtrl,forward,turn,this_WheelMotorCtrl->gyroOffset);
+		break;
+	default :
+		//none
+		break;
+	}
+
+	WheelMotor_driveMotor(&rightWheelMotor,this_WheelMotorCtrl->rightMotorCtrlVal);
+	WheelMotor_driveMotor(&leftWheelMotor,this_WheelMotorCtrl->leftMotorCtrlVal);
 
 
 
@@ -27,7 +48,20 @@ void WheelMotorCtrl_calcBalancingMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtr
 				(S8*)this_WheelMotorCtrl->leftMotorCtrlVal,
 				(S8*)this_WheelMotorCtrl->rightMotorCtrlVal);
 
-}
+	if (-100 >this_WheelMotorCtrl->rightMotorCtrlVal) {
+		this_WheelMotorCtrl->rightMotorCtrlVal = -100;
+	}
+	else if (100 <this_WheelMotorCtrl->rightMotorCtrlVal) {
+		this_WheelMotorCtrl->rightMotorCtrlVal = 100;
+	}
+
+	if (-100 >this_WheelMotorCtrl->leftMotorCtrlVal) {
+		this_WheelMotorCtrl->leftMotorCtrlVal = -100;
+	} else if (100 <this_WheelMotorCtrl->leftMotorCtrlVal) {
+		this_WheelMotorCtrl->leftMotorCtrlVal = 100;
+	}
+
+}@@
 void WheelMotorCtrl_calcTailRunningMotorCtrlVal(WheelMotorCtrl *this_WheelMotorCtrl,int forward,int turn){
 	
 
@@ -50,5 +84,32 @@ void WheelMotorCtrl_calcTailRunningMotorCtrlVal(WheelMotorCtrl *this_WheelMotorC
 
 
 void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl,TargetDrivenParm parm){
+	this_WheelMotorCtrl->runMode = parm.runMode;
+	this_WheelMotorCtrl->targCtrlMethod = parm.targCtrlMethod;
+	ForwardValRevise_setTargForwardVal(&mForwardValRevise,parm.targForwardVal);
+	LightValCtrl_setTargLightVal(&mLightValCtrl,(parm.whiteVal + parm.blackVal/2);
+	CurvatureCtrl_setTargCurvature(&mCurvature,parm.curvature);
 
+}
+
+S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl){
+	S8 turn=0;
+
+	switch (this_WheelMotorCtrl->targCtrlMethod){
+	case  LIGHT_PID :
+		turn = LightValCtrl_doLightValCtrl(&mthis_LightValCtrl);
+		break;
+
+	case CURV_PID :
+		turn = CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
+		break;
+	case HYBRID_PID :
+		//turn = (LightValCtrl_doLightValCtrl(&mthis_LightValCtrl) + CurvatureCtrl_doCurvatureCtrl(&mCurvatureCtrl));
+		break;
+	
+	default :
+		//none
+		break;
+	}
+	return turn;
 }

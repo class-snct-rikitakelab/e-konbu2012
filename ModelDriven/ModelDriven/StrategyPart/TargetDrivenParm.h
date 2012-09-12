@@ -1,75 +1,69 @@
+#ifndef __TargetDriveParm
+#define __TargetDriveParm
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
-#include "DrivenPart/S8.h"
-#include "DrivenPart/WheelMotorCtrl.h"
-#include "DetectionPart/U16.h"
+#include "../DrivenPart/WheelMotorCtrl.h"
+#include "../Common/RUN_MODE.h"
+#include "../Common/TARG_CTRL_METHOD.h"
 
-namespace StrategyPart
-{
 /**
  * 目標駆動パラメータ
  */
-class TargetDrivenParm
+typedef struct 
 {
-private:
+
 	/**
 	 * 目標前進速度
 	 */
-	DrivenPart::S8 targForwardVal;
+	S8 targForwardVal;
 
 	/**
 	 * 曲率半径
 	 */
-	float Curvature;
+	float curvature;
 
 	/**
 	 * 走行モード
 	 */
-	int runMode;
+	RUN_MODE runMode;
 
 	/**
 	 * 尻尾角度
 	 */
 	int tailAngle;
 
-	/**
-	 * 使用制御器
-	 */
-	int useController;
-
+	
 	/**
 	 * 目標輝度値
 	 */
-	DetectionPart::U16 TargLightVal;
+	U16 targLightVal;
 
 	/**
 	 * 目標制御方式
 	 */
-	int targCtrlMethod;
+	TARG_CTRL_METHOD targCtrlMethod;
 
-	int whiteVal;
+	/**
+	 * 白色輝度値
+	 */
+	
+	S8 whiteVal;
 
 	/**
 	 * 黒色輝度値
 	 */
-	int blackVal;
+	S8 blackVal;
 
 	/**
 	 * 電圧値
 	 */
-	int volt;
+	U16 volt;
 
 	/**
 	 * ジャイロオフセット
 	 */
-	int gyroOffset;
+	U16 gyroOffset;
 
-	DrivenPart::WheelMotorCtrl wheelMotorCtrl;
-};
+}TargetDrivenParm;
 
-}  // namespace StrategyPart
+#endif
