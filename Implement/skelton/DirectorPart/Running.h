@@ -36,6 +36,8 @@ private:
 
 public:
 	Running();
+	void Running_init(Running *this_Running);
+
 	/**
 	 * 現在区間を走行する
 	 */
@@ -63,6 +65,8 @@ public:
 		StrategyPart::TargetDrivenParm 目標駆動パラメータ;
 
 	public:
+		void RunnerRobot_init(RunnerRobot *this_RunnerRobot);
+
 		/**
 		 * 走行する
 		 */

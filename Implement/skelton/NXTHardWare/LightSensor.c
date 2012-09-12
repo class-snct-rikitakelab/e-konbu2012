@@ -9,6 +9,10 @@
 namespace NXTHardWare
 {
 
+void LightSensor::LightSensor_init(LightSensor *this_LightSensor)
+{
+}
+
 DrivenPart::S8 LightSensor::LightSensor_getLightSensorVal(LightSensor *this_LightSensor)
 {
 	return 0;

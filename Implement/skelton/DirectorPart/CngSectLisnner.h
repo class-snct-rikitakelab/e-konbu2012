@@ -19,6 +19,8 @@ private:
 	Running running;
 
 public:
+	virtual void CngSectLisnner_init(CngSectLisnner *this_CngSectLisnner)=0;
+
 	/**
 	 * Ÿ‚Ì‹æŠÔ‚ÉØ‚è‘Ö‚¦‚é
 	 */

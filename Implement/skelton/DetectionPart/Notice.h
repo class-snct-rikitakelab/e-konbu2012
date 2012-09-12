@@ -47,6 +47,8 @@ private:
 	Battery battery;
 
 public:
+	void Notice_init(Notice *this_Notice);
+
 	/**
 	 * ‹æŠÔØ‘ÖğŒw’è
 	 */

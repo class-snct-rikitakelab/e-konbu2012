@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void Gradient::Gradient_init(Gradient *this_Gradient)
+{
+}
+
 bool Gradient::Gradient_dectTargGradient(Gradient *this_Gradient)
 {
 	return false;

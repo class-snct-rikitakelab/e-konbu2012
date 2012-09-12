@@ -9,17 +9,21 @@
 namespace DetectionPart
 {
 
+void Coordinates::Coordinates_init(Coordinates *this_Coordinates)
+{
+}
+
 bool Coordinates::Coordinates_detecTargCoo(Coordinates *this_Coordinates)
 {
 	return false;
 }
 
-bool Coordinates::指定x座標移動を検知する()
+bool Coordinates::Cooridnates_detcXCooReach()
 {
 	return false;
 }
 
-bool Coordinates::指定y座標移動を検知する()
+bool Coordinates::Cooridnates_detcYCooReach()
 {
 	return false;
 }

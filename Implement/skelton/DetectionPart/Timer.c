@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void Timer::Timer_init(Timer *this_Timer)
+{
+}
+
 void Timer::Timer_detcPassTargTimer(Timer *this_Timer)
 {
 }

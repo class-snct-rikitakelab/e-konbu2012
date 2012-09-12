@@ -9,6 +9,10 @@
 namespace DrivenPart
 {
 
+void WheelMotorCtrl::WheelMotorCtrl_init(WheelMotorCtrl *this_WheelMotorCtrl)
+{
+}
+
 void WheelMotorCtrl::WheelMotorCtrl_doMotorCtrl(WheelMotorCtrl *this_WheelMotorCtrl)
 {
 }

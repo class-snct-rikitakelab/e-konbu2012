@@ -51,6 +51,8 @@ private:
 	NXTHardWare::GyroSensor gyroSensor;
 
 public:
+	void WheelMotorCtrl_init(WheelMotorCtrl *this_WheelMotorCtrl);
+
 	/**
 	 * ÉÇÅ[É^Çêßå‰Ç∑ÇÈ
 	 */

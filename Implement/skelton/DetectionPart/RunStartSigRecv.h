@@ -24,6 +24,8 @@ private:
 	NXTHardWare::TouchSensor touchSensor;
 
 public:
+	void RunStartSigRecv_init(RunStartSigRecv *this_RunStartSigRecv);
+
 	/**
 	 * ”­iM†‚ğŒŸ’m‚·‚é
 	 */

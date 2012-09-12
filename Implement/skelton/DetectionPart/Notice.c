@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void Notice::Notice_init(Notice *this_Notice)
+{
+}
+
 void Notice::Notice_setCngSectTerm(Notice *this_Notice, StrategyPart::CngSectTerm term)
 {
 }

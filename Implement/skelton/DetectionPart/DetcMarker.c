@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void DetcMarker::DetcMarker_init(DetcMarker *this_DetcMarker)
+{
+}
+
 bool DetcMarker::DetcMarker_detcMarker(DetcMarker *this_DetcMarker)
 {
 	return false;

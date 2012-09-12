@@ -16,10 +16,12 @@ namespace DrivenPart
 class CurvatureCtrl
 {
 public:
+	void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl);
+
 	/**
 	 * –Ú•W‹È—¦”¼Œa‚ğİ’è‚·‚é
 	 */
-	void CurvatureCtrl_setTargCurature(int *this_CurvatureCtrl, float targCurvature);
+	void CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature);
 
 	/**
 	 * ‹È—¦”¼Œa–Ú•W§Œä‚ğÀs‚·‚é

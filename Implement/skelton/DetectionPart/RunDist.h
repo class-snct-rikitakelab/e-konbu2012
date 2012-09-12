@@ -25,6 +25,8 @@ private:
 	NXTHardWare::MotorEncoder motorEncoder;
 
 public:
+	void RunDist_init(RunDist *this_RunDist);
+
 	bool RunDist_dectTargRunDist(RunDist *this_RunDist);
 
 };

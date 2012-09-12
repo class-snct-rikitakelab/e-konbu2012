@@ -14,6 +14,10 @@ Running::Running()
 {
 }
 
+void Running::Running_init(Running *this_Running)
+{
+}
+
 void Running::Running_runCurrentSect(Running *this_Running)
 {
 }

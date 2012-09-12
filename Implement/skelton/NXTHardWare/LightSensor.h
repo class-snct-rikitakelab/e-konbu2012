@@ -15,6 +15,8 @@ namespace NXTHardWare
 class LightSensor
 {
 public:
+	void LightSensor_init(LightSensor *this_LightSensor);
+
 	/**
 	 * Œv‘ª‚·‚é
 	 */

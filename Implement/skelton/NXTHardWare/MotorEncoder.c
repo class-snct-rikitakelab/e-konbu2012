@@ -9,6 +9,10 @@
 namespace NXTHardWare
 {
 
+void MotorEncoder::MotorEncoder_init(MotorEncoder *this_MotorEncoder)
+{
+}
+
 int MotorEncoder::MotorEncoder_getCount(MotorEncoder *this_MotorEncoder)
 {
 	return 0;

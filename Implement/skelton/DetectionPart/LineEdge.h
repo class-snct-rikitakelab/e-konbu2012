@@ -20,6 +20,8 @@ private:
 	NXTHardWare::LightSensor lightSensor;
 
 public:
+	void LineEdge_init(LineEdge *this_LineEdge);
+
 	/**
 	 * ラインエッジを検出する
 	 */

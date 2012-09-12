@@ -9,6 +9,10 @@
 namespace DrivenPart
 {
 
+void TailAngleCtrl::TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl)
+{
+}
+
 void TailAngleCtrl::TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int agnle)
 {
 }

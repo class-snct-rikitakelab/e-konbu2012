@@ -9,22 +9,26 @@
 namespace StrategyPart
 {
 
-int Sector::Sector_getSectID()
+void Sector::Sector_init(Sector *this_Sector)
+{
+}
+
+int Sector::Sector_getSectID(Sector *this_Sector)
 {
 	return 0;
 }
 
-CngSectTerm Sector::Sector_getNextCngSectTerm()
+CngSectTerm Sector::Sector_getNextCngSectTerm(Sector *this_Sector)
 {
 	return 0;
 }
 
-Sector Sector::Sector_GetNextSect()
+Sector Sector::Sector_GetNextSect(Sector *this_Sector)
 {
 	return 0;
 }
 
-TargetDrivenParm Sector::Sector_getTargDrienParm()
+TargetDrivenParm Sector::Sector_getTargDrienParm(Sector *this_Sector)
 {
 	return 0;
 }

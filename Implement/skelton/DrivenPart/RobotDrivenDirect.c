@@ -9,7 +9,11 @@
 namespace DrivenPart
 {
 
-void RobotDrivenDirect::directDrive(RobotDrivenDirect *this_RobotDrivenDirect)
+void RobotDrivenDirect::RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect)
+{
+}
+
+void RobotDrivenDirect::RobotDrivenDirect_directDrive(RobotDrivenDirect *this_RobotDrivenDirect)
 {
 }
 

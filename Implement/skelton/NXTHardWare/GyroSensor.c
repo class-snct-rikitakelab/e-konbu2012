@@ -9,6 +9,10 @@
 namespace NXTHardWare
 {
 
+void GyroSensor::GyroSensor_init(GyroSensor *this_GyroSensor)
+{
+}
+
 DetectionPart::U16 GyroSensor::GyroSensor_getGyroAngVelocity(GyroSensor *this_GyroSensor)
 {
 	return 0;

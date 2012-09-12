@@ -9,6 +9,10 @@
 namespace DrivenPart
 {
 
+void LightValCtrl::LightValCtrl_init(LightValCtrl *this_LightValCtrl)
+{
+}
+
 void LightValCtrl::LightValCtrl_setTargLightVal(LightValCtrl *this_LightValCtrl, DetectionPart::U16 targLightVal)
 {
 }

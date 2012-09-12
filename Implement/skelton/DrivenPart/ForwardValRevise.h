@@ -32,6 +32,8 @@ public:
 	 */
 	void ForwardValRevise_setTargForwardVal(ForwardValRevise *this_ForwardValRevise, S8 ForwardVal);
 
+	void ForwardValRevise_init(ForwardValRevise *this_ForwardValRevise);
+
 };
 
 }  // namespace DrivenPart

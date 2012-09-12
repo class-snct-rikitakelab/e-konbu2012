@@ -26,10 +26,12 @@ private:
 	WheelMotorCtrl 車輪モータ制御量算出;
 
 public:
+	void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect);
+
 	/**
 	 * 駆動指示
 	 */
-	void directDrive(RobotDrivenDirect *this_RobotDrivenDirect);
+	void RobotDrivenDirect_directDrive(RobotDrivenDirect *this_RobotDrivenDirect);
 
 	/**
 	 * 目標駆動パラメータを設定する

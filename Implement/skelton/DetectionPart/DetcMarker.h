@@ -24,6 +24,8 @@ private:
 	Notice notice;
 
 public:
+	void DetcMarker_init(DetcMarker *this_DetcMarker);
+
 	/**
 	 * マーカーを検知する
 	 */

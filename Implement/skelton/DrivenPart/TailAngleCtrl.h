@@ -13,6 +13,8 @@ namespace DrivenPart
 class TailAngleCtrl
 {
 public:
+	void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl);
+
 	/**
 	 * –Ú•WŠp“x‚ğİ’è‚·‚é
 	 */

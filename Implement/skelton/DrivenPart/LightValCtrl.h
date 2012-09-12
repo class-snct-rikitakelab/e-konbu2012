@@ -24,6 +24,8 @@ private:
 	NXTHardWare::LightSensor lightSensor;
 
 public:
+	void LightValCtrl_init(LightValCtrl *this_LightValCtrl);
+
 	/**
 	 * –Ú•W‹P“x’l‚ğİ’è‚·‚é
 	 */

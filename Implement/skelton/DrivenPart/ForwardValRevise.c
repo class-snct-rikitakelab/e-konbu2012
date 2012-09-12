@@ -17,4 +17,8 @@ S8 ForwardValRevise::ForwardValRevise_riveseForwardVal(ForwardValRevise *this_Fo
 void ForwardValRevise::ForwardValRevise_setTargForwardVal(ForwardValRevise *this_ForwardValRevise, S8 ForwardVal)
 {
 }
+
+void ForwardValRevise::ForwardValRevise_init(ForwardValRevise *this_ForwardValRevise)
+{
+}
 }  // namespace DrivenPart
