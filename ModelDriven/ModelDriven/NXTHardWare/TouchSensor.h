@@ -7,4 +7,6 @@ typedef struct {
 
 }TouchSensor;
 
+void TouchSensor_init(TouchSensor *this_TouchSensor);
+
 U8 TouchSensor_getTouchSensor(TouchSensor *this_TouchSensor);

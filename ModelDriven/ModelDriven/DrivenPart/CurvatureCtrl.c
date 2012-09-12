@@ -9,7 +9,11 @@
 namespace DrivenPart
 {
 
-void CurvatureCtrl::CurvatureCtrl_setTargCurature(int *this_CurvatureCtrl, float targCurvature)
+void CurvatureCtrl::CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl)
+{
+}
+
+void CurvatureCtrl::CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature)
 {
 }
 

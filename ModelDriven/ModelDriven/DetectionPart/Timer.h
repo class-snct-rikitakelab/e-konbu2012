@@ -17,6 +17,8 @@ private:
 
 
 public:
+	void Timer_init(Timer *this_Timer);
+
 	/**
 	 * w’èŠÔ‚ğŒŸ’m‚·‚é
 	 */

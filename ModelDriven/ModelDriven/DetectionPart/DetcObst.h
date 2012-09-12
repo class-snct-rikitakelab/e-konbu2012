@@ -7,7 +7,7 @@
 
 #include "DetectionPart/S32.h"
 #include "DetectionPart/Notice.h"
-#include "NXTHardWare/UltrasonicSensor.h"
+#include "NXTHardWare/SonorSensor.h"
 
 namespace DetectionPart
 {
@@ -23,9 +23,11 @@ private:
 	S32 detcDist;
 
 	Notice notice;
-	NXTHardWare::UltrasonicSensor ultrasonicSensor;
+	NXTHardWare::SonorSensor sonorSensor;
 
 public:
+	void DetcObst_init(DetcObst *this_DetcObst);
+
 	/**
 	 * Žw’è‹——£‚ðŒŸ’m‚·‚é
 	 */

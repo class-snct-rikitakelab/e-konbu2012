@@ -1,3 +1,8 @@
+#include <string>
+#include <vector>
+#include <list>
+#include <iostream>
+#include <assert.h>
 
 #include "Running.h"
 
@@ -6,6 +11,10 @@ namespace DirectorPart
 
 Running::Running()
 :currentSect(‘Ò‹@)
+{
+}
+
+void Running::Running_init(Running *this_Running)
 {
 }
 

@@ -1,56 +1,50 @@
+#ifndef __WheelMotorCtrl
+#define __WheelMotorCtrl
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
-#include "StrategyPart/TargetDrivenParm.h"
-#include "DrivenPart/ForwardValRevise.h"
-#include "DrivenPart/LightValCtrl.h"
-#include "DrivenPart/CurvatureCtrl.h"
-#include "DrivenPart/WheelMotor.h"
-#include "DrivenPart/S8.h"
-#include "NXTHardWare/GyroSensor.h"
+#include "balancer.h"
+#include "../StrategyPart/TargetDrivenParm.h"
+#include "../DrivenPart/ForwardValRevise.h"
+#include "../DrivenPart/LightValCtrl.h"
+#include "../DrivenPart/CurvatureCtrl.h"
+#include "../DrivenPart/WheelMotor.h"
+#include "../DrivenPart/S8.h"
+#include "../NXTHardWare/GyroSensor.h"
+#include "RUN_MODE.h"
+#include "TARG_CTRL_METHOD.h"
 
-namespace DrivenPart
-{
 /**
  * 車輪モータ制御
  */
-class WheelMotorCtrl
-{
-private:
+typedef struct {
 	/**
 	 * 走行モード
 	 */
-	int runMode;
+	RUN_MODE runMode;
 
 	/**
 	 * 右モータ制御量
 	 * 右PWM値
 	 */
-	int rightMotorCtrlVal;
+	S8 rightMotorCtrlVal;
 
 	/**
 	 * 左モータ制御量
 	 * 左PWM値
 	 */
-	int leftMotorCtrlVal;
+	S8 leftMotorCtrlVal;
 
 	/**
 	 * 目標制御方式
 	 */
-	int targCtrlMethod;
+	
+	TARG_CTRL_METHOD targCtrlMethod;
 
-	ForwardValRevise 前進量算出;
-	LightValCtrl 旋回量算出;
-	CurvatureCtrl 旋回量算出;
-	WheelMotor 右車輪サーボモータ;
-	WheelMotor 左車輪サーボモータ;
-	NXTHardWare::GyroSensor gyroSensor;
+} WheelMotorCtrl;
 
-public:
+
+	void WheelMotorCtrl_init(WheelMotorCtrl *this_WheelMotorCtrl);
+
 	/**
 	 * モータを制御する
 	 */
@@ -71,6 +65,5 @@ public:
 	 */
 	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl, StrategyPart::TargetDrivenParm parm);
 
-};
 
-}  // namespace DrivenPart
+#endif

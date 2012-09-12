@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void TurnAngle::TurnAngle_init(TurnAngle *this_TurnAngle)
+{
+}
+
 bool TurnAngle::TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle)
 {
 	return false;

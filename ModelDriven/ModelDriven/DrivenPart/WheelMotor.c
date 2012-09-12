@@ -1,15 +1,10 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "WheelMotor.h"
 
-namespace DrivenPart
-{
-
-void WheelMotor::WheelMotor_driveMotor(WheelMotor *this_WheelMotor, S8 motorCtrlVal)
-{
+void WheelMotor_driveMotor(WheelMotor *this_WheelMotor, S8 motorCtrlVal){
+	nxt_motor_set_speed(this_WheelMotor->PORT,motorCtrlVal,1); 
 }
-}  // namespace DrivenPart
+
+void WheelMotor_init(WheelMotor *this_WheelMotor,U32 port){
+	this_WheelMotor->PORT = port;
+}

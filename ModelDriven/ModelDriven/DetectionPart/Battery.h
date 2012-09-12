@@ -20,6 +20,8 @@ private:
 
 
 public:
+	void Battery_init(Battery *this_Battery);
+
 	void 指定バッテリ電圧値を取得する(Battery *this_Battery);
 
 };

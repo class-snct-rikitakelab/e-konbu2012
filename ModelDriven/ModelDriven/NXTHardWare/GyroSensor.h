@@ -8,6 +8,7 @@ typedef struct GyroSensor{
 
 }GyroSensor;
 
+void GyroSensor_init(GyroSensor *this_GyroSensor);
 	/**
 	 * Šp‘¬“x‚ðŽæ“¾‚·‚é
 	 */

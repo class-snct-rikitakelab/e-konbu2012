@@ -1,19 +1,23 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+
 
 #include "RobotDrivenDirect.h"
 
-namespace DrivenPart
-{
 
-void RobotDrivenDirect::directDrive(RobotDrivenDirect *this_RobotDrivenDirect)
-{
+void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect){
+	//none
 }
 
-void RobotDrivenDirect::RobotDrivenDirect_seDriveParm(RobotDrivenDirect *this_RobotDrivenDirect, StrategyPart::TargetDrivenParm parm)
-{
+	/**
+	 * 駆動指示
+	 */
+void RobotDrivenDirect_directDrive(RobotDrivenDirect *this_RobotDrivenDirect){
+	WheelMotorCtrl_doMotorCtrl(&mWheelMotorCtrl);
 }
-}  // namespace DrivenPart
+
+	/**
+	 * 目標駆動パラメータを設定する
+	 */
+void RobotDrivenDirect_seDriveParm(RobotDrivenDirect *this_RobotDrivenDirect, TargetDrivenParm parm){
+	WheelMotorCtrl_setMotionTargVal(&mWheelMotorCtrl,TargetDrivenParm parm);
+	TailAngleCtrl_setTargAngle(&mTailAngleCtrl,TargetDrivenParm parmt.tailAngle);
+}

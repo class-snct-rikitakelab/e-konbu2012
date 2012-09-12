@@ -9,6 +9,10 @@
 namespace DetectionPart
 {
 
+void LineEdge::LineEdge_init(LineEdge *this_LineEdge)
+{
+}
+
 void LineEdge::LineEdge_detecLineEdge(LineEdge *this_LineEdge)
 {
 }

@@ -26,6 +26,8 @@ private:
 	Notice notice;
 
 public:
+	void Gradient_init(Gradient *this_Gradient);
+
 	/**
 	 * Žw’èŠp‘¬“x‚ðŒŸ’m‚·‚é
 	 */

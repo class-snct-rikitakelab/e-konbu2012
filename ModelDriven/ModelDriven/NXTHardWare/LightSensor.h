@@ -6,6 +6,7 @@ typedef struct GyroSensor{
 
 }LightSensor;
 
+void LightSensor_init(LightSensor *this_LightSensor);
 	/**
 	 * Œv‘ª‚·‚é
 	 */
