@@ -1,23 +1,14 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "Notice.h"
 
-namespace DetectionPart
-{
+void Notice_init(Notice *this_Notice);
 
-void Notice::Notice_init(Notice *this_Notice)
-{
-}
+	/**
+	 * ãÊä‘êÿë÷èåèéwíË
+	 */
+void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm term);
 
-void Notice::Notice_setCngSectTerm(Notice *this_Notice, StrategyPart::CngSectTerm term)
-{
-}
-
-void Notice::Notice_judgeNotice(Notice *this_Notice)
-{
-}
-}  // namespace DetectionPart
+	/**
+	 * í ímîªíf
+	 */
+void Notice_judgeNotice(Notice *this_Notice);

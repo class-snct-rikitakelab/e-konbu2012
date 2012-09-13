@@ -69,7 +69,8 @@ typedef struct {
 	 */
 	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl, TargetDrivenParm parm);
 	
-	S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl);
+	//モータ制御量算出
+	S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl);//turn値算出　内部で尻尾か倒立か状態を判断して算出
 
 
 #endif

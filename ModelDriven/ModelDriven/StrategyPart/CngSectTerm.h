@@ -1,23 +1,16 @@
+#ifndef __CngSectTerm
+#define __CngSectTerm
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
-namespace StrategyPart
-{
 /**
  * ‹æŠÔØ‘ÖğŒ
  */
-class CngSectTerm
-{
-private:
+typedef struct  {
 	/**
 	 * Ø‘ÖğŒ
 	 */
-	CngSectTerm cngTerm;
+	int cngTerm;
 
-};
+}CngSectTerm;
 
-}  // namespace StrategyPart
+#endif

@@ -1,31 +1,26 @@
+#ifndef __Sector
+#define __Sector
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#include "../StrategyPart/TargetDrivenParm.h"
+#include "../StrategyPart/CngSectTerm.h"
 
-#include "StrategyPart/TargetDrivenParm.h"
-#include "StrategyPart/CngSectTerm.h"
-
-namespace StrategyPart
-{
 /**
  * 区間
  */
-class Sector
-{
-private:
-	/**
+typedef struct  {
+		/**
 	 * 区間ID
 	 */
+
 	int sectID;
 
-	TargetDrivenParm 目標駆動パラメータ;
-	CngSectTerm 切替条件[];
-	Sector 次区間[];
+	TargetDrivenParm targetDrvenParm;
+	//CngSectTerm cngTerm[];
+	//Sector 次区間[];
 
-public:
+}Sector;
+
+
 	void Sector_init(Sector *this_Sector);
 
 	/**
@@ -48,6 +43,4 @@ public:
 	 */
 	TargetDrivenParm Sector_getTargDrienParm(Sector *this_Sector);
 
-};
-
-}  // namespace StrategyPart
+#endif

@@ -1,28 +1,22 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
 #include "Running.h"
 
-namespace DirectorPart
-{
-
-Running::Running()
-:currentSect(‘Ò‹@)
-{
+void Running_init(Running *this_Running){
+	this_Running->currentSect=0;
 }
 
-void Running::Running_init(Running *this_Running)
-{
+	/**
+	 * Œ»İ‹æŠÔ‚ğ‘–s‚·‚é
+	 */
+void Running_runCurrentSect(Running *this_Running){
+	RobotDrivenDirect_directDrive(&mRobotDrivenDirect);
 }
 
-void Running::Running_runCurrentSect(Running *this_Running)
-{
+	/**
+	 * Ÿ‚Ì‹æŠÔ‚ÉØ‚è‘Ö‚¦‚é
+	 */
+void Running_cngNextSect(Running *this_Running,Notice checkResult){
+
+
 }
 
-void Running::Running_cngNextSect(Running *this_Running, DetectionPart::Notice checkResult)
-{
-}
-}  // namespace DirectorPart
+	

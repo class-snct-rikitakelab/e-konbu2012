@@ -1,29 +1,17 @@
+#ifndef __LightValCtrl
+#define __LightValCtrl
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#include "ecrobot_interface.h"
+#include "../NXTHardWare/LightSensor.h"
 
-#include "DrivenPart/˜H–Ê‹P“x’l.h"
-#include "DrivenPart/‹P“x’l§Œä•û®.h"
-#include "DrivenPart/S8.h"
-#include "DetectionPart/U16.h"
-#include "NXTHardWare/LightSensor.h"
 
-namespace DrivenPart
-{
 /**
  * ‹P“x’l§ŒäŠí
  */
-class LightValCtrl
-{
-private:
-	˜H–Ê‹P“x’l ˜H–Ê‹P“x’l;
-	‹P“x’l§Œä•û® ‹P“x’l§Œä•û®;
-	NXTHardWare::LightSensor lightSensor;
+typedef struct { 
+}LightValCtrl;
 
-public:
+
 	void LightValCtrl_init(LightValCtrl *this_LightValCtrl);
 
 	/**
@@ -36,6 +24,5 @@ public:
 	 */
 	S8 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl);
 
-};
 
-}  // namespace DrivenPart
+#endif

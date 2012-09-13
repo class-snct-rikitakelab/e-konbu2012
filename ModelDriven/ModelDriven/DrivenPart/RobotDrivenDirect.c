@@ -18,6 +18,6 @@ void RobotDrivenDirect_directDrive(RobotDrivenDirect *this_RobotDrivenDirect){
 	 * 目標駆動パラメータを設定する
 	 */
 void RobotDrivenDirect_seDriveParm(RobotDrivenDirect *this_RobotDrivenDirect, TargetDrivenParm parm){
-	WheelMotorCtrl_setMotionTargVal(&mWheelMotorCtrl,TargetDrivenParm parm);
-	TailAngleCtrl_setTargAngle(&mTailAngleCtrl,TargetDrivenParm parmt.tailAngle);
+	WheelMotorCtrl_setMotionTargVal(&mWheelMotorCtrl,parm);
+	TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,parm.tailAngle);
 }

@@ -14,6 +14,7 @@ void WheelMotorCtrl_doMotorCtrl(WheelMotorCtrl *this_WheelMotorCtrl){
 	S8 turn = 0;
 	S8 forward = 0;
 	switch (this_WheelMotorCtrl->runMode){
+
 	case  TAIL_RUNNING :
 		forward = ForwardValRevise_riveseForwardVal(&mForwardValRevise);
 		turn = WheelMotorCtrl_calTurnVal(this_WheelMotorCtrl);
@@ -104,12 +105,14 @@ S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl){
 		turn = CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
 		break;
 	case HYBRID_PID :
-		//turn = (LightValCtrl_doLightValCtrl(&mthis_LightValCtrl) + CurvatureCtrl_doCurvatureCtrl(&mCurvatureCtrl));
+		turn = (LightValCtrl_doLightValCtrl(&mthis_LightValCtrl) + CurvatureCtrl_doCurvatureCtrl(&mCurvatureCtrl));
 		break;
 	
 	default :
 		//none
 		break;
+		
 	}
+	
 	return turn;
 }

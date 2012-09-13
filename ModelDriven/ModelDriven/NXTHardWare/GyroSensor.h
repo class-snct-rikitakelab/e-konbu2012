@@ -1,3 +1,7 @@
+#ifndef __GyroSensor
+#define __GyroSensor
+
+
 #include "ecrobot_interface.h"
 /**
  * ジャイロセンサクラス
@@ -15,3 +19,4 @@ void GyroSensor_init(GyroSensor *this_GyroSensor);
 
 U16 GyroSensor_getGyroAngVelocity(GyroSensor *this_GyroSensor);
 
+#endif

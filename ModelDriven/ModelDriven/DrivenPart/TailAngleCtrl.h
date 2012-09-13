@@ -1,18 +1,14 @@
+#ifndef __TailAngleCtrl
+#define __TailAngleCtrl
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
-namespace DrivenPart
-{
 /**
  * êKîˆäpìxêßå‰äÌ
  */
-class TailAngleCtrl
+typedef struct  
 {
-public:
+
+}TailAngleCtrl;
+
 	void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl);
 
 	/**
@@ -25,6 +21,4 @@ public:
 	 */
 	void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl);
 
-};
-
-}  // namespace DrivenPart
+#endif
