@@ -1,21 +1,23 @@
-
 #include "TailAngleCtrl.h"
+#include "../Common/Factory.h"
 
-
-void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl){
-
+void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl)
+{
 }
 
-	/**
-	 * 目標角度を設定する
-	 */
-void TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int agnle){
+void TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int angle)
+{
+	TailAngle_setTargTailAngle(angle);
+}
 
+void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl)
+{
+	U16 target;
+	U16 calc;
+	S8 speed;
 
-	}
-	/**
-	 * 角度目標制御を実行する
-	 */
-void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl){
-
+	target = TailAngle_getTargTailAngle(&mTailAngle);
+	calc = TailAngle_getTailAngle(&mTailAngle);
+	speed = PIDTailAngleCtrl_calcTailAngleCtrlVal(&mPIDTailAngleCtrl,target,calc);
+	TailMotor_setTailSpeed(&mTailMotor,speed);
 }

@@ -1,25 +1,15 @@
-#ifndef __TailAngleCtrl
-#define __TailAngleCtrl
+#ifndef _TAIL_ANGLE_CTRL_H
+#define _TAIL_ANGLE_CTRL_H
 
-/**
- * K”öŠp“x§ŒäŠí
- */
-typedef struct  
-{
+#include "ecrobot_interface.h"
+#include "../Factory.h"
+#include "../DrivenPart/TailAngle.h"
 
+typedef struct{
 }TailAngleCtrl;
 
-	void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl);
-
-	/**
-	 * –Ú•WŠp“x‚ğİ’è‚·‚é
-	 */
-	void TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int agnle);
-
-	/**
-	 * Šp“x–Ú•W§Œä‚ğÀs‚·‚é
-	 */
-	void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl);
+extern void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl);
+extern void TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int angle);
+extern void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl);
 
 #endif
-
