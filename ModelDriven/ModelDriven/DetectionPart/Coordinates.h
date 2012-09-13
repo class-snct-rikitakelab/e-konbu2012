@@ -1,21 +1,13 @@
-
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#ifndef __Coordinates
+#define __Coordinates
 
 #include "DetectionPart/Notice.h"
 #include "DetectionPart/LocationInfo.h"
 
-namespace DetectionPart
-{
 /**
  * 現在座標
  */
-class Coordinates
-{
-private:
+typedef struct { 
 	/**
 	 * 指定x座標
 	 */
@@ -26,28 +18,26 @@ private:
 	 */
 	float targYCoo;
 
-	Notice notice;
-	LocationInfo locationInfo;
+}Coordinates;
 
-public:
-	void Coordinates_init(Coordinates *this_Coordinates);
+
+void Coordinates_init(Coordinates *this_Coordinates);
 
 	/**
 	 * 指定座標移動を検知する
 	 */
-	bool Coordinates_detecTargCoo(Coordinates *this_Coordinates);
+bool Coordinates_detecTargCoo(Coordinates *this_Coordinates);
 
 	/**
 	 * 指定x座標移動を検知する
 	 */
-	bool Cooridnates_detcXCooReach();
+bool Cooridnates_detcXCooReach();
 
 	/**
 	 * 
 	 * 指定y座標移動を検知する
 	 */
-	bool Cooridnates_detcYCooReach();
+bool Cooridnates_detcYCooReach();
 
-};
+#endif
 
-}  // namespace DetectionPart

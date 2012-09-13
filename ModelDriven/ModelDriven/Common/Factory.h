@@ -79,7 +79,7 @@ Sector mSector;
 
 /****start Director part objects****/
 RunnerRobot mRunnerRobot;
-Running mRunnig;
+Running mRunning;
 
 /****end Director part objects****/
 

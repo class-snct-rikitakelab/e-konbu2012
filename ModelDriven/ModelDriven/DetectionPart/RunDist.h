@@ -1,34 +1,26 @@
+#ifndef __RunDist
+#define __RunDist
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "DetectionPart/Notice.h"
 #include "NXTHardWare/MotorEncoder.h"
+#include "../Common/Common.h"
 
-namespace DetectionPart
-{
+
 /**
  * ˆÚ“®‹——£
  */
-class RunDist
-{
-private:
-	/**
+typedef struct {
+/**
 	 * Žw’èˆÚ“®‹——£
 	 */
 	float targRunDist;
+}RunDist;
 
-	Notice notice;
-	NXTHardWare::MotorEncoder motorEncoder;
-
-public:
+	
 	void RunDist_init(RunDist *this_RunDist);
 
 	bool RunDist_dectTargRunDist(RunDist *this_RunDist);
 
-};
 
-}  // namespace DetectionPart
+#endif

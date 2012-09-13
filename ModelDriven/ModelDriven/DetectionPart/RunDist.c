@@ -1,20 +1,10 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+
 
 #include "RunDist.h"
+void RunDist_init(RunDist *this_RunDist){
 
-namespace DetectionPart
-{
-
-void RunDist::RunDist_init(RunDist *this_RunDist)
-{
 }
 
-bool RunDist::RunDist_dectTargRunDist(RunDist *this_RunDist)
-{
-	return false;
-}
-}  // namespace DetectionPart
+	bool RunDist_dectTargRunDist(RunDist *this_RunDist){
+		return false;
+	}

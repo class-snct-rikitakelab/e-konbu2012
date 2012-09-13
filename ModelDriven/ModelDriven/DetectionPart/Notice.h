@@ -14,8 +14,6 @@
 #include "../DetectionPart/Battery.h"
 #include "../DirectorPart/CngSectLisnner.h"
 
-namespace DetectionPart
-{
 /**
  * ’Ê’mŠí
  */
@@ -38,3 +36,4 @@ void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm term);
 void Notice_judgeNotice(Notice *this_Notice);
 
 #endif
+

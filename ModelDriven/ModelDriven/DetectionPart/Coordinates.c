@@ -1,30 +1,25 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#ifndef __Coordinates
+#define __Coordinates
 
 #include "Coordinates.h"
 
-namespace DetectionPart
-{
 
-void Coordinates::Coordinates_init(Coordinates *this_Coordinates)
-{
-}
+void Coordinates_init(Coordinates *this_Coordinates);
 
-bool Coordinates::Coordinates_detecTargCoo(Coordinates *this_Coordinates)
-{
-	return false;
-}
+	/**
+	 * 指定座標移動を検知する
+	 */
+bool Coordinates_detecTargCoo(Coordinates *this_Coordinates);
 
-bool Coordinates::Cooridnates_detcXCooReach()
-{
-	return false;
-}
+	/**
+	 * 指定x座標移動を検知する
+	 */
+bool Cooridnates_detcXCooReach();
 
-bool Coordinates::Cooridnates_detcYCooReach()
-{
-	return false;
-}
-}  // namespace DetectionPart
+	/**
+	 * 
+	 * 指定y座標移動を検知する
+	 */
+bool Cooridnates_detcYCooReach();
+
+#endif

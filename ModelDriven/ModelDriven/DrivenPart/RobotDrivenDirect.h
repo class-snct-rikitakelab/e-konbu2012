@@ -11,7 +11,7 @@
  */
 typedef struct {
 	TargetDrivenParm drivenParm;
-}RobotDrivenDirect
+}RobotDrivenDirect;
 
 	void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect);
 

@@ -1,19 +1,8 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "Timer.h"
+void Timer_init(Timer *this_Timer);
 
-namespace DetectionPart
-{
-
-void Timer::Timer_init(Timer *this_Timer)
-{
-}
-
-void Timer::Timer_detcPassTargTimer(Timer *this_Timer)
-{
-}
-}  // namespace DetectionPart
+	/**
+	 * Žw’èŽžŠÔ‚ðŒŸ’m‚·‚é
+	 */
+	void Timer_detcPassTargTimer(Timer *this_Timer);

@@ -1,7 +1,7 @@
 #ifndef __PWMValGenerator
 #define __PWMValGenerator
 
-#include "Common.h"
+#include "Common/Common.h"
 
 
 typedef enum{

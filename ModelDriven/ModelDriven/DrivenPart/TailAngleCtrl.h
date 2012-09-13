@@ -22,3 +22,4 @@ typedef struct
 	void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl);
 
 #endif
+

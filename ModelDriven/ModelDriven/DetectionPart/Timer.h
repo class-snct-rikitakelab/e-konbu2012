@@ -1,22 +1,15 @@
+#ifndef __Timer
+#define __Timer
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
-namespace DetectionPart
-{
 /**
  * ŽžŠÔŒv
  */
-class Timer
-{
-private:
+typedef struct {
 	int targTimer;
+}
+Timer;
 
-
-public:
 	void Timer_init(Timer *this_Timer);
 
 	/**
@@ -24,6 +17,4 @@ public:
 	 */
 	void Timer_detcPassTargTimer(Timer *this_Timer);
 
-};
-
-}  // namespace DetectionPart
+#endif

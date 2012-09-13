@@ -14,6 +14,18 @@ USER_LIB = nxtway_gs_balancer
 TARGET_SOURCES := \
 	balancer_param.c \
 	Slope.c \
+	StrategyPart/CngSectTerm.c \
+	DetectionPart/RunDist.c \
+	DetectionPart/TurnAngle.c \
+	DetectionPart/Coordinates.c \
+	DetectionPart/DetcObst.c \
+	DetectionPart/RunStartSigRecv.c \
+	DetectionPart/LineEdge.c \
+	DetectionPart/DetcMarker.c \
+	DetectionPart/Gradient.c \
+	DetectionPart/Timer.c \
+	DetectionPart/Battery.c \
+	DirectorPart/CngSectLisnner.c \
 	Calibration.c \
 	Factory.c \
 	PIDCalcDebug.c \

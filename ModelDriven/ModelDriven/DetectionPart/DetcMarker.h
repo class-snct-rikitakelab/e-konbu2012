@@ -1,36 +1,24 @@
+#ifndef __DetcMarker
+#define __DetcMarker
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
-#include "DetectionPart/S16.h"
-#include "DetectionPart/Notice.h"
+#include "../DetectionPart/Notice.h"
 
-namespace DetectionPart
-{
-/**
- * マーカー検出
- */
-class DetcMarker
-{
-private:
+
+typedef struct { 
 	/**
 	 * マーカー閾値
 	 */
 	S16 markerThreshold;
 
-	Notice notice;
+}DetcMarker;
 
-public:
-	void DetcMarker_init(DetcMarker *this_DetcMarker);
+void DetcMarker_init(DetcMarker *this_DetcMarker);
 
 	/**
 	 * マーカーを検知する
 	 */
-	bool DetcMarker_detcMarker(DetcMarker *this_DetcMarker);
+bool DetcMarker_detcMarker(DetcMarker *this_DetcMarker);
 
-};
+#endif
 
-}  // namespace DetectionPart

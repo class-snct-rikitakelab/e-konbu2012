@@ -32,7 +32,7 @@ void RunnerRobot_init(RunnerRobot *this_RunnerRobot);
 	/**
 	 * 走行する
 	 */
-void RunneRobot_run(RunnerRobot *this_RunnerRobot);
+extern void RunneRobot_run(RunnerRobot *this_RunnerRobot);
 
 	/**
 	 * 走行を終了する
@@ -47,6 +47,6 @@ void RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot);
 	/**
 	 * 走行体状態更新する
 	 */
-void RunnerRobot_updateRobotState(RunnerRobot *this_RunnerRobot,ROBOT_STATE robotState;);
+void RunnerRobot_updateRobotState(RunnerRobot *this_RunnerRobot,ROBOT_STATE robotState);
 
 #endif

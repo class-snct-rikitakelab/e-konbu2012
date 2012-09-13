@@ -3,14 +3,24 @@
 #include "../Common/Factory.h"
 
 void RunnerRobot_init(RunnerRobot *this_RunnerRobot){
-	this_RunnerRobot->robotState = CAlIBRATION;
+	this_RunnerRobot->robotState = CALIBRATION;
 }
 
 	/**
 	 * ‘–s‚·‚é
 	 */
 void RunneRobot_run(RunnerRobot *this_RunnerRobot){
-	Running_runCurrentSect(&mRunning);
+	switch (this_RunnerRobot->robotState) {
+		case CALIBRATION :
+			RunnerRobot_calibrate(&mRunnerRobot);
+		break;
+
+		case RUNNING :
+			Running_runCurrentSect(&mRunning);
+			break;
+		default :
+			break;
+	}
 }
 	/**
 	 * ‘–s‚ðI—¹‚·‚é
@@ -85,4 +95,3 @@ void RunnerRobot_carlibrate(RunnerRobot *this_RunnerRobot){
 void RunnerRobot_updateRobotState(RunnerRobot *this_RunnerRobot,ROBOT_STATE robotState){
 	this_RunnerRobot->robotState = robotState;
 }
-

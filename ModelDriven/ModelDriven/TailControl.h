@@ -1,7 +1,7 @@
 #ifndef __TailControl
 #define __TailControl
 
-#include "Common.h"
+#include "Common/Common.h"
 
 //K”ö‚Ìó‘Ô
 typedef enum{

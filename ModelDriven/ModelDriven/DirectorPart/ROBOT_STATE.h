@@ -3,7 +3,7 @@
 
 typedef enum 
 {
-	CAlIBRATION,
+	CALIBRATION,
 	RUNNING,
 	FINISH
 

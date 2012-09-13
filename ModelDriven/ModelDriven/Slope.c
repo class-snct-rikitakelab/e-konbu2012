@@ -7,8 +7,9 @@
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
 #include "Slope.h"
-#include "Factory.h"
+#include "Common/Factory.h"
 
+#include "DirectorPart\RunnerRobot.h"
 
 /*
  *	各種定義
@@ -695,18 +696,22 @@ void RN_modesetting()
 
 //走行体管理タスク(4ms)
 TASK(ActionTask)
-{
+{	
+	RunnnerRobot_run(&mRunnerRobot);
+	/*
 	RN_modesetting();							//走行体状態設定
 	TailControl_PIDTailControl(&mTailControl);	//問題点:尻尾が目標角度で停止せずに回り続ける
 //	taildown();									//尻尾制御
 	SelfLocation_SelfLocate(&mSelfLocation);	//自己位置同定
+	*/
 	TerminateTask();
 }
 
 //走行状態管理タスク(5ms)
 TASK(ActionTask2)
-{
+{/*
 	RN_setting();		//走行状態設定
+	*/
 	TerminateTask();
 }
 
@@ -720,11 +725,12 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(SelfLocation_GetDistance(&mSelfLocation),cmd_turn,SelfLocation_GetDistance(&mSelfLocation),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
-			BLACK_VALUE,WHITE_VALUE);
 
-	sonarcheck();											//超音波センサ状態管理
-	getsonarvalue();
+	//logSend(SelfLocation_GetDistance(&mSelfLocation),cmd_turn,SelfLocation_GetDistance(&mSelfLocation),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
+	//		BLACK_VALUE,WHITE_VALUE);
+
+	///sonarcheck();											//超音波センサ状態管理
+	//getsonarvalue();
 
 	TerminateTask();
 }
