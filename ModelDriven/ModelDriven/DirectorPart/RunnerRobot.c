@@ -2,6 +2,10 @@
 #include "RunnerRobot.h"
 #include "../Common/Factory.h"
 
+//for test driven part
+#include "../TestDrivenPart.h"
+//
+
 void RunnerRobot_init(RunnerRobot *this_RunnerRobot){
 	this_RunnerRobot->robotState = CALIBRATION;
 }
@@ -12,10 +16,10 @@ void RunnerRobot_init(RunnerRobot *this_RunnerRobot){
 void RunneRobot_run(RunnerRobot *this_RunnerRobot){
 	switch (this_RunnerRobot->robotState) {
 		case CALIBRATION :
-			RunnerRobot_calibrate(&mRunnerRobot);
+			 RunnerRobot_calibrate(this_RunnerRobot);
 		break;
 
-		case RUNNING :
+		case DRIVING :
 			Running_runCurrentSect(&mRunning);
 			break;
 		default :
@@ -33,7 +37,7 @@ void RunnerRobot_finRun(RunnerRobot *this_RunnerRobot){
 	/**
 	 * キャリブレーションする
 	 */
-void RunnerRobot_carlibrate(RunnerRobot *this_RunnerRobot){
+void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 	S8 blackVal=0,whiteVal=0;
 	U16 gyroOffset=0;
 	//黒値取得
@@ -80,7 +84,9 @@ void RunnerRobot_carlibrate(RunnerRobot *this_RunnerRobot){
 		if(TouchSensor_getTouchSensor(&mTouchSensor) == TRUE)
 		{
 			Sound_soundTone(&mSound,932, 512, 10);
-			RunnerRobot_updateRobotState(this_RunnerRobot,RUNNING);
+			setTargVals(mSector.targetDrvenParm); //test code
+			RunnerRobot_updateRobotState(this_RunnerRobot,DRIVING);
+
 			systick_wait_ms(500);
 			break;
 		}

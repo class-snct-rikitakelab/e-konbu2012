@@ -18,7 +18,7 @@ void DetcMarker_init(DetcMarker *this_DetcMarker);
 	/**
 	 * マーカーを検知する
 	 */
-bool DetcMarker_detcMarker(DetcMarker *this_DetcMarker);
+BOOL DetcMarker_detcMarker(DetcMarker *this_DetcMarker);
 
 #endif
 

@@ -6,7 +6,9 @@ void TurnAngle_init(TurnAngle *this_TurnAngle){
 
 }
 
-bool TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle){
+BOOL TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle){
 
+	return false;
 
 }
+

@@ -1,46 +1,40 @@
 #ifndef __Factory
 #define __Factory
 
-#include "../Calibration.h"
-#include "../WLReceiver.h"
-#include "../PWMValGenerator.h"
-#include "../PIDCalcDebug.h"
-#include "../TailControl.h"
-#include "../SelfLocation.h"
 
 
 /****start dectionPart****/
-#include "../DetectionPart\Battery.h"
-#include "../DetectionPart\Coordinates.h"
-#include "../DetectionPart\DetcMarker.h"
-#include "../DetectionPart\DetcObst.h"
-#include "../DetectionPart\Gradient.h"
-#include "../DetectionPart\LineEdge.h"
-#include "../DetectionPart\LocationInfo.h"
-#include "../DetectionPart\Notice.h"
-#include "../DetectionPart\RunDist.h"
-#include "../DetectionPart\RunStartSigRecv.h"
-#include "../DetectionPart\Timer.h"
-#include "../DetectionPart\TurnAngle.h"
+#include "../DetectionPart/Battery.h"
+#include "../DetectionPart/Coordinates.h"
+#include "../DetectionPart/DetcMarker.h"
+#include "../DetectionPart/DetcObst.h"
+#include "../DetectionPart/Gradient.h"
+#include "../DetectionPart/LineEdge.h"
+#include "../DetectionPart/LocationInfo.h"
+#include "../DetectionPart/Notice.h"
+#include "../DetectionPart/RunDist.h"
+#include "../DetectionPart/RunStartSigRecv.h"
+#include "../DetectionPart/Timer.h"
+#include "../DetectionPart/TurnAngle.h"
 /****end Dection part Include ****/
 
 
 /****start DirectorPart****/
-#include "../DirectorPart\CngSectLisnner.h"
-#include "../DirectorPart\Running.h"
+#include "../DirectorPart/CngSectLisnner.h"
+#include "../DirectorPart/Running.h"
 #include "../DirectorPart/RunnerRobot.h"
 
 /****end dirctor part incude****/
 
 
 /****start DrivenPart****/
-#include "../DrivenPart\CurvatureCtrl.h"
-#include "../DrivenPart\ForwardValRevise.h"
-#include "../DrivenPart\LightValCtrl.h"
-#include "../DrivenPart\RobotDrivenDirect.h"
-#include "../DrivenPart\TailAngleCtrl.h"
-#include "../DrivenPart\WheelMotor.h"
-#include "../DrivenPart\WheelMotorCtrl.h"
+#include "../DrivenPart/CurvatureCtrl.h"
+#include "../DrivenPart/ForwardValRevise.h"
+#include "../DrivenPart/LightValCtrl.h"
+#include "../DrivenPart/RobotDrivenDirect.h"
+#include "../DrivenPart/TailAngleCtrl.h"
+#include "../DrivenPart/WheelMotor.h"
+#include "../DrivenPart/WheelMotorCtrl.h"
 /****end DrivenPart include ****/
 
 
@@ -63,7 +57,18 @@
 
 
 /****start detectionPart part objects****/
-
+Notice mNotice;
+Battery mBattery;
+Coordinates mCoordinates;
+DetcMarker mDetcMarker;
+DetcObst mDetcObst;
+Gradient mGradient;
+LineEdge mLineEdge;
+LocationInfo mLocationInfo;
+RunDist mRunDist;
+RunStartSigRecv mRunStartSigRecv;
+Timer mTimer;
+TurnAngle mTurnAngle;
 /****not yet create instance****/
 
 /****end dectionPart part objects****/
@@ -79,6 +84,7 @@ Sector mSector;
 
 /****start Director part objects****/
 RunnerRobot mRunnerRobot;
+
 Running mRunning;
 
 /****end Director part objects****/
@@ -89,7 +95,9 @@ Running mRunning;
 CurvatureCtrl mCurvatureCtrl;
 ForwardValRevise mForwardValRevise;
 LightValCtrl mLightValCtrl;
+
 RobotDrivenDirect mRobotDrivenDirect;
+
 TailAngleCtrl mTailAngleCtrl;
 WheelMotor rightWheelMotor;
 WheelMotor leftWheelMotor;
@@ -112,16 +120,11 @@ SonorSensor mSonorSensor;
 
 
 
-Calibration mCalibration;
-WLReceiver mWLReceiver;
-PWMValGenerator mPWMValGenerator;
-PIDCalcDebug mPIDCalcDebug;
-TailControl mTailControl;
-SelfLocation mSelfLocation;
 
 extern void factory();
 
-
 #endif
+
+
 
 

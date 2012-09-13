@@ -1,3 +1,6 @@
+#ifndef __ForwardValRevise
+#define __ForwardValRevise
+
 #include "ecrobot_interface.h"
 
 /**
@@ -21,4 +24,6 @@
 	void ForwardValRevise_setTargForwardVal(ForwardValRevise *this_ForwardValRevise, S8 ForwardVal);
 
 	void ForwardValRevise_init(ForwardValRevise *this_ForwardValRevise);
+
+#endif
 

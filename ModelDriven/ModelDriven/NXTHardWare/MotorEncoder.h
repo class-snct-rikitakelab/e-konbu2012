@@ -4,11 +4,12 @@
 
 typedef struct MotorEncoder{
 
-}MotroEncoder;
+}MotorEncoder;
 
 void MotorEncoder_init(MotorEncoder *this_MotorEncoder);
 
-int MotorEncoder_getCount(MotroEncoder *this_MotroEncoder);
+int MotorEncoder_getCount(MotorEncoder *this_MotorEncoder);
 
 #endif
+
 

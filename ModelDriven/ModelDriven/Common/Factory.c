@@ -3,14 +3,11 @@
 
 void factory(){
 
-	Calibration_init(&mCalibration);
-	WLReceiver_init(&mWLReceiver);
-	PWMValGenerator_init(&mPWMValGenerator);
-	PIDCalcDebug_init(&mPIDCalcDebug);
 
 	/****start Director part init****/
-	RunnerRobot_init(&mRunnerRobot);
-	Running_init(&mRunning);
+	
+RunnerRobot_init(&mRunnerRobot);
+Running_init(&mRunning);
 
 	/****end Director part init****/
 
@@ -33,9 +30,9 @@ WheelMotorCtrl_init(&mWheelMotorCtrl);
 
 /****start Strategy part init****/
 
-Sector_init(&mSector); //test object
+Sector_init(&mSector);
+//test object
 
 /****end Strategy part init****/
-
-
 }
+

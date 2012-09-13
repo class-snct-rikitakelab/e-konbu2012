@@ -3,10 +3,11 @@
 
 typedef enum 
 {
-	CALIBRATION,
-	RUNNING,
-	FINISH
+CALIBRATION,
+DRIVING,
+FINISH,
+}ROBOT_STATE;
 
-} ROBOT_STATE;
 
 #endif
+

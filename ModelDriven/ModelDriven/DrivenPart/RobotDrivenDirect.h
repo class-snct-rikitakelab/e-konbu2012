@@ -3,9 +3,9 @@
 
 #include "../StrategyPart/TargetDrivenParm.h"
 #include "../DrivenPart/TailAngleCtrl.h"
-#include "../DrivenPart/WheelMotorCtrl.h"
+#include "./DrivenPart/WheelMotorCtrl.h"
 #include "../DirectorPart/Running.h"
-#include "../Common/Factory.h"
+
 /**
  * ŽÔ‘Ì‹ì“®ŽwŽ¦Ší
  */
@@ -26,3 +26,4 @@ typedef struct {
 	void RobotDrivenDirect_seDriveParm(RobotDrivenDirect *this_RobotDrivenDirect,TargetDrivenParm parm);
 
 #endif
+

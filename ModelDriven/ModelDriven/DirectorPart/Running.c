@@ -1,4 +1,6 @@
 #include "Running.h"
+#include "../Common/Factory.h"
+
 
 void Running_init(Running *this_Running){
 	this_Running->currentSect=0;

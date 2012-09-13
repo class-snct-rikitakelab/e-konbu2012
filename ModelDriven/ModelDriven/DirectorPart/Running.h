@@ -5,8 +5,8 @@
 #include "../StrategyPart/TargetDrivenParm.h"
 #include "../DrivenPart/TailAngleCtrl.h"
 #include "../DrivenPart/RobotDrivenDirect.h"
-#include "../DetectionPart/Notice.h"
-#include "../DetectionPart/RunStartSigRecv.h"
+#include "./DetectionPart/Notice.h"
+#include "./DetectionPart/RunStartSigRecv.h"
 #include "../DirectorPart/CngSectLisnner.h"
 
 
@@ -30,7 +30,9 @@ void Running_runCurrentSect(Running *this_Running);
 	/**
 	 * éüÇÃãÊä‘Ç…êÿÇËë÷Ç¶ÇÈ
 	 */
-void Running_cngNextSect(Running *this_Running,Notice checkResult);
+//void Running_cngNextSect(Running *this_Running,Notice checkResult);
 
 
 #endif
+
+

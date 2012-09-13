@@ -14,7 +14,9 @@ USER_LIB = nxtway_gs_balancer
 TARGET_SOURCES := \
 	balancer_param.c \
 	Slope.c \
+	Common/Factory.c \
 	StrategyPart/CngSectTerm.c \
+	StrategyPart/Sector.c \
 	DetectionPart/RunDist.c \
 	DetectionPart/TurnAngle.c \
 	DetectionPart/Coordinates.c \
@@ -25,14 +27,25 @@ TARGET_SOURCES := \
 	DetectionPart/Gradient.c \
 	DetectionPart/Timer.c \
 	DetectionPart/Battery.c \
+	DetectionPart/Notice.c \
+	DirectorPart/Running.c \
+	DirectorPart/RunnerRobot.c \
 	DirectorPart/CngSectLisnner.c \
-	Calibration.c \
-	Factory.c \
-	PIDCalcDebug.c \
-	PWMValGenerator.c \
-	WLReceiver.c \
-	TailControl.c \
-	SelfLocation.c \
+	DrivenPart/CurvatureCtrl.c \
+	DrivenPart/ForwardValRevise.c \
+	DrivenPart/LightValCtrl.c \
+	DrivenPart/RobotDrivenDirect.c \
+	DrivenPart/TailAngleCtrl.c \
+	DrivenPart/WheelMotor.c \
+	DrivenPart/WheelMotorCtrl.c \
+	NXTHardWare/GyroSensor.c \
+	NXTHardWare/LightSensor.c \
+	NXTHardWare/Sound.c \
+	NXTHardWare/TouchSensor.c \
+	NXTHardWare/MotorEncoder.c \
+	NXTHardWare/SonorSensor.c \
+	TestDrivenPart.c \
+	
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

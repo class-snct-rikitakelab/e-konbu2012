@@ -5,13 +5,13 @@
 #include "../StrategyPart/TargetDrivenParm.h"
 #include "../DetectionPart/RunStartSigRecv.h"
 #include "../DirectorPart/Running.h"
-#include "ROBOT_STATE.h"
+
 #include "../NXTHardWare/TouchSensor.h"
 #include "../NXTHardWare/LightSensor.h"
 #include "../NXTHardWare/Sound.h"
 #include "../NXTHardWare/GyroSensor.h"
 
-
+#include "ROBOT_STATE.h"
 
 
 /**
@@ -50,3 +50,4 @@ void RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot);
 void RunnerRobot_updateRobotState(RunnerRobot *this_RunnerRobot,ROBOT_STATE robotState);
 
 #endif
+

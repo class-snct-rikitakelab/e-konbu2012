@@ -5,11 +5,11 @@
 #include "ecrobot_interface.h"
 #include "balancer.h"
 
-#ifndef bool /* bool が定義されていなかったら */
-#define bool int
+#ifndef BOOL /* BOOL が定義されていなかったら */
+#define BOOL int
 #endif
 
-#ifndef true            /* TRUE が定義されていなかったら */
+#ifndef true /* TRUE が定義されていなかったら */
 #define true 1
 #endif
 
@@ -31,4 +31,6 @@ S8 pwmR;
 
 
 #endif
+
+
 

@@ -1,8 +1,8 @@
 #ifndef __Sector
 #define __Sector
 
-#include "../StrategyPart/TargetDrivenParm.h"
-#include "../StrategyPart/CngSectTerm.h"
+#include "./StrategyPart/TargetDrivenParm.h"
+#include "./StrategyPart/CngSectTerm.h"
 
 /**
  * ‹æŠÔ
@@ -44,3 +44,4 @@ typedef struct  {
 	TargetDrivenParm Sector_getTargDrienParm(Sector *this_Sector);
 
 #endif
+

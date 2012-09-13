@@ -2,6 +2,8 @@
 
 #include "RobotDrivenDirect.h"
 
+#include "../Common/Factory.h"
+
 
 void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect){
 	//none

@@ -1,14 +1,20 @@
 
 #include "Notice.h"
 
-void Notice_init(Notice *this_Notice);
+void Notice_init(Notice *this_Notice){
+
+}
 
 	/**
 	 * ãÊä‘êÿë÷èåèéwíË
 	 */
-void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm term);
+void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm term){
+
+}
 
 	/**
 	 * í ímîªíf
 	 */
-void Notice_judgeNotice(Notice *this_Notice);
+void Notice_judgeNotice(Notice *this_Notice){
+	 //Running_cngNextSect(&mRunning,Notice checkResult);
+}

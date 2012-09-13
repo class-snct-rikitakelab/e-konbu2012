@@ -20,7 +20,7 @@ typedef struct {
 	
 	void RunDist_init(RunDist *this_RunDist);
 
-	bool RunDist_dectTargRunDist(RunDist *this_RunDist);
+	BOOL RunDist_dectTargRunDist(RunDist *this_RunDist);
 
 
 #endif

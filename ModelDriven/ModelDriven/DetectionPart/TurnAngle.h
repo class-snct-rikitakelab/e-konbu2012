@@ -3,7 +3,7 @@
 
 #include "DetectionPart/Notice.h"
 #include "DetectionPart/LocationInfo.h"
-
+#include "../Common/Common.h"
 
 /**
  * ê˘âÒäpìx
@@ -18,7 +18,7 @@ typedef struct {
 
 void TurnAngle_init(TurnAngle *this_TurnAngle);
 
-bool TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle);
+BOOL TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle);
 
 
 #endif

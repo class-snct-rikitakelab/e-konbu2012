@@ -1,8 +1,9 @@
 #ifndef __Coordinates
 #define __Coordinates
 
-#include "DetectionPart/Notice.h"
-#include "DetectionPart/LocationInfo.h"
+#include "../DetectionPart/Notice.h"
+#include "../DetectionPart/LocationInfo.h"
+
 
 /**
  * 現在座標
@@ -26,18 +27,18 @@ void Coordinates_init(Coordinates *this_Coordinates);
 	/**
 	 * 指定座標移動を検知する
 	 */
-bool Coordinates_detecTargCoo(Coordinates *this_Coordinates);
+BOOL Coordinates_detecTargCoo(Coordinates *this_Coordinates);
 
 	/**
 	 * 指定x座標移動を検知する
 	 */
-bool Cooridnates_detcXCooReach();
+BOOL Cooridnates_detcXCooReach();
 
 	/**
 	 * 
 	 * 指定y座標移動を検知する
 	 */
-bool Cooridnates_detcYCooReach();
+BOOL Cooridnates_detcYCooReach();
 
 #endif
 

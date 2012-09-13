@@ -2,13 +2,16 @@
 #define __GyroSensor
 
 
+
 #include "ecrobot_interface.h"
+
+
 /**
  * ジャイロセンサクラス
  */
 
 
-typedef struct GyroSensor{
+typedef struct {
 
 }GyroSensor;
 
@@ -20,3 +23,4 @@ void GyroSensor_init(GyroSensor *this_GyroSensor);
 U16 GyroSensor_getGyroAngVelocity(GyroSensor *this_GyroSensor);
 
 #endif
+

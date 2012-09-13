@@ -8,7 +8,6 @@
 #include "../DrivenPart/LightValCtrl.h"
 #include "../DrivenPart/CurvatureCtrl.h"
 #include "../DrivenPart/WheelMotor.h"
-#include "../DrivenPart/S8.h"
 #include "../NXTHardWare/GyroSensor.h"
 #include "../Common/RUN_MODE.h"
 #include "../Common/TARG_CTRL_METHOD.h"
@@ -67,10 +66,12 @@ typedef struct {
 	/**
 	 * 動作目標値を設定する
 	 */
-	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl, TargetDrivenParm parm);
+	void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl,TargetDrivenParm parm);
 	
 	//モータ制御量算出
 	S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl);//turn値算出　内部で尻尾か倒立か状態を判断して算出
 
 
 #endif
+
+

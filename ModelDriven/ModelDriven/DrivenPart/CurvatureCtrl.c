@@ -2,15 +2,21 @@
 #include "CurvatureCtrl.h"
 
 
-void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl);
+void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl){
+}
 
 	/**
 	 * –Ú•W‹È—¦”¼Œa‚ğİ’è‚·‚é
 	 */
-void CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature);
+void CurvatureCtrl_setTargCurvature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature){
+
+
+}
 
 	/**
 	 * ‹È—¦”¼Œa–Ú•W§Œä‚ğÀs‚·‚é
 	 */
-S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
+S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl){
+
+}
 

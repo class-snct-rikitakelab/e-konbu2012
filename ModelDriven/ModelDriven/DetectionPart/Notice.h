@@ -18,10 +18,27 @@
  * 通知器
  */
 typedef struct {	
-	通知条件 noticeTerm;
+//	通知条件 noticeTerm;
 
 }Notice;
 
+/*
+typedef struct {
+SectID;
+jLineEdge;
+jBT;
+targDist;
+targbattery;
+targGradient;
+targTime;
+targXCoo;
+targYCoo;
+jMarker;
+targObstDist;
+targTurnAngle;
+
+}cngSectTerm;
+*/
 
 void Notice_init(Notice *this_Notice);
 
@@ -33,7 +50,7 @@ void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm term);
 	/**
 	 * 通知判断
 	 */
-void Notice_judgeNotice(Notice *this_Notice);
+extern void Notice_judgeNotice(Notice *this_Notice);
 
 #endif
 

@@ -1,9 +1,9 @@
-#ifndef __CngSectLissner
-#define __CngSectLissner
+#ifndef __CngSectLisnner
+#define __CngSectLisnner
 
 
-#include "../DetectionPart/Notice.h"
-#include "../DirectorPart/Running.h"
+#include "./DetectionPart/Notice.h"
+#include "./DirectorPart/Running.h"
 
 /**
  * ‹æŠÔØ‘ÖƒŠƒXƒi[
