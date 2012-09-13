@@ -7,7 +7,7 @@ void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl)
 
 void TailAngleCtrl_setTargTailAngle(TailAngleCtrl *this_TailAngleCtrl, int angle)
 {
-	TailAngle_setTargTailAngle(angle);
+	TailAngle_setTargTailAngle(&mTailAngle,angle);
 }
 
 void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl)

@@ -4,7 +4,7 @@
 #include "LightValCtrlMethod.h"
 #include "ecrobot_interface.h"
 #include "PIDLightValCtrlParm.h"
-#include "../Common/Factory.h"
+
 
 typedef struct{
 }PIDLightValCtrl;

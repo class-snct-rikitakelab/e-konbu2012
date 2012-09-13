@@ -1,8 +1,8 @@
 #ifndef __Sector
 #define __Sector
 
-#include "./StrategyPart/TargetDrivenParm.h"
-#include "./StrategyPart/CngSectTerm.h"
+#include "../StrategyPart/TargetDrivenParm.h"
+#include "../StrategyPart/CngSectTerm.h"
 
 /**
  * ‹æŠÔ
@@ -15,7 +15,7 @@ typedef struct  {
 	int sectID;
 
 	TargetDrivenParm targetDrvenParm;
-	//CngSectTerm cngTerm[];
+	CngSectTerm cngTerm;
 	//Sector ŽŸ‹æŠÔ[];
 
 }Sector;

@@ -29,6 +29,11 @@ S8 pwmL;
 S8 pwmR;
 } PWMValues;
 
+//for test code??
+typedef struct {
+
+}CtrlParm;
+
 
 #endif
 

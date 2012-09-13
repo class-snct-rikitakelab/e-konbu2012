@@ -16,14 +16,14 @@ int Sector_getSectID(Sector *this_Sector){
 	 * ŽŸ‹æŠÔØ‘ÖðŒŽæ“¾
 	 */
 CngSectTerm Sector_getNextCngSectTerm(Sector *this_Sector){
-	
+	return this_Sector->cngTerm;
 }
 
 	/**
 	 * ŽŸ‹æŠÔ‚ðŽæ“¾‚·‚é
 	 */
 Sector Sector_GetNextSect(Sector *this_Sector){
-
+	return *this_Sector; //test code
 }
 
 	/**
@@ -31,6 +31,6 @@ Sector Sector_GetNextSect(Sector *this_Sector){
 	 */
 TargetDrivenParm Sector_getTargDrienParm(Sector *this_Sector){
 
-
+	return this_Sector->targetDrvenParm;
 }
 

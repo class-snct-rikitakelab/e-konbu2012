@@ -92,7 +92,7 @@ void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl,TargetD
 	this_WheelMotorCtrl->targCtrlMethod = parm.targCtrlMethod;
 	ForwardValRevise_setTargForwardVal(&mForwardValRevise,parm.targForwardVal);
 	LightValCtrl_setTargLightVal(&mLightValCtrl,((parm.whiteVal + parm.blackVal)/2));
-	CurvatureCtrl_setTargCurvature(&mCurvatureCtrl,parm.curvature);
+	CurvatureCtrl_setTargCurature(&mCurvatureCtrl,parm.curvature);
 	this_WheelMotorCtrl->gyroOffset=parm.gyroOffset;
 
 }

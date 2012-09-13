@@ -35,6 +35,23 @@
 #include "../DrivenPart/TailAngleCtrl.h"
 #include "../DrivenPart/WheelMotor.h"
 #include "../DrivenPart/WheelMotorCtrl.h"
+#include "../DrivenPart/TailMotorEncoder.h"
+
+#include "../DrivenPart/LightVal.h"
+#include "../DrivenPart/LightValCtrl.h"
+#include "../DrivenPart/LightValCtrlMethod.h"
+#include "../DrivenPart/LightValCtrlParm.h"
+#include "../DrivenPart/PIDLightValCtrl.h"
+#include "../DrivenPart/PIDLightValCtrlParm.h"
+#include "../DrivenPart/PIDTailAngleCtrl.h"
+#include "../DrivenPart/PIDTailAngleCtrlParm.h"
+#include "../DrivenPart/TailAngle.h"
+#include "../DrivenPart/TailAngleCtrl.h"
+#include "../DrivenPart/TailMotor.h"
+#include "../DrivenPart/TailMotorEncoder.h"
+
+
+
 /****end DrivenPart include ****/
 
 
@@ -102,6 +119,20 @@ TailAngleCtrl mTailAngleCtrl;
 WheelMotor rightWheelMotor;
 WheelMotor leftWheelMotor;
 WheelMotorCtrl mWheelMotorCtrl;
+TailMotorEncoder mTailMotorEncoder;
+
+LightVal mLightVal;
+LightValCtrl mLightValCtrl;
+
+LightValCtrlMethod mLightValCtrlMethod;
+LightValCtrlParm mLightValCtrlParm;
+PIDLightValCtrl mPIDLightValCtrl;
+PIDLightValCtrlParm mPIDLightValCtrlParm;
+PIDTailAngleCtrl mPIDTailAngleCtrl;
+PIDTailAngleCtrlParm mPIDTailAngleCtrlParm;
+TailAngle mTailAngle;
+TailAngleCtrl mTailAngleCtrl;
+TailMotor mTailMotor;
 
 
 /****end Driven part objects****/

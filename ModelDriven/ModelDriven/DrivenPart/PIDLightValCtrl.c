@@ -1,4 +1,5 @@
 #include "PIDLightValCtrl.h"
+#include "../Common/Factory.h"
 
 void PIDLightValCtrl_init(PIDLightValCtrl *this_PIDLightValCtrl)
 {

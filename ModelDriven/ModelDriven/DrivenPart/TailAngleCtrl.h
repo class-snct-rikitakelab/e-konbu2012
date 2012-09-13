@@ -2,7 +2,6 @@
 #define _TAIL_ANGLE_CTRL_H
 
 #include "ecrobot_interface.h"
-#include "../Factory.h"
 #include "../DrivenPart/TailAngle.h"
 
 typedef struct{

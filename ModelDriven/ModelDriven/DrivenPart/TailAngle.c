@@ -1,4 +1,5 @@
 #include "TailAngle.h"
+#include "../Common/Factory.h"
 
 void TailAngle_init(TailAngle *this_TailAngle)
 {

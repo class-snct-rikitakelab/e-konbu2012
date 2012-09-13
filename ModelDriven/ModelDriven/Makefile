@@ -38,13 +38,25 @@ TARGET_SOURCES := \
 	DrivenPart/TailAngleCtrl.c \
 	DrivenPart/WheelMotor.c \
 	DrivenPart/WheelMotorCtrl.c \
+	DrivenPart/LightVal.c \
+	DrivenPart/LightValCtrl.c \
+	DrivenPart/LightValCtrlMethod.c \
+	DrivenPart/LightValCtrlParm.c \
+	DrivenPart/PIDLightValCtrl.c \
+	DrivenPart/PIDLightValCtrlParm.c \
+	DrivenPart/PIDTailAngleCtrl.c \
+	DrivenPart/PIDTailAngleCtrlParm.c \
+	DrivenPart/TailAngle.c \
+	DrivenPart/TailAngleCtrl.c \
+	DrivenPart/TailMotor.c \
+	DrivenPart/TailMotorEncoder.c \
 	NXTHardWare/GyroSensor.c \
 	NXTHardWare/LightSensor.c \
 	NXTHardWare/Sound.c \
 	NXTHardWare/TouchSensor.c \
 	NXTHardWare/MotorEncoder.c \
 	NXTHardWare/SonorSensor.c \
-	TestDrivenPart.c \
+	TestDrivenPart.c 
 	
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
