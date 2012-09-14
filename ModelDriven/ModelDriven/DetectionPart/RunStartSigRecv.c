@@ -12,7 +12,7 @@ BOOL RunStartSigRecv_detcRunStartSig(RunStartSigRecv *this_RunStartSigRecv){
 
 	int i;
 	unsigned int rx_len;
-	BOOL start = false;		//状態フラグ
+	 BOOL start = false; //開始信号受信の取りこぼしの可能性がある場合static変数にするとよいかも
 
 	for (i=0; i<BT_MAX_RX_BUF_SIZE; i++)
 	{
@@ -36,6 +36,12 @@ BOOL RunStartSigRecv_detcRunStartSig(RunStartSigRecv *this_RunStartSigRecv){
 	if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 	{
 		ecrobot_sound_tone(200,512,10);
+		start = true;
+	}
+	//HOME BUTTON START FOR DEBG at HOME
+	if (ecrobot_is_ENTER_button_pressed() == TRUE)
+	{
+		systick_wait_ms(20);
 		start = true;
 	}
 	return start;

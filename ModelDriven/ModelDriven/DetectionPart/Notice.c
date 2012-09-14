@@ -3,7 +3,7 @@
 #include "../Common/Factory.h"
 
 void Notice_init(Notice *this_Notice){
-	Notice_setCngSectTerm(this_Notice,&mSector.cngTerm[0]);
+	Notice_setCngSectTerm(this_Notice,mSector.cngTerm);
 }
 
 void Notice_copyTerm(Notice *this_Notice,CngSectTerm *term){
@@ -24,7 +24,7 @@ void Notice_copyTerm(Notice *this_Notice,CngSectTerm *term){
 	}
 }
 	/**
-	 * 区間切替条件指定
+	 * 区間切替条件指定 making flags
 	 */
 void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm *term){
 	int i = 0;	
@@ -50,8 +50,7 @@ void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm *term){
 
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		if(term[i].jBT == true){
-			this_Notice->noticeTerm[i].fBT == true;
-		
+			this_Notice->noticeTerm[i].fBT = true;
 		}
 		if(term[i].targDist !=0 ){
 			this_Notice->noticeTerm[i].fDist =true;
@@ -97,13 +96,10 @@ void Notice_judgeNotice(Notice *this_Notice){
 	
 	int numOfOnFlag[CNG_TERM_MAX_NUM]; //need to intialized?? 
  	int satisTermNum[CNG_TERM_MAX_NUM]; //need to intialized?? 
-
+	
 	//count number of flag
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		numOfOnFlag[i] = Notice_countOnFlag(this_Notice,this_Notice->noticeTerm[i]);
-	}
-	if(numOfOnFlag[0]>0){
-		Sound_soundTone(&mSound,850,100,50);
 	}
 	//区間切替条件のトリガーを満たした数をカウント	
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
@@ -111,10 +107,11 @@ void Notice_judgeNotice(Notice *this_Notice){
 		satisTermNum[i]= Notice_judgeStatisTerm(this_Notice,this_Notice->term[i],this_Notice->noticeTerm[i]);
 	}
 	
+
 	//区間切替条件のトリガーを満たした数と、フラグ（使用検出器数）が一致した条件の名前で区間を切替
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
-		if(numOfOnFlag[i] == satisTermNum[i]){
-			Sound_soundTone(&mSound,250,100,50);
+		if(numOfOnFlag[i] == satisTermNum[i] &&numOfOnFlag[i]!=0 ) {
+			Sound_soundTone(&mSound,250,100,5);
 			//Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
 		}
 	}

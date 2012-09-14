@@ -4,6 +4,7 @@
 void Sector_init(Sector *this_Sector){
 	//test code
 	this_Sector->cngTerm[0].jBT=true;
+	this_Sector->cngTerm[0].targDist=30;
 }
 
 	/**
@@ -23,7 +24,7 @@ CngSectTerm Sector_getCngSectTerm(Sector *this_Sector){
 	/**
 	 * ŽŸ‹æŠÔ‚ðŽæ“¾‚·‚é
 	 */
-Sector Sector_GetNextSect(Sector *this_Sector){
+Sector Sector_getNextSect(Sector *this_Sector){
 	return *this_Sector; //test code
 }
 

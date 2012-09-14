@@ -37,7 +37,7 @@ typedef struct  {
 	/**
 	 * 次区間を取得する
 	 */
-	Sector Sector_GetNextSect(Sector *this_Sector);
+	Sector Sector_getNextSect(Sector *this_Sector);
 
 	/**
 	 * 目標駆動パラメータを取得する

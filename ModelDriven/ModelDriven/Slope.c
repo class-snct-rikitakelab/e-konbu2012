@@ -115,7 +115,7 @@ void user_1ms_isr_type2(void){
 //走行体管理タスク(4ms)
 TASK(ActionTask)
 {	
-	RunneRobot_run(&mRunnerRobot);
+	//RunneRobot_run(&mRunnerRobot);
 	/*
 	RN_modesetting();							//走行体状態設定
 	TailControl_PIDTailControl(&mTailControl);	//問題点:尻尾が目標角度で停止せずに回り続ける
