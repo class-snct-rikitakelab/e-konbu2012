@@ -12,15 +12,14 @@ USER_LIB = nxtway_gs_balancer
 
 # User application source
 TARGET_SOURCES := \
-	balancer_param.c \
-	Slope.c \
-	Calibration.c \
-	Factory.c \
-	PIDCalcDebug.c \
-	PWMValGenerator.c \
-	WLReceiver.c \
-	TailControl.c \
-	SelfLocation.c \
+	../DrivenPart/TailMotor.c \
+	../DrivenPart/TailAngle.c \
+	../DrivenPart/TailAngleCtrl.c \
+	../DrivenPart/TailMotorEncoder.c \
+	../DrivenPart/PIDTailAngleCtrl.c \
+	../DrivenPart/PIDTailAngleCtrlParm.c \
+	../Common/Factory.c \
+	../LogSend.c
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

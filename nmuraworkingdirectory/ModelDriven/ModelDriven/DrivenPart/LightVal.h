@@ -5,10 +5,11 @@
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
 
-#include "../NXTHardWare/LightSensor.h"
+//#include "../NXTHardWare/LightSensor.h"
+#include "../Common/Factory.h"
 
 typedef struct{
-	float targetLightVal;
+	float targetLightVal;	//–Ú•W‹P“x’l
 }LightVal;
 
 void LightVal_init(LightVal * this_LightVal);

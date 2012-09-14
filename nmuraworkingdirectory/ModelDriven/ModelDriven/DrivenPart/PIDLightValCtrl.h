@@ -7,6 +7,11 @@
 #include "../Common/Factory.h"
 
 typedef struct{
+	float deviation;			//偏差
+	float integratedDeviation;	//積分偏差
+	float differentialDeviation;//微分偏差
+	float bfDeviation;			//前回値
+	float lastMeasurementTime;	//前回からの計測時間
 }PIDLightValCtrl;
 
 extern S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal);

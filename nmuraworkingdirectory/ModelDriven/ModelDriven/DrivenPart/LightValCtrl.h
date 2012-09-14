@@ -4,6 +4,9 @@
 #include "ecrobot_interface.h"
 #include "../Factory.h"
 #include "../DrivenPart/LightVal.h"
+#include "../DrivenPart/LightValCtrlMethod.h"
+
+#include "../DrivenPart/PIDLightValCtrl.h"
 
 typedef struct{
 }LightValCtrl;

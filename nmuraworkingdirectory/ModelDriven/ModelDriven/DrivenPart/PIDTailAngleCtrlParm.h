@@ -5,9 +5,9 @@
  * K”öŠp“xPID§Œäƒpƒ‰ƒ[ƒ^
  */
 typedef struct{
-	float tKp;
-	float tKi;
-	float tKd;
+	float tKp;	//”ä—áŒW”
+	float tKi;	//Ï•ªŒW”
+	float tKd;	//”÷•ªŒW”
 } PIDTailAngleCtrlParm;
 
 extern float PIDTailAngleCtrlParm_getTKp(PIDTailAngleCtrlParm *this_PIDTailAngleCtrlParm);

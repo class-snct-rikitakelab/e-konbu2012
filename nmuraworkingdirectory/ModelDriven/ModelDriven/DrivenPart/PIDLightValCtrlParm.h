@@ -3,23 +3,17 @@
 
 
 typedef struct{
-	float lKp;
-	float lKi;
-	float lKd;
+	float lKp;	//î‰ó·åWêî
+	float lKi;	//êœï™åWêî
+	float lKd;	//î˜ï™åWêî
 }PIDLightValCtrlParm;
 
 extern float PIDLightValCtrlParm_getLKp(PIDLightValCtrlParm *this_PIDLightValCtrlParm);
-
 extern void PIDLightValCtrlParm_setLKp(PIDLightValCtrlParm *this_PIDLightValCtrlParm, float parm);
-
 extern float PIDLightValCtrlParm_getLKi(PIDLightValCtrlParm *this_PIDLightValCtrlParm);
-
 extern void PIDLightValCtrlParm_setLKi(PIDLightValCtrlParm *this_PIDLightValCtrlParm, float parm);
-
 extern float PIDLightValCtrlParm_getLKd(PIDLightValCtrlParm *this_PIDLightValCtrlParm);
-
 extern void PIDLightValCtrlParm_setLKd(PIDLightValCtrlParm *this_PIDLightValCtrlParm, float parm);
-
 extern void PIDLightValCtrlParm_init(PIDLightValCtrlParm *this_PIDLightValCtrlParm);
 
 #endif

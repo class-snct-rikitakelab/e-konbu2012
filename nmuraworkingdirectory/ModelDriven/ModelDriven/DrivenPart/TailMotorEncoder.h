@@ -11,6 +11,6 @@ typedef struct{
 }TailMotorEncoder;
 
 extern void TailMotorEncoder_init(TailMotorEncoder *this_TailMotorEncoder);
-S32 TailMotorEncoder_getTailAngle(TailMotorEncoder *this_TailMotorEncoder);
+int TailMotorEncoder_getTailAngle(TailMotorEncoder *this_TailMotorEncoder);
 
 #endif

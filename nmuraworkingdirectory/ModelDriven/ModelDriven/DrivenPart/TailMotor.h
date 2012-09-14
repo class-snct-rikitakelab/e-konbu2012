@@ -7,11 +7,12 @@
 
 #include "ecrobot_interface.h"
 
+
 typedef struct{
 }TailMotor;
 
 extern void TailMotor_init(TailMotor *this_TailMotor);
 
-extern void TailMotor_setTailSpeed(TailMotor *this_TailMotor, S32 parm);
+extern void TailMotor_setTailSpeed(TailMotor *this_TailMotor, int parm);
 
 #endif
