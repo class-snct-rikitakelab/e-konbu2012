@@ -5,8 +5,12 @@
  */
 
  typedef struct {
-	int targForwardVal; 
+	int targForwardVal;	//目標速度
+	int ForwardVal;		//速度
  }ForwardValRevise;
+
+
+#define SPEED_COUNT 10
 	/**
 	 * 目標前進量
 	 */
