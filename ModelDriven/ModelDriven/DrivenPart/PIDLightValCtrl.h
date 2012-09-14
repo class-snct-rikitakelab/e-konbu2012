@@ -1,7 +1,7 @@
 #ifndef _P_I_D_LIGHT_VAL_CTRL_H
 #define _P_I_D_LIGHT_VAL_CTRL_H
 
-#include "LightValCtrlMethod.h"
+//#include "LightValCtrlMethod.h"
 #include "ecrobot_interface.h"
 
 

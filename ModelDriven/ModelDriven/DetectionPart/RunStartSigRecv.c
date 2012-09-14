@@ -25,16 +25,17 @@ BOOL RunStartSigRecv_detcRunStartSig(RunStartSigRecv *this_RunStartSigRecv){
 		//受信データあり
 		if (rx_buf[0] == CMD_START)
 		{
+			
 			start = true; //走行開始フラグ
 		}
 	}
 	
-	systick_wait_ms(500);	//デバッグ用（タッチセンサ待ち）
+	systick_wait_ms(20);	//デバッグ用（タッチセンサ待ち）
 
 	//タッチセンサスタート
 	if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 	{
-		ecrobot_sound_tone(982,512,10);
+		ecrobot_sound_tone(200,512,10);
 		start = true;
 	}
 	return start;

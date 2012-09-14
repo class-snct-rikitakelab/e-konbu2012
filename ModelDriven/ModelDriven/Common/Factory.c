@@ -14,7 +14,8 @@ Running_init(&mRunning);
 
 	
 
-	
+
+Sector_init(&mSector);
 
 /****start detectionPart part objects****/
 Notice_init(&mNotice);
@@ -40,7 +41,6 @@ WheelMotorCtrl_init(&mWheelMotorCtrl);
 
 /****start Strategy part init****/
 
-Sector_init(&mSector);
 //test object
 
 /****end Strategy part init****/

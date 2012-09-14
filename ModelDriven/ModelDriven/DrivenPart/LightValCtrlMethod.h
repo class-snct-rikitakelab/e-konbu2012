@@ -2,7 +2,7 @@
 #define _LIGHT_VAL_CTRL_METHOD_H
 
 #include "../Common/Common.h"
-#include "PIDLightValCtrlParm.h"
+//#include "PIDLightValCtrlParm.h"
 
 typedef struct{
 }LightValCtrlMethod;

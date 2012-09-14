@@ -97,24 +97,25 @@ void Notice_judgeNotice(Notice *this_Notice){
 	
 	int numOfOnFlag[CNG_TERM_MAX_NUM]; //need to intialized?? 
  	int satisTermNum[CNG_TERM_MAX_NUM]; //need to intialized?? 
-	
+
 	//count number of flag
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		numOfOnFlag[i] = Notice_countOnFlag(this_Notice,this_Notice->noticeTerm[i]);
 	}
-
+	if(numOfOnFlag[0]>0){
+		Sound_soundTone(&mSound,850,100,50);
+	}
 	//区間切替条件のトリガーを満たした数をカウント	
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		Notice_setTargVal(this_Notice,this_Notice->term[i]); //検出条件を切り替える
-
 		satisTermNum[i]= Notice_judgeStatisTerm(this_Notice,this_Notice->term[i],this_Notice->noticeTerm[i]);
 	}
-
+	
 	//区間切替条件のトリガーを満たした数と、フラグ（使用検出器数）が一致した条件の名前で区間を切替
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		if(numOfOnFlag[i] == satisTermNum[i]){
-			Sound_soundTone(&mSound,550,400,50);
-			Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
+			Sound_soundTone(&mSound,250,100,50);
+			//Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
 		}
 	}
 	
@@ -143,7 +144,7 @@ int Notice_countOnFlag(Notice *this_Notice,NoticeTerm noticeTerm){
 			flagCounter++;
 		}
 
-		if(noticeTerm.fTime = true){
+		if(noticeTerm.fTime == true){
 			flagCounter++;
 		}
 		if(noticeTerm.fXCoo == true){
@@ -202,11 +203,12 @@ int satisTermNum=0;
 		if(Battery_dectBatteryThreShold(&mBattery)==true&&noticeTerm.fBattery==true){
 			satisTermNum++;
 		}
+		return satisTermNum;
 }
 
 void Notice_setTargVal(Notice *this_Notice,CngSectTerm term){
+	
 	mBattery.batteryThereshold=term.targBatteryVol;
-
 	mCoordinates.targXCoo = term.targXCoo;
 	mCoordinates.targYCoo = term.targYCoo;
 	mDetcMarker.markerThreshold = term.makerThreshold;

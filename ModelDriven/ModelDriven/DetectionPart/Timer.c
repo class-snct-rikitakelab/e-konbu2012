@@ -1,8 +1,12 @@
 
 #include "Timer.h"
-void Timer_init(Timer *this_Timer);
+void Timer_init(Timer *this_Timer){
+
+}
 
 	/**
 	 * Žw’èŽžŠÔ‚ðŒŸ’m‚·‚é
 	 */
-	BOOL Timer_detcPassTargTimer(Timer *this_Timer);
+BOOL Timer_detcPassTargTimer(Timer *this_Timer){
+
+	}

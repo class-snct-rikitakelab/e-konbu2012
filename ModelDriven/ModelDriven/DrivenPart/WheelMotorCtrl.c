@@ -26,7 +26,6 @@ void WheelMotorCtrl_doMotorCtrl(WheelMotorCtrl *this_WheelMotorCtrl){
 		forward = ForwardValRevise_riveseForwardVal(&mForwardValRevise);
 		turn = WheelMotorCtrl_calTurnVal(this_WheelMotorCtrl);
 		WheelMotorCtrl_calcBalancingMotorCtrlVal(this_WheelMotorCtrl,forward,turn,this_WheelMotorCtrl->gyroOffset);
-		Sound_soundTone(&mSound,220,20,20);
 		break;
 	default :
 		//none

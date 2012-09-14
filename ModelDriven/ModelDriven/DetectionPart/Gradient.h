@@ -1,9 +1,8 @@
 #ifndef __Gradient
 #define __Gradient
 
-#include "../DetectionPart/Notice.h"
 #include "../NXTHardWare/GyroSensor.h"
-
+#include "../Common/Common.h"
 /**
  * 傾き検出
  */
@@ -20,7 +19,7 @@ void Gradient_init(Gradient *this_Gradient);
 	/**
 	 * 指定角速度を検知する
 	 */
-BOOL Gradient_dectTargGradient(Gradient *this_Gradient);
+extern BOOL Gradient_dectTargGradient(Gradient *this_Gradient);
 
 
 #endif

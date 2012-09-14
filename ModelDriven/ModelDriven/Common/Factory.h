@@ -39,7 +39,9 @@
 
 #include "../DrivenPart/LightVal.h"
 #include "../DrivenPart/LightValCtrl.h"
+
 #include "../DrivenPart/LightValCtrlMethod.h"
+
 #include "../DrivenPart/LightValCtrlParm.h"
 #include "../DrivenPart/PIDLightValCtrl.h"
 #include "../DrivenPart/PIDLightValCtrlParm.h"
@@ -125,9 +127,12 @@ LightValCtrl mLightValCtrl;
 
 LightValCtrlMethod mLightValCtrlMethod;
 LightValCtrlParm mLightValCtrlParm;
+
 PIDLightValCtrl mPIDLightValCtrl;
 PIDLightValCtrlParm mPIDLightValCtrlParm;
+
 PIDTailAngleCtrl mPIDTailAngleCtrl;
+
 PIDTailAngleCtrlParm mPIDTailAngleCtrlParm;
 TailAngle mTailAngle;
 TailAngleCtrl mTailAngleCtrl;
