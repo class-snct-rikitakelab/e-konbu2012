@@ -36,13 +36,15 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 	/*
 	 *	しっぽ目標値制御（他に入れられないか検討中）
 	 */
-	/*
+	
 	static int counter = 0;
-	static S32 resultAngle = 0;
-	float t_speed;
+	static int resultAngle = 0;
 
 	counter++;
-
+	/*
+	if(targTailAngle == 0)
+		resultAngle = 0;
+		*/
 	if(counter >= TAIL_ANGLE_COUNT_MAX)
 	{
 		if(targTailAngle - resultAngle >= 0){
@@ -59,7 +61,7 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 		}
 		counter = 0;
 	}
-	*/
+	
 
 	/*
 	 *	しっぽ制御量算出
@@ -67,10 +69,10 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 
 	S8 t_speed;
 
-	this_PIDTailAngleCtrl->deviation = (float)targTailAngle - (float)tailAngle;
-	
+	this_PIDTailAngleCtrl->deviation = (float)resultAngle - (float)tailAngle;
+	/*
 	this_PIDTailAngleCtrl->integratedDeviation = this_PIDTailAngleCtrl->integratedDeviation+(this_PIDTailAngleCtrl->deviation*this_PIDTailAngleCtrl->lastMeasurementTime);
-/*	this_PIDTailAngleCtrl->differentialDeviation = (this_PIDTailAngleCtrl->deviation - this_PIDTailAngleCtrl->bfDeviation)/this_PIDTailAngleCtrl->lastMeasurementTime;
+	this_PIDTailAngleCtrl->differentialDeviation = (this_PIDTailAngleCtrl->deviation - this_PIDTailAngleCtrl->bfDeviation)/this_PIDTailAngleCtrl->lastMeasurementTime;
 	this_PIDTailAngleCtrl->bfDeviation = this_PIDTailAngleCtrl->deviation;
 */	
 	t_speed = PIDTailAngleCtrl_getPIDTailAngleCtrlParm(&mPIDTailAngleCtrl).Kp * this_PIDTailAngleCtrl->deviation;/* + 

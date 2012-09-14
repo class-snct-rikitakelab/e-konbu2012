@@ -43,7 +43,7 @@ void PIDTailAngleCtrlParm_setTKd(PIDTailAngleCtrlParm *this_PIDTailAngleCtrlParm
 
 void PIDTailAngleCtrlParm_init(PIDTailAngleCtrlParm *this_PIDTailAngleCtrlParm)
 {
-	this_PIDTailAngleCtrlParm->tKp = 1.85;
+	this_PIDTailAngleCtrlParm->tKp = 8.85;
 	this_PIDTailAngleCtrlParm->tKi = 0;
 	this_PIDTailAngleCtrlParm->tKd = 0;
 }

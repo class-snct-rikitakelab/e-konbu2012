@@ -74,11 +74,16 @@ void TailAngleCtrl_doTailCtrl(TailAngleCtrl *this_TailAngleCtrl)
 
 TASK(ActionTask)
 {
-	TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,90);
+	static int wait = 0;
+	if(wait==0)
+		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,120);
+	if(wait == 1000)
+		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,0);
 	TailAngleCtrl_doTailCtrl(&mTailAngleCtrl);	//ëñçsëÃèÛë‘
 
-	logSend(0,0,TailAngle_getTargTailAngle(&mTailAngle),TailAngle_getTailAngle(&mTailAngle),0,0);
+	logSend(0,0,TailAngle_getTargTailAngle(&mTailAngle),TailAngle_getTailAngle(&mTailAngle),PIDTailAngleCtrl_calcTailAngleCtrlVal(&mPIDTailAngleCtrl,TailAngle_getTargTailAngle(&mTailAngle),TailAngle_getTailAngle(&mTailAngle)),0);
 
+	wait++;
 
 	TerminateTask();
 }
