@@ -22,6 +22,7 @@ void Gradient_init(Gradient *this_Gradient);
 	 */
 BOOL Gradient_dectTargGradient(Gradient *this_Gradient);
 
+
 #endif
 
 

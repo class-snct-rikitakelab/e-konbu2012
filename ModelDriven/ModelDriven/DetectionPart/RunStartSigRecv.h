@@ -4,7 +4,9 @@
 #include "./DetectionPart/Notice.h"
 #include "./DirectorPart/Running.h"
 #include "./NXTHardWare/TouchSensor.h"
+#include "../Common/Common.h"
 
+#define CMD_START '1'
 /**
  * ”­iM†óM
  */

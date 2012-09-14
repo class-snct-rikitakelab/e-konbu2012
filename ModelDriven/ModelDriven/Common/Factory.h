@@ -86,7 +86,6 @@ RunDist mRunDist;
 RunStartSigRecv mRunStartSigRecv;
 Timer mTimer;
 TurnAngle mTurnAngle;
-/****not yet create instance****/
 
 /****end dectionPart part objects****/
 

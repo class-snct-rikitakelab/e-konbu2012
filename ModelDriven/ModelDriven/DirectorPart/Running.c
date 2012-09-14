@@ -16,7 +16,7 @@ void Running_runCurrentSect(Running *this_Running){
 	/**
 	 * Ÿ‚Ì‹æŠÔ‚ÉØ‚è‘Ö‚¦‚é
 	 */
-void Running_cngNextSect(Running *this_Running,Notice checkResult){
+void Running_cngNextSect(Running *this_Running,SectName nxetSectName){
 
 
 }
