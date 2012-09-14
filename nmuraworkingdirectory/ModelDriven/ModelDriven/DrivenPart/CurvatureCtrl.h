@@ -1,27 +1,20 @@
+#ifndef _CURVATURE_CTRL_H
+#define _CURVATURE_CTRL_H
 
-#include "DrivenPart/S8.h"
+#include "ecrobot_interface.h"
 
-namespace DrivenPart
-{
-/**
- * ‹È—¦”¼Œa§ŒäŠí
- * 
- */
-class CurvatureCtrl
-{
-public:
-	void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl);
+typedef struct{
+}CurvatureCtrl;
+
+extern void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl);
 
 	/**
 	 * –Ú•W‹È—¦”¼Œa‚ğİ’è‚·‚é
 	 */
-	void CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature);
+extern void CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature);
 
 	/**
 	 * ‹È—¦”¼Œa–Ú•W§Œä‚ğÀs‚·‚é
 	 */
-	S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
-
-};
-
-}  // namespace DrivenPart
+extern S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
+#endif

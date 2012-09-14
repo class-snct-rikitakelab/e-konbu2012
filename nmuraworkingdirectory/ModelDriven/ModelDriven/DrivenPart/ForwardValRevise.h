@@ -1,4 +1,8 @@
+#ifndef _FORWARD_VAL_REVISE_H
+#define _FORWARD_VAL_REVISE_H
+
 #include "ecrobot_interface.h"
+
 
 /**
  * ëOêió êßå‰äÌ
@@ -26,3 +30,4 @@
 
 	void ForwardValRevise_init(ForwardValRevise *this_ForwardValRevise);
 
+#endif
