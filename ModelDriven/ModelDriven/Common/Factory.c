@@ -4,6 +4,7 @@
 void factory(){
 
 
+
 	/****start Director part init****/
 	
 RunnerRobot_init(&mRunnerRobot);
@@ -12,7 +13,16 @@ Running_init(&mRunning);
 	/****end Director part init****/
 
 	
+
 	
+
+/****start detectionPart part objects****/
+Notice_init(&mNotice);
+//not yet all initlized
+
+/****end dectionPart part objects****/
+
+
 
 /****start Driven part init****/
 CurvatureCtrl_init(&mCurvatureCtrl);

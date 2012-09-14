@@ -2,7 +2,8 @@
 #include "Sector.h"
 
 void Sector_init(Sector *this_Sector){
-
+	//test code
+	this_Sector->cngTerm[0].jBT=true;
 }
 
 	/**
@@ -13,10 +14,10 @@ int Sector_getSectID(Sector *this_Sector){
 }
 
 	/**
-	 * Ÿ‹æŠÔØ‘ÖğŒæ“¾
+	 * Ÿ‹æŠÔ‚Ö‚ÌØ‘ÖğŒæ“¾
 	 */
-CngSectTerm Sector_getNextCngSectTerm(Sector *this_Sector){
-	return this_Sector->cngTerm;
+CngSectTerm Sector_getCngSectTerm(Sector *this_Sector){
+	return this_Sector->cngTerm[0];
 }
 
 	/**

@@ -3,6 +3,7 @@
 
 #include "../StrategyPart/TargetDrivenParm.h"
 #include "../StrategyPart/CngSectTerm.h"
+#include "../Common/SectName.h"
 
 /**
  * ‹æŠÔ
@@ -12,10 +13,10 @@ typedef struct  {
 	 * ‹æŠÔID
 	 */
 
-	int sectID;
+	SectName sectName;
 
 	TargetDrivenParm targetDrvenParm;
-	CngSectTerm cngTerm;
+	CngSectTerm cngTerm[CNG_TERM_MAX_NUM];
 	//Sector Ÿ‹æŠÔ[];
 
 }Sector;
@@ -29,9 +30,9 @@ typedef struct  {
 	int Sector_getSectID(Sector *this_Sector);
 
 	/**
-	 * Ÿ‹æŠÔØ‘ÖğŒæ“¾
+	 * Ÿ‹æŠÔ‚Ö‚ÌØ‘ÖğŒæ“¾
 	 */
-	CngSectTerm Sector_getNextCngSectTerm(Sector *this_Sector);
+	CngSectTerm Sector_getCngSectTerm(Sector *this_Sector);
 
 	/**
 	 * Ÿ‹æŠÔ‚ğæ“¾‚·‚é

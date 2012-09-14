@@ -3,12 +3,13 @@
 
 #include "../DetectionPart/Notice.h"
 #include "../NXTHardWare/LightSensor.h"
-
+#include "../Common/Common.h"
 
 /**
  * ラインエッジ検出器
  */
 typedef struct {
+	U16 lineEdgeThreshold;
 }LineEdge;
 
 void LineEdge_init(LineEdge *this_LineEdge);
@@ -16,7 +17,7 @@ void LineEdge_init(LineEdge *this_LineEdge);
 	/**
 	 * ラインエッジを検出する
 	 */
-void LineEdge_detecLineEdge(LineEdge *this_LineEdge);
+BOOL LineEdge_detecLineEdge(LineEdge *this_LineEdge);
 
 #endif
 

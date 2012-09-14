@@ -17,6 +17,10 @@
 #define false 0
 #endif
 
+#define CNG_TERM_MAX_NUM 3
+//‹æŠÔØ‘ÖğŒ‚Ì”‚ÌÅ‘å’l
+
+
 /*
 typedef struct {
 float forward_val;
@@ -29,11 +33,12 @@ S8 pwmL;
 S8 pwmR;
 } PWMValues;
 
-//for test code??
+
 typedef struct {
-
+	float Kp;
+	float Ki;
+	float Kd;
 }CtrlParm;
-
 
 #endif
 
