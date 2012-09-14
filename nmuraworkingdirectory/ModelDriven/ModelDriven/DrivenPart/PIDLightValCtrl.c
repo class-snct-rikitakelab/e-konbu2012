@@ -1,4 +1,5 @@
 #include "PIDLightValCtrl.h"
+#include "../Common/Factory.h"
 
 /*
  *	PIDLightValCtrl.c
@@ -9,7 +10,7 @@
 void PIDLightValCtrl_init(PIDLightValCtrl *this_PIDLightValCtrl)
 {
 	this_PIDLightValCtrl->deviation = 0;
-	this_PIDLightValCtrl->integrateDeviation = 0;
+	this_PIDLightValCtrl->integratedDeviation = 0;
 	this_PIDLightValCtrl->differentialDeviation = 0;
 	this_PIDLightValCtrl->bfDeviation = 0;
 	this_PIDLightValCtrl->lastMeasurementTime = 0.004;

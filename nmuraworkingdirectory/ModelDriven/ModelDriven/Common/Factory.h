@@ -37,17 +37,19 @@
 
 
 /****start DrivenPart****/
-/*
-#include "../DrivenPart\CurvatureCtrl.h"
-#include "../DrivenPart\ForwardValRevise.h"
+
+//#include "../DrivenPart\CurvatureCtrl.h"
+//#include "../DrivenPart\ForwardValRevise.h"
+#include "../DrivenPart/LightVal.h"
 #include "../DrivenPart\LightValCtrl.h"
-#include "../DrivenPart\RobotDrivenDirect.h"
+#include "../DrivenPart/PIDLightValCtrl.h"
+#include "../DrivenPart/PIDLightValCtrlParm.h"
+//#include "../DrivenPart\RobotDrivenDirect.h"
 #include "../DrivenPart\TailAngleCtrl.h"
-#include "../DrivenPart\WheelMotor.h"
-#include "../DrivenPart\WheelMotorCtrl.h"
-*/
+//#include "../DrivenPart\WheelMotor.h"
+//#include "../DrivenPart\WheelMotorCtrl.h"
+
 //added
-#include "../DrivenPart/TailAngleCtrl.h"
 #include "../DrivenPart/PIDTailAngleCtrl.h"
 #include "../DrivenPart/TailMotorEncoder.h"
 #include "../DrivenPart/TailAngle.h"
@@ -63,10 +65,10 @@
 
 
 /****start include NXT Hardware****/
-/*
-#include "../NXTHardWare/GyroSensor.h"
-#include "../NXTHardWare/LightSensor.h"
 
+//#include "../NXTHardWare/GyroSensor.h"
+//#include "../NXTHardWare/LightSensor.h"
+/*
 #include "../NXTHardWare/Sound.h"
 #include "../NXTHardWare/TouchSensor.h"
 #include "../NXTHardWare/MotorEncoder.h"
@@ -103,17 +105,20 @@ Running mRunning;
 
 
 /****start create Driven part objects****/
-/*
-CurvatureCtrl mCurvatureCtrl;
-ForwardValRevise mForwardValRevise;
+
+//CurvatureCtrl mCurvatureCtrl;
+//ForwardValRevise mForwardValRevise;
+LightVal mLightVal;
 LightValCtrl mLightValCtrl;
-RobotDrivenDirect mRobotDrivenDirect;
+PIDLightValCtrl mPIDLightValCtrl;
+PIDLightValCtrlParm mPIDLightValCtrlParm;
+//RobotDrivenDirect mRobotDrivenDirect;
 TailAngleCtrl mTailAngleCtrl;
-WheelMotor rightWheelMotor;
-WheelMotor leftWheelMotor;
-WheelMotorCtrl mWheelMotorCtrl;
-*/
-//added
+//WheelMotor rightWheelMotor;
+//WheelMotor leftWheelMotor;
+//WheelMotorCtrl mWheelMotorCtrl;
+
+////added
 TailAngleCtrl mTailAngleCtrl;
 PIDTailAngleCtrl mPIDTailAngleCtrl;
 PIDTailAngleCtrlParm mPIDTailAngleCtrlParm;
@@ -127,8 +132,9 @@ TailMotor mTailMotor;
 
 
 /****start create NXT HarDware objects****/
-/*
+
 LightSensor mLightSensor;
+/*
 TouchSensor mTouchSensor;
 GyroSensor mGyroSensor;
 Sound mSound;

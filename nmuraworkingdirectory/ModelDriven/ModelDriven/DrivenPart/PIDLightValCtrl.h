@@ -1,10 +1,8 @@
 #ifndef _P_I_D_LIGHT_VAL_CTRL_H
 #define _P_I_D_LIGHT_VAL_CTRL_H
 
-#include "LightValCtrlMethod.h"
 #include "ecrobot_interface.h"
 #include "PIDLightValCtrlParm.h"
-#include "../Common/Factory.h"
 
 typedef struct{
 	float deviation;			//ïŒç∑

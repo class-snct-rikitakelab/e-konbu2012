@@ -19,7 +19,12 @@ TARGET_SOURCES := \
 	../DrivenPart/PIDTailAngleCtrl.c \
 	../DrivenPart/PIDTailAngleCtrlParm.c \
 	../Common/Factory.c \
-	../LogSend.c
+	../LogSend.c \
+	../DrivenPart/LightValCtrl.c \
+	../DrivenPart/LightVal.c \
+	../DrivenPart/PIDLightValCtrl.c \
+	../DrivenPart/PIDLightValCtrlParm.c \
+	../NXTHardware/LightSensor.c 
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

@@ -1,8 +1,6 @@
 #ifndef _LIGHT_VAL_CTRL_METHOD_H
 #define _LIGHT_VAL_CTRL_METHOD_H
 
-#include "../Common.h"
-
 typedef struct{
 }LightValCtrlMethod;
 

@@ -1,4 +1,5 @@
 #include "LightValCtrl.h"
+#include "../Common/Factory.h"
 
 /*
  *	LightValCtrl.c
@@ -20,5 +21,5 @@ void LightValCtrl_setTargLightVal(LightValCtrl *this_LightValCtrl, U16 targLight
 //輝度値制御実行メソッド
 S8 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl)
 {
-	return PIDLightValCtrl_calcLightValCtrlVal(&mPIDLightValCtrl,LightVal_getLightValue(&mLightVal),LightVal_getTargLightVal(&mLightVal));
+	return PID_LightValCtrl_calcLightValCtrlVal(&mPIDLightValCtrl,LightVal_getLightVal(&mLightVal),LightVal_getTargLightVal(&mLightVal));
 }

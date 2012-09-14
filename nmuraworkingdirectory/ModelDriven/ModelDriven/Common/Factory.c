@@ -19,18 +19,20 @@ void factory(){
 	
 
 /****start Driven part init****/
-	/*
-CurvatureCtrl_init(&mCurvatureCtrl);
-ForwardValRevise_init(&mForwardValRevise);
+
+//CurvatureCtrl_init(&mCurvatureCtrl);
+//ForwardValRevise_init(&mForwardValRevise);
+LightSensor_init(&mLightSensor);
 LightValCtrl_init(&mLightValCtrl);
-RobotDrivenDirect_init(&mRobotDrivenDirect);
+PIDLightValCtrl_init(&mPIDLightValCtrl);
+PIDLightValCtrlParm_init(&mPIDLightValCtrlParm);
+//RobotDrivenDirect_init(&mRobotDrivenDirect);
 TailAngleCtrl_init(&mTailAngleCtrl);
-WheelMotor_init(&rightWheelMotor,NXT_PORT_B);
-WheelMotor_init(&leftWheelMotor,NXT_PORT_C);
-WheelMotorCtrl_init(&mWheelMotorCtrl);
-*/
+//WheelMotor_init(&rightWheelMotor,NXT_PORT_B);
+//WheelMotor_init(&leftWheelMotor,NXT_PORT_C);
+//WheelMotorCtrl_init(&mWheelMotorCtrl);
+
 //added
-TailAngleCtrl_init(&mTailAngleCtrl);
 TailAngle_init(&mTailAngle);
 PIDTailAngleCtrl_init(&mPIDTailAngleCtrl);
 PIDTailAngleCtrlParm_init(&mPIDTailAngleCtrlParm);

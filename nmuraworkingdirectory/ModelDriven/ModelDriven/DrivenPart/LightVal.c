@@ -1,4 +1,5 @@
 #include "LightVal.h"
+#include "../Common/Factory.h"
 
 /*
  *	LightVal.c

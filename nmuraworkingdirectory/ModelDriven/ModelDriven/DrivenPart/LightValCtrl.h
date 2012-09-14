@@ -2,9 +2,7 @@
 #define _LIGHT_VAL_CTRL_H
 
 #include "ecrobot_interface.h"
-#include "../Factory.h"
 #include "../DrivenPart/LightVal.h"
-#include "../DrivenPart/LightValCtrlMethod.h"
 
 #include "../DrivenPart/PIDLightValCtrl.h"
 

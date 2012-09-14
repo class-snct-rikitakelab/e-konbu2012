@@ -5,8 +5,7 @@
 #include "kernel_id.h"
 #include "ecrobot_interface.h"
 
-//#include "../NXTHardWare/LightSensor.h"
-#include "../Common/Factory.h"
+#include "../NXTHardWare/LightSensor.h"
 
 typedef struct{
 	float targetLightVal;	//–Ú•W‹P“x’l
