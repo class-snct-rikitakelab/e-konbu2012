@@ -9,6 +9,6 @@ typedef struct{
 
 extern void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl);
 extern void CurvatureCtrl_setTargCurvature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature);
-extern S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
+extern S32 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl);
 
 #endif

@@ -25,7 +25,7 @@ void LightValCtrlMethod_setCtrlParm(PIDLightValCtrl *this_PIDLightValCtrl, CtrlP
 }
 
 //PID制御計算メソッド
-S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
+S32 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
 {
 	this_PIDLightValCtrl->deviation = (float)targLightVal - (float)lightVal;
 

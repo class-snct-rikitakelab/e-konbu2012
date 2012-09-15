@@ -7,7 +7,7 @@
  */
 
 //‹È—¦”¼ŒaPID§Œäƒƒ\ƒbƒh
-S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature)
+S32 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature)
 {
 	this_PIDCurvatureCtrl->deviation = (float)targCurvature - (float)curvature;
 

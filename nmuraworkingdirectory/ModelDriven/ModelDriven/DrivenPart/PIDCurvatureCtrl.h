@@ -14,7 +14,7 @@ typedef struct{
 	PIDCurvatureCtrlParm pIDCurvatureCtrlParm;
 }PIDCurvatureCtrl;
 
-extern S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature);
+extern S32 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature);
 
 extern CtrlParm PIDCurvatureCtrl_getPIDCurvatureCtrlParm(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
 

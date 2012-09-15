@@ -11,6 +11,6 @@ typedef struct{
 
 void LightValCtrl_init(LightValCtrl *this_LightValCtrl);
 extern void LightValCtrl_setTargLightVal(LightValCtrl *this_LightValCtrl, U16 targLightVal);
-extern S8 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl);
+extern S32 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl);
 
 #endif
