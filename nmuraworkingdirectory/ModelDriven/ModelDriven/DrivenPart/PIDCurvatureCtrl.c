@@ -7,7 +7,7 @@
  */
 
 //‹È—¦”¼ŒaPID§Œäƒƒ\ƒbƒh
-S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature)
+S32 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature)
 {
 	this_PIDCurvatureCtrl->deviation = (float)targCurvature - (float)curvature;
 
@@ -15,7 +15,7 @@ S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl
 	this_PIDCurvatureCtrl->differentialDeviation = (this_PIDCurvatureCtrl->deviation - this_PIDCurvatureCtrl->bfDeviation)/this_PIDCurvatureCtrl->lastMeasurementTime;
 	this_PIDCurvatureCtrl->bfDeviation = this_PIDCurvatureCtrl->deviation;
 
-	return -(PIDCurvatureCtrlParm_getCKp(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->deviation + 
+	return (PIDCurvatureCtrlParm_getCKp(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->deviation + 
 		PIDCurvatureCtrlParm_getCKi(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->integratedDeviation + 
 		PIDCurvatureCtrlParm_getCKd(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->differentialDeviation);
 }

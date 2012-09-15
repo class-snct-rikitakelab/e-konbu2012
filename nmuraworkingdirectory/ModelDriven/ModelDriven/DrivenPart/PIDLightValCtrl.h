@@ -12,7 +12,7 @@ typedef struct{
 	float lastMeasurementTime;	//‘O‰ñ‚©‚ç‚ÌŒv‘ªŽžŠÔ
 }PIDLightValCtrl;
 
-extern S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal);
+extern S32 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal);
 void PIDLightValCtrl_init(PIDLightValCtrl *this_PIDLightValCtrl);
 
 #endif

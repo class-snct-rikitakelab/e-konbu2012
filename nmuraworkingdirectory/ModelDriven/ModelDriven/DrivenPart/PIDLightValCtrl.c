@@ -25,15 +25,15 @@ void LightValCtrlMethod_setCtrlParm(PIDLightValCtrl *this_PIDLightValCtrl, CtrlP
 }
 
 //PID制御計算メソッド
-S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
+S32 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
 {
 	this_PIDLightValCtrl->deviation = (float)targLightVal - (float)lightVal;
 
 	this_PIDLightValCtrl->integratedDeviation = this_PIDLightValCtrl->integratedDeviation+(this_PIDLightValCtrl->deviation*this_PIDLightValCtrl->lastMeasurementTime);
 	this_PIDLightValCtrl->differentialDeviation = (this_PIDLightValCtrl->deviation - this_PIDLightValCtrl->bfDeviation)/this_PIDLightValCtrl->lastMeasurementTime;
 	this_PIDLightValCtrl->bfDeviation = this_PIDLightValCtrl->deviation;
-
-	return -(PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->deviation + 
+	
+	return (PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->deviation + 
 		PIDLightValCtrlParm_getLKi(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->integratedDeviation + 
 		PIDLightValCtrlParm_getLKd(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->differentialDeviation);
 }

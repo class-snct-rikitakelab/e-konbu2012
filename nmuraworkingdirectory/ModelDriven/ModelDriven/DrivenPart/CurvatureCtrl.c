@@ -18,7 +18,7 @@ void CurvatureCtrl_setTargCurvature(CurvatureCtrl *this_CurvatureCtrl, float tar
 }
 
 //‹È—¦”¼Œa§Œäƒƒ\ƒbƒh
-S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl)
+S32 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl)
 {
 	return PIDCurvatureCtrl_calcCurvatureCtrlVal(&mPIDCurvatureCtrl,Curvature_getTargCurvature(&mCurvature),Curvature_getCurvature(&mCurvature));
 }

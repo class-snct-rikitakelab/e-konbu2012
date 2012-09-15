@@ -19,7 +19,7 @@ void LightValCtrl_setTargLightVal(LightValCtrl *this_LightValCtrl, U16 targLight
 }
 
 //輝度値制御実行メソッド
-S8 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl)
+S32 LightValCtrl_doLightValCtrl(LightValCtrl *this_LightValCtrl)
 {
 	return PID_LightValCtrl_calcLightValCtrlVal(&mPIDLightValCtrl,LightVal_getLightVal(&mLightVal),LightVal_getTargLightVal(&mLightVal));
 }
