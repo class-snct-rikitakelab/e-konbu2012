@@ -115,6 +115,7 @@ void Notice_judgeNotice(Notice *this_Notice){
 			RunDist_resetRunDist(&mRunDist); //距離計をリセット
 			Timer_reset(&mTimer); //区間走行経過時間をリセット
 			Coordinates_rest(&mCoordinates);//現在座標をバッファに保存　区間開始点を基準とするため
+			//need more reset methods
 			//Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
 		}
 	}

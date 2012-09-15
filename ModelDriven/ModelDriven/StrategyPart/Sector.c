@@ -29,6 +29,7 @@ CngSectTerm Sector_getCngSectTerm(Sector *this_Sector){
 	 * ŽŸ‹æŠÔ‚ðŽæ“¾‚·‚é
 	 */
 Sector Sector_getNextSect(Sector *this_Sector){
+	
 	return *this_Sector; //test code
 }
 

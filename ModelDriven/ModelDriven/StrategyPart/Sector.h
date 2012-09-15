@@ -22,7 +22,7 @@ typedef struct  {
 }Sector;
 
 
-	void Sector_init(Sector *this_Sector);
+	void Sector_init(Sector *this_Sector,/*  */);
 
 	/**
 	 * ‹æŠÔID‚ðŽæ“¾‚·‚é

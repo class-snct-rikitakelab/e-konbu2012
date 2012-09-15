@@ -94,6 +94,8 @@ TurnAngle mTurnAngle;
 
 /****start create Strategy part objects****/
 Sector mSector;
+Sector idelSector;
+Sector fstStraightSector;
 
 
 /****end create Strategy part objects****/
