@@ -147,13 +147,16 @@ int Notice_countOnFlag(Notice *this_Notice,NoticeTerm noticeTerm){
 		if(noticeTerm.fTime == true){
 			flagCounter++;
 		}
-		if(noticeTerm.fXCoo == true){
+		if(noticeTerm.fXCoo == true && noticeTerm.fYCoo == true){
 			flagCounter++;
 		}
+		/*
 		if(noticeTerm.fYCoo == true){
 			flagCounter++;
 
 		}
+		*/
+
 		if(noticeTerm.fMarker == true){
 			flagCounter++;
 
@@ -184,12 +187,14 @@ int satisTermNum=0;
 		if(Timer_detcPassTargTimer(&mTimer)==true&&noticeTerm.fTime==true){
 			satisTermNum++;
 		}
-		if(Cooridnates_detcXCooReach()==true&&noticeTerm.fXCoo==true){
+		if(Cooridnates_detcXCooReach(&mCoordinates)==true&&noticeTerm.fXCoo==true&&Cooridnates_detcYCooReach(&mCoordinates)==true&&noticeTerm.fYCoo==true){
 			satisTermNum++;
 		}
-		if(Cooridnates_detcYCooReach()==true&&noticeTerm.fYCoo==true){
+		/*
+		if(Cooridnates_detcYCooReach(&mCoordinates)==true&&noticeTerm.fYCoo==true){
 			satisTermNum++;
 		}
+		*/
 		if(DetcMarker_detcMarker(&mDetcMarker)==true&&noticeTerm.fMarker==true){
 			satisTermNum++;
 		}

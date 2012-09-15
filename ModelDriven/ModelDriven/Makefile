@@ -29,6 +29,7 @@ TARGET_SOURCES := \
 	DetectionPart/Timer.c \
 	DetectionPart/Battery.c \
 	DetectionPart/Notice.c \
+	DetectionPart/LocationInfo.c \
 	DirectorPart/Running.c \
 	DirectorPart/RunnerRobot.c \
 	DirectorPart/CngSectLisnner.c \
