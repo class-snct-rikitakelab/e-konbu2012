@@ -35,6 +35,7 @@ TailAngleCtrl_init(&mTailAngleCtrl);
 WheelMotor_init(&rightWheelMotor,NXT_PORT_B);
 WheelMotor_init(&leftWheelMotor,NXT_PORT_C);
 WheelMotorCtrl_init(&mWheelMotorCtrl);
+LocationInfo_init(&mLocationInfo);
 
 //added
 TailAngle_init(&mTailAngle);

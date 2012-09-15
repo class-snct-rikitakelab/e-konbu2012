@@ -66,19 +66,20 @@ TASK(ActionTask)
 //走行状態管理タスク(10ms)
 TASK(ActionTask2)
 {
+	Sector mSector;
 	TargetDrivenParm parm;
 	parm.blackVal = 560;
-	parm.curvature = 1.0;
+	parm.curvature = 0.0;
 	parm.gyroOffset = 0;
 	parm.runMode = TAIL_RUNNING;
 	parm.tailAngle = 95;
-	parm.targCtrlMethod = LIGHT_PID;
+	parm.targCtrlMethod = CURV_PID;
 	parm.targForwardVal = 50;
 	parm.targLightVal = 600;
 	parm.volt = 7800;
 	parm.whiteVal = 620;
 	RobotDrivenDirect_seDriveParm(&mRobotDrivenDirect,parm);
-	logSend(0,0,LightVal_getTargLightVal(&mLightVal),
-		PID_LightValCtrl_calcLightValCtrlVal(&mPIDLightValCtrl,LightVal_getTargLightVal(&mLightVal),LightVal_getLightVal(&mLightVal)),parm.blackVal,parm.whiteVal);
+	LocationInfo_selfLocate(&mLocationInfo);
+	logSend(0,0,Curvature_getCurvature(&mCurvature),Curvature_getTargCurvature(&mCurvature),0,0);
 	TerminateTask();
 }

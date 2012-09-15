@@ -36,6 +36,7 @@ TARGET_SOURCES := \
 	DrivenPart/WheelMotor.c \
 	DrivenPart/WheelMotorCtrl.c \
 	DetectionPart/LocationInfo.c \
+	Common/mymath.c \
 	TestCode.c
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil

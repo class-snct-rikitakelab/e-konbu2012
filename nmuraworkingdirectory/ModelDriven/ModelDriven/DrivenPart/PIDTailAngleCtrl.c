@@ -69,7 +69,7 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 
 	S32 t_speed;
 
-	this_PIDTailAngleCtrl->deviation = (float)resultAngle - (float)tailAngle;
+	this_PIDTailAngleCtrl->deviation = (float)targTailAngle - (float)tailAngle;
 	
 	this_PIDTailAngleCtrl->integratedDeviation = this_PIDTailAngleCtrl->integratedDeviation+(this_PIDTailAngleCtrl->deviation*this_PIDTailAngleCtrl->lastMeasurementTime);
 	this_PIDTailAngleCtrl->differentialDeviation = (this_PIDTailAngleCtrl->deviation - this_PIDTailAngleCtrl->bfDeviation)/this_PIDTailAngleCtrl->lastMeasurementTime;

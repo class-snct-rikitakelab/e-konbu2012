@@ -15,9 +15,9 @@ S32 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtr
 	this_PIDCurvatureCtrl->differentialDeviation = (this_PIDCurvatureCtrl->deviation - this_PIDCurvatureCtrl->bfDeviation)/this_PIDCurvatureCtrl->lastMeasurementTime;
 	this_PIDCurvatureCtrl->bfDeviation = this_PIDCurvatureCtrl->deviation;
 
-	return (PIDCurvatureCtrlParm_getCKp(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->deviation + 
+	return -(PIDCurvatureCtrlParm_getCKp(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->deviation); /*+ 
 		PIDCurvatureCtrlParm_getCKi(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->integratedDeviation + 
-		PIDCurvatureCtrlParm_getCKd(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->differentialDeviation);
+		PIDCurvatureCtrlParm_getCKd(&mPIDCurvatureCtrlParm) * this_PIDCurvatureCtrl->differentialDeviation);*/
 }
 
 //制御パラメータ取得メソッド
