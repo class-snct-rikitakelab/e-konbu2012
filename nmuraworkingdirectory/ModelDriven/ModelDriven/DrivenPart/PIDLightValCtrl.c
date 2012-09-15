@@ -32,8 +32,8 @@ S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U
 	this_PIDLightValCtrl->integratedDeviation = this_PIDLightValCtrl->integratedDeviation+(this_PIDLightValCtrl->deviation*this_PIDLightValCtrl->lastMeasurementTime);
 	this_PIDLightValCtrl->differentialDeviation = (this_PIDLightValCtrl->deviation - this_PIDLightValCtrl->bfDeviation)/this_PIDLightValCtrl->lastMeasurementTime;
 	this_PIDLightValCtrl->bfDeviation = this_PIDLightValCtrl->deviation;
-
-	return -(PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->deviation + 
+	
+	return (PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->deviation + 
 		PIDLightValCtrlParm_getLKi(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->integratedDeviation + 
 		PIDLightValCtrlParm_getLKd(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->differentialDeviation);
 }

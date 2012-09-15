@@ -1,5 +1,5 @@
 # Target specific macros
-TARGET = ObjectOriented
+TARGET = e-konbu
 
 NXTOSEK_ROOT = /cygdrive/c/cygwin/nxtOSEK
 
@@ -30,7 +30,8 @@ TARGET_SOURCES := \
 	../DrivenPart/PIDCurvatureCtrl.c \
 	../DrivenPart/PIDCurvatureCtrlParm.c \
 	../DrivenPart/CurvatureEncoder.c \
-	../DrivenPart/ForwardValRevise.c
+	../DrivenPart/ForwardValRevise.c \
+	../TestCode.c
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

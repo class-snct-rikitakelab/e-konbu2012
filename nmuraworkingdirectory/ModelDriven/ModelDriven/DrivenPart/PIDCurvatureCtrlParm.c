@@ -26,7 +26,7 @@ float PIDCurvatureCtrlParm_getCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlPar
 //積分係数設定メソッド
 void PIDCurvatureCtrlParm_setCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
 {
-	this_PIDCurvatureCtrlParm->cKi;
+	this_PIDCurvatureCtrlParm->cKi = parm;
 }
 
 //微分係数取得メソッド
@@ -38,13 +38,13 @@ float PIDCurvatureCtrlParm_getCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlPar
 //微分係数設定メソッド
 void PIDCurvatureCtrlParm_setCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
 {
-	this_PIDCurvatureCtrlParm->cKd;
+	this_PIDCurvatureCtrlParm->cKd = parm;
 }
 
 //初期化メソッド
 void PIDCurvatureCtrlParm_init(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
 {
-	this_PIDCurvatureCtrlParm->cKp = 1.85;
+	this_PIDCurvatureCtrlParm->cKp = 0.6;
 	this_PIDCurvatureCtrlParm->cKi = 0;
 	this_PIDCurvatureCtrlParm->cKd = 0;
 }
