@@ -1,20 +1,18 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#include "../DrivenPart/CurvatureEncoder.h"
+#include "../Common/Factory.h"
 
-#include "CurvatureEncoder.h"
+/*
+ *	CurvatureEncoder.c
+ *	曲率半径計測器クラス
+ */
 
-namespace 駆動部
-{
-
-void CurvatureEncoder::CurvatureEncoder_init(CurvatureEncoder *this_CurvatureEncoder)
+//初期化メソッド
+void CurvatureEncoder_init(CurvatureEncoder *this_CurvatureEncoder)
 {
 }
 
-float CurvatureEncoder::CurvatureEncoder_getCurvature(CurvatureEncoder *this_CurvatureEncoder)
+//曲率半径計測メソッド
+float CurvatureEncoder_getCurvature(CurvatureEncoder *this_CurvatureEncoder)
 {
 	return 0;
 }
-}  // namespace 駆動部

@@ -1,5 +1,6 @@
 
 #include "ForwardValRevise.h"
+#include "../Common/Factory.h"
 
 /*
  *	ForwardValRevise.c

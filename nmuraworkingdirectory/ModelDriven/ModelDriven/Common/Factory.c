@@ -20,8 +20,12 @@ void factory(){
 
 /****start Driven part init****/
 
-//CurvatureCtrl_init(&mCurvatureCtrl);
-//ForwardValRevise_init(&mForwardValRevise);
+CurvatureCtrl_init(&mCurvatureCtrl);
+Curvature_init(&mCurvature);
+CurvatureEncoder_init(&mCurvatureEncoder);
+PIDCurvatureCtrl_init(&mPIDCurvatureCtrl);
+PIDCurvatureCtrlParm_init(&mPIDCurvatureCtrlParm);
+ForwardValRevise_init(&mForwardValRevise);
 LightSensor_init(&mLightSensor);
 LightValCtrl_init(&mLightValCtrl);
 PIDLightValCtrl_init(&mPIDLightValCtrl);

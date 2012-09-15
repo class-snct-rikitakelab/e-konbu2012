@@ -1,55 +1,25 @@
-#ifndef ‹ì“®•”_P_I_D_CURVATURE_CTRL_H
-#define ‹ì“®•”_P_I_D_CURVATURE_CTRL_H
+#ifndef _P_I_D_CURVATURE_CTRL_H
+#define _P_I_D_CURVATURE_CTRL_H
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#include "../DrivenPart/PIDCurvatureCtrlParm.h"
+#include "ecrobot_interface.h"
+#include "../Common.h"
 
-#include "‹ì“®•”/PIDCurvatureCtrlParm.h"
-#include "‹ì“®•”/PIDCurvatureParm.h"
-#include "‹ì“®•”/PIDCtrlParm.h"
-#include "DrivenPart/S8.h"
-
-namespace ‹ì“®•”
-{
-/**
- * PID‹È—¦”¼Œa§Œä•û®
- */
-class PIDCurvatureCtrl
-{
-private:
-	/**
-	 * •Î·
-	 */
-	float deviation;
-
-	float integratedDeviation;
-
-	int lastMeasurementTime;
-
+typedef struct{
+	float deviation;			//”ä—áŒW”
+	float integratedDeviation;	//Ï•ªŒW”
+	float differentialDeviation;//”÷•ªŒW”
+	float bfDeviation;			//bf
+	float lastMeasurementTime;	//‘O‰ñ‚©‚ç‚ÌŒv‘ªŠÔ
 	PIDCurvatureCtrlParm pIDCurvatureCtrlParm;
+}PIDCurvatureCtrl;
 
-public:
-	/**
-	 * ‘€ì—Ê‚ğZo‚·‚é
-	 */
-	DrivenPart::S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
+extern S8 PIDCurvatureCtrl_calcCurvatureCtrlVal(PIDCurvatureCtrl *this_PIDCurvatureCtrl,float targCurvature,float curvature);
 
-	/**
-	 * ‹È—¦”¼Œa§Œäƒpƒ‰ƒ[ƒ^‚ğæ“¾‚·‚é
-	 */
-	PIDCurvatureParm PIDCurvatureCtrl_getPIDCurvatureCtrlParm(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
+extern CtrlParm PIDCurvatureCtrl_getPIDCurvatureCtrlParm(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
 
-	/**
-	 * ‹È—¦”¼Œa§Œäƒpƒ‰ƒ[ƒ^‚ğİ’è‚·‚é
-	 */
-	void PIDCurvatureCtrl_setPIDCurvatureCtrlParm(PIDCurvatureCtrl *this_PIDCurvatureCtrl, PIDCtrlParm parm);
+extern void PIDCurvatureCtrl_setPIDCurvatureCtrlParm(PIDCurvatureCtrl *this_PIDCurvatureCtrl, CtrlParm parm);
 
-	void PIDCurvatureCtrl_init(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
+extern void PIDCurvatureCtrl_init(PIDCurvatureCtrl *this_PIDCurvatureCtrl);
 
-};
-
-}  // namespace ‹ì“®•”
 #endif

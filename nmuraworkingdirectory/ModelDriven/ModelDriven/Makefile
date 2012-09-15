@@ -24,7 +24,13 @@ TARGET_SOURCES := \
 	../DrivenPart/LightVal.c \
 	../DrivenPart/PIDLightValCtrl.c \
 	../DrivenPart/PIDLightValCtrlParm.c \
-	../NXTHardware/LightSensor.c 
+	../NXTHardware/LightSensor.c \
+	../DrivenPart/CurvatureCtrl.c \
+	../DrivenPart/Curvature.c \
+	../DrivenPart/PIDCurvatureCtrl.c \
+	../DrivenPart/PIDCurvatureCtrlParm.c \
+	../DrivenPart/CurvatureEncoder.c \
+	../DrivenPart/ForwardValRevise.c
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

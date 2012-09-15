@@ -38,8 +38,12 @@
 
 /****start DrivenPart****/
 
-//#include "../DrivenPart\CurvatureCtrl.h"
-//#include "../DrivenPart\ForwardValRevise.h"
+#include "../DrivenPart\CurvatureCtrl.h"
+#include "../DrivenPart/Curvature.h"
+#include "../DrivenPart/CurvatureEncoder.h"
+#include "../DrivenPart/PIDCurvatureCtrl.h"
+#include "../DrivenPart/PIDCurvatureCtrlParm.h"
+#include "../DrivenPart\ForwardValRevise.h"
 #include "../DrivenPart/LightVal.h"
 #include "../DrivenPart\LightValCtrl.h"
 #include "../DrivenPart/PIDLightValCtrl.h"
@@ -106,8 +110,12 @@ Running mRunning;
 
 /****start create Driven part objects****/
 
-//CurvatureCtrl mCurvatureCtrl;
-//ForwardValRevise mForwardValRevise;
+CurvatureCtrl mCurvatureCtrl;
+Curvature mCurvature;
+CurvatureEncoder mCurvatureEncoder;
+PIDCurvatureCtrl mPIDCurvatureCtrl;
+PIDCurvatureCtrlParm mPIDCurvatureCtrlParm;
+ForwardValRevise mForwardValRevise;
 LightVal mLightVal;
 LightValCtrl mLightValCtrl;
 PIDLightValCtrl mPIDLightValCtrl;

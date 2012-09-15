@@ -1,41 +1,50 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
 #include "PIDCurvatureCtrlParm.h"
 
-namespace 駆動部
-{
+/*
+ *	PIDCurvatureCtrlParm.c
+ *	曲率半径PID制御パラメータクラス
+ */
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_getCKp(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
+//比例係数取得メソッド
+float PIDCurvatureCtrlParm_getCKp(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
 {
-	return 0;
+	return this_PIDCurvatureCtrlParm->cKp;
 }
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_setCKp(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
+//比例係数設定メソッド
+void PIDCurvatureCtrlParm_setCKp(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
 {
-	return 0;
+	this_PIDCurvatureCtrlParm->cKp = parm;
 }
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_getCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
+//積分係数取得メソッド
+float PIDCurvatureCtrlParm_getCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
 {
-	return 0;
+	return this_PIDCurvatureCtrlParm->cKi;
 }
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_setCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
+//積分係数設定メソッド
+void PIDCurvatureCtrlParm_setCKi(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
 {
-	return 0;
+	this_PIDCurvatureCtrlParm->cKi;
 }
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_getCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
+//微分係数取得メソッド
+float PIDCurvatureCtrlParm_getCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
 {
-	return 0;
+	return this_PIDCurvatureCtrlParm->cKd;
 }
 
-float PIDCurvatureCtrlParm::PIDCurvatureCtrlParm_setCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
+//微分係数設定メソッド
+void PIDCurvatureCtrlParm_setCKd(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm, float parm)
 {
-	return 0;
+	this_PIDCurvatureCtrlParm->cKd;
 }
-}  // namespace 駆動部
+
+//初期化メソッド
+void PIDCurvatureCtrlParm_init(PIDCurvatureCtrlParm *this_PIDCurvatureCtrlParm)
+{
+	this_PIDCurvatureCtrlParm->cKp = 1.85;
+	this_PIDCurvatureCtrlParm->cKi = 0;
+	this_PIDCurvatureCtrlParm->cKd = 0;
+}

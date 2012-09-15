@@ -1,29 +1,10 @@
-#ifndef ‹ì“®•”_CURVATURE_ENCODER_H
-#define ‹ì“®•”_CURVATURE_ENCODER_H
+#ifndef _CURVATURE_ENCODER_H
+#define _CURVATURE_ENCODER_H
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+typedef struct{
+}CurvatureEncoder;
 
-namespace ‹ì“®•”
-{
-/**
- * ‹È—¦”¼ŒaŒv‘ªŠí
- * 
- */
-class CurvatureEncoder
-{
-public:
-	void CurvatureEncoder_init(CurvatureEncoder *this_CurvatureEncoder);
+extern void CurvatureEncoder_init(CurvatureEncoder *this_CurvatureEncoder);
+extern float CurvatureEncoder_getCurvature(CurvatureEncoder *this_CurvatureEncoder);
 
-	/**
-	 * ‹È—¦”¼Œa‚ðŽæ“¾‚·‚é
-	 */
-	float CurvatureEncoder_getCurvature(CurvatureEncoder *this_CurvatureEncoder);
-
-};
-
-}  // namespace ‹ì“®•”
 #endif
