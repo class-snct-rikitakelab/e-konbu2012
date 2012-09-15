@@ -58,27 +58,26 @@ void user_1ms_isr_type2(void){
 
 //走行体管理タスク(4ms)
 TASK(ActionTask)
-{
+{/*
 	static int wait = 0;
 	wait++;
 
-	TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,95);
+	if(wait < 2000)
+		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,95);
 
-	ForwardValRevise_setTargForwardVal(&mForwardValRevise, 20);
-
-	LightValCtrl_setTargLightVal(&mLightValCtrl,580);
+	else
+		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,0);
 
 	TailAngleCtrl_doTailCtrl(&mTailAngleCtrl);
-
-	nxt_motor_set_speed(NXT_PORT_B,ForwardValRevise_reviseForwardVal(&mForwardValRevise) - LightValCtrl_doLightValCtrl(&mLightValCtrl) / 2,1);
-	nxt_motor_set_speed(NXT_PORT_C,ForwardValRevise_reviseForwardVal(&mForwardValRevise) + LightValCtrl_doLightValCtrl(&mLightValCtrl) / 2,1);
-
+	*/
 	TerminateTask();
 }
 
 //走行状態管理タスク(10ms)
 TASK(ActionTask2)
-{
-	logSend(ForwardValRevise_reviseForwardVal(&mForwardValRevise),LightValCtrl_doLightValCtrl(&mLightValCtrl),LightVal_getLightVal(&mLightVal),0,0,0);
-	TerminateTask();
+{/*
+	logSend(ForwardValRevise_reviseForwardVal(&mForwardValRevise),LightValCtrl_doLightValCtrl(&mLightValCtrl),
+		LightVal_getLightVal(&mLightVal),PIDTailAngleCtrl_calcTailAngleCtrlVal(&mPIDTailAngleCtrl,TailAngle_getTargTailAngle(&mTailAngle),TailAngle_getTailAngle(&mTailAngle)),0,0);
+		*/
+		TerminateTask();
 }

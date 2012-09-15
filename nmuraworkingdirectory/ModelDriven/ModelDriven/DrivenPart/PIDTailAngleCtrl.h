@@ -18,7 +18,7 @@ typedef struct{
 	PIDTailAngleCtrlParm Parm;		//集約用（グレーゾーン）
 }PIDTailAngleCtrl;
 
-#define TAIL_ANGLE_COUNT_MAX 2		//目標値上昇用カウンタ
+#define TAIL_ANGLE_COUNT_MAX 3		//目標値上昇用カウンタ
 
 #define SPEED_LIMIT 100
 
