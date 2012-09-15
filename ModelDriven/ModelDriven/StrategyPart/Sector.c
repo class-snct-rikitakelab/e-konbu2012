@@ -3,11 +3,12 @@
 
 void Sector_init(Sector *this_Sector){
 	//test code
-	this_Sector->cngTerm[0].jBT=true;
+//	this_Sector->cngTerm[0].jBT=true;
 	//this_Sector->cngTerm[0].targDist=5;
 	//this_Sector->cngTerm[0].targTime=5000;
-	this_Sector->cngTerm[0].targXCoo = 3;
-	this_Sector->cngTerm[0].targYCoo = 10;
+	//this_Sector->cngTerm[0].targXCoo = 3;
+	//this_Sector->cngTerm[0].targYCoo = 10;
+	this_Sector->cngTerm[0].jlineEdge=true;
 }
 
 	/**

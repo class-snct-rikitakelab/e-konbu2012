@@ -46,12 +46,12 @@ typedef struct {
 	 * 白色輝度値
 	 */
 	
-	S8 whiteVal;
+	U16 whiteVal;
 
 	/**
 	 * 黒色輝度値
 	 */
-	S8 blackVal;
+	U16 blackVal;
 
 	/**
 	 * 電圧値

@@ -10,7 +10,8 @@ typedef struct {
 	/**
 	 * Žw’èŠp‘¬“x
 	 */
-	U16 TargetGradient;
+	U16 targRange;
+	U16 baseGyroVal;
 }
 Gradient;
 

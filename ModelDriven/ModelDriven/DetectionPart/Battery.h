@@ -9,13 +9,14 @@ typedef struct {
 	/**
 	 * バッテリ閾値
 	 */
-	int batteryThereshold;
+	U16 targReductRang;
+	U16 initVol;
 
 }Battery;
 
 	void Battery_init(Battery *this_Battery);
 
-	BOOL Battery_dectBatteryThreShold(Battery *this_Battery);
+	BOOL Battery_dectRedct(Battery *this_Battery);
 
 #endif
 

@@ -1,7 +1,6 @@
 
 #include "RunnerRobot.h"
 #include "../Common/Factory.h"
-
 //for test driven part
 #include "../TestDrivenPart.h"
 //
@@ -66,16 +65,23 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 		}
 	}
 
-	//灰色値計算
-	//this_Calibration -> grayValue=(this_Calibration -> blackValue + this_Calibration -> whiteValue)/2;
+	//ラインエッジ検出器にラインエッジの輝度値をセット
+	//mLineEdge.edgeLightVal=( blackVal +  whiteVal)/2;
+	mLineEdge.blackVal=blackVal;
+	mLineEdge.whiteVal=whiteVal;
 
-	//ジャイロオフセット取得
+	//ジャイロオフセットと静止時の電圧値を取得
 	while(1){
 		if(TouchSensor_getTouchSensor(&mTouchSensor) == TRUE)
 		{
 			Sound_soundTone(&mSound,932, 512, 10);
 			gyroOffset=GyroSensor_getGyroAngVelocity(&mGyroSensor);
 			mSector.targetDrvenParm.gyroOffset = gyroOffset;
+			//傾き検知器に基準となるオフセット値をセット
+			mGradient.baseGyroVal=gyroOffset;
+			//基準バッテリ電圧値をセット
+			mBattery.initVol=ecrobot_get_battery_voltage();
+
 			systick_wait_ms(500);
 			break;
 		}

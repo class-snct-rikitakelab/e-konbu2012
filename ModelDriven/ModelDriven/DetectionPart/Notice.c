@@ -12,7 +12,7 @@ void Notice_copyTerm(Notice *this_Notice,CngSectTerm *term){
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		this_Notice->term[i].jBT = term[i].jBT;
 		this_Notice->term[i].targDist =term[i].targDist;
-		this_Notice->term[i].lineEdgeThreshold = term[i].lineEdgeThreshold;
+		this_Notice->term[i].jlineEdge = term[i].jlineEdge;
 		this_Notice->term[i].targBatteryVol = term[i].targBatteryVol;
 		this_Notice->term[i].targetGradient = term[i].targetGradient;
 		this_Notice->term[i].targTime = term[i].targTime;
@@ -56,7 +56,7 @@ void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm *term){
 			this_Notice->noticeTerm[i].fDist =true;
 		}
 		
-		if(term[i].lineEdgeThreshold !=0 ){
+		if(term[i].jlineEdge ==true ){
 			this_Notice->noticeTerm[i].fLineEdge =true;
 		}
 
@@ -205,22 +205,24 @@ int satisTermNum=0;
 		if(TurnAngle_detcTurnAngle(&mTurnAngle)==true&&noticeTerm.fTurnAngle==true){
 			satisTermNum++;
 		}
-		if(Battery_dectBatteryThreShold(&mBattery)==true&&noticeTerm.fBattery==true){
+		if(Battery_dectRedct(&mBattery)==true&&noticeTerm.fBattery==true){
 			satisTermNum++;
 		}
+		if(LineEdge_detectLineEdge(&mLineEdge)==true){
+			satisTermNum++;
+		}	
 		return satisTermNum;
 }
 
 void Notice_setTargVal(Notice *this_Notice,CngSectTerm term){
 	
-	mBattery.batteryThereshold=term.targBatteryVol;
+	mBattery.targReductRang=term.targBatteryVol;
 	mCoordinates.targXCoo = term.targXCoo;
 	mCoordinates.targYCoo = term.targYCoo;
 	mDetcMarker.markerThreshold = term.makerThreshold;
 	mDetcObst.dectDist=term.targObstDist;
-	mGradient.TargetGradient=term.targetGradient;
+	mGradient.targRange=term.targetGradient;
 	mRunDist.targRunDist=term.targDist;
 	mTimer.targTimer=term.targTime;
 	mTurnAngle.targAngle=term.targTurnAngle;
-	mLineEdge.lineEdgeThreshold=term.lineEdgeThreshold;
 }

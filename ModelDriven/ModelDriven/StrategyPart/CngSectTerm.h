@@ -13,7 +13,7 @@ typedef struct  {
 	SectName sectName;
 	BOOL jBT;
 	int targDist;
-	int lineEdgeThreshold;
+	BOOL jlineEdge;
 U16 targetGradient;
 	S32 targTime;
 	float targXCoo;
