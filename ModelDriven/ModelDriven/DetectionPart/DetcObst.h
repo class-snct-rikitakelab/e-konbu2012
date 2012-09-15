@@ -2,8 +2,8 @@
 #define __DetcObst
 
 
-#include "DetectionPart/Notice.h"
-#include "NXTHardWare/SonorSensor.h"
+#include "../DetectionPart/Notice.h"
+#include "../NXTHardWare/SonorSensor.h"
 #include "../Common/Common.h"
 
 

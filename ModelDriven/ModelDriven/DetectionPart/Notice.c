@@ -111,7 +111,10 @@ void Notice_judgeNotice(Notice *this_Notice){
 	//区間切替条件のトリガーを満たした数と、フラグ（使用検出器数）が一致した条件の名前で区間を切替
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		if(numOfOnFlag[i] == satisTermNum[i] &&numOfOnFlag[i]!=0 ) {
-			Sound_soundTone(&mSound,250,100,5);
+			Sound_soundTone(&mSound,250,100,20);
+			RunDist_resetRunDist(&mRunDist); //距離計をリセット
+			Timer_reset(&mTimer); //区間走行経過時間をリセット
+			Coordinates_rest(&mCoordinates);//現在座標をバッファに保存　区間開始点を基準とするため
 			//Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
 		}
 	}

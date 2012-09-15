@@ -4,7 +4,8 @@
 void Sector_init(Sector *this_Sector){
 	//test code
 	this_Sector->cngTerm[0].jBT=true;
-	this_Sector->cngTerm[0].targDist=30;
+	//this_Sector->cngTerm[0].targDist=5;
+	this_Sector->cngTerm[0].targTime=5000;
 }
 
 	/**
@@ -35,4 +36,3 @@ TargetDrivenParm Sector_getTargDrienParm(Sector *this_Sector){
 
 	return this_Sector->targetDrvenParm;
 }
-

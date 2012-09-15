@@ -15,6 +15,7 @@ TARGET_SOURCES := \
 	balancer_param.c \
 	Slope.c \
 	Common/Factory.c \
+	Common/mymath.c \
 	StrategyPart/CngSectTerm.c \
 	StrategyPart/Sector.c \
 	DetectionPart/RunDist.c \

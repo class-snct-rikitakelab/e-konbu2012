@@ -148,7 +148,9 @@ LightSensor mLightSensor;
 TouchSensor mTouchSensor;
 GyroSensor mGyroSensor;
 Sound mSound;
-MotorEncoder mMotorEncoder;
+MotorEncoder rightMotorEncoder;
+MotorEncoder leftMotorEncoder;
+
 SonorSensor mSonorSensor;
 
 /****end create NXT HarDware objects****/

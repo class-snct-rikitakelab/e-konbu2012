@@ -30,12 +30,12 @@ BOOL RunStartSigRecv_detcRunStartSig(RunStartSigRecv *this_RunStartSigRecv){
 		}
 	}
 	
-	systick_wait_ms(20);	//デバッグ用（タッチセンサ待ち）
+	systick_wait_ms(20);	//デバッグ用（タッチセンサ待ちs）
 
 	//タッチセンサスタート
 	if (ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 	{
-		ecrobot_sound_tone(200,512,10);
+		//ecrobot_sound_tone(200,512,10);
 		start = true;
 	}
 	//HOME BUTTON START FOR DEBG at HOME

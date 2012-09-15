@@ -127,7 +127,7 @@ TASK(ActionTask)
 
 //走行状態管理タスク(5ms)
 TASK(ActionTask2)
-{
+{	LocationInfo_selfLocate(&mLocationInfo); //自己位置推定
 	Notice_judgeNotice(&mNotice);
 	/*
 	RN_setting();		//走行状態設定

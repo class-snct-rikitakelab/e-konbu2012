@@ -2,8 +2,7 @@
 #define __RunDist
 
 
-#include "DetectionPart/Notice.h"
-#include "NXTHardWare/MotorEncoder.h"
+#include "../NXTHardWare/MotorEncoder.h"
 #include "../Common/Common.h"
 
 
@@ -15,12 +14,14 @@ typedef struct {
 	 * Žw’èˆÚ“®‹——£
 	 */
 	float targRunDist;
+	float leftCountBuf;
+	float rightCountBuf;
 }RunDist;
 
 	
 	void RunDist_init(RunDist *this_RunDist);
 
 	BOOL RunDist_dectTargRunDist(RunDist *this_RunDist);
-
+	void RunDist_resetRunDist(RunDist *this_RunDist);
 
 #endif

@@ -19,6 +19,7 @@ Sector_init(&mSector);
 
 /****start detectionPart part objects****/
 Notice_init(&mNotice);
+LocationInfo_init(&mLocationInfo);
 //not yet all initlized
 
 /****end dectionPart part objects****/
@@ -44,5 +45,19 @@ WheelMotorCtrl_init(&mWheelMotorCtrl);
 //test object
 
 /****end Strategy part init****/
+
+
+
+/****start create NXT HarDware init****/
+LightSensor_init(&mLightSensor);
+TouchSensor_init(&mTouchSensor);
+GyroSensor_init(&mGyroSensor);
+Sound_init(&mSound);
+MotorEncoder_init(&rightMotorEncoder,NXT_PORT_B);
+MotorEncoder_init(&leftMotorEncoder,NXT_PORT_C);
+SonorSensor_init(&mSonorSensor,NXT_PORT_S2);
+Timer_init(&mTimer);
+
+/****end create NXT HarDware init****/
 }
 
