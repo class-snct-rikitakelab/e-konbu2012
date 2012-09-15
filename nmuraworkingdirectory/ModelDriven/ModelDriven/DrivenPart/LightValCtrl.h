@@ -3,10 +3,10 @@
 
 #include "ecrobot_interface.h"
 #include "../DrivenPart/LightVal.h"
-
 #include "../DrivenPart/PIDLightValCtrl.h"
 
 typedef struct{
+	S8 LightValCtrlVal;
 }LightValCtrl;
 
 void LightValCtrl_init(LightValCtrl *this_LightValCtrl);
