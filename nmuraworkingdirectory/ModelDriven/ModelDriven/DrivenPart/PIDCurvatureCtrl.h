@@ -3,7 +3,7 @@
 
 #include "../DrivenPart/PIDCurvatureCtrlParm.h"
 #include "ecrobot_interface.h"
-#include "../Common.h"
+#include "../Common/Common.h"
 
 typedef struct{
 	float deviation;			//î‰ó·åWêî

@@ -17,7 +17,9 @@
 #include "../DetectionPart\DetcObst.h"
 #include "../DetectionPart\Gradient.h"
 #include "../DetectionPart\LineEdge.h"
+*/
 #include "../DetectionPart\LocationInfo.h"
+/*
 #include "../DetectionPart\Notice.h"
 #include "../DetectionPart\RunDist.h"
 #include "../DetectionPart\RunStartSigRecv.h"
@@ -48,10 +50,10 @@
 #include "../DrivenPart\LightValCtrl.h"
 #include "../DrivenPart/PIDLightValCtrl.h"
 #include "../DrivenPart/PIDLightValCtrlParm.h"
-//#include "../DrivenPart\RobotDrivenDirect.h"
+#include "../DrivenPart\RobotDrivenDirect.h"
 #include "../DrivenPart\TailAngleCtrl.h"
-//#include "../DrivenPart\WheelMotor.h"
-//#include "../DrivenPart\WheelMotorCtrl.h"
+#include "../DrivenPart\WheelMotor.h"
+#include "../DrivenPart\WheelMotorCtrl.h"
 
 //added
 #include "../DrivenPart/PIDTailAngleCtrl.h"
@@ -120,11 +122,13 @@ LightVal mLightVal;
 LightValCtrl mLightValCtrl;
 PIDLightValCtrl mPIDLightValCtrl;
 PIDLightValCtrlParm mPIDLightValCtrlParm;
-//RobotDrivenDirect mRobotDrivenDirect;
+RobotDrivenDirect mRobotDrivenDirect;
 TailAngleCtrl mTailAngleCtrl;
-//WheelMotor rightWheelMotor;
-//WheelMotor leftWheelMotor;
-//WheelMotorCtrl mWheelMotorCtrl;
+WheelMotor rightWheelMotor;
+WheelMotor leftWheelMotor;
+WheelMotorCtrl mWheelMotorCtrl;
+
+LocationInfo mLocationInfo;
 
 ////added
 TailAngleCtrl mTailAngleCtrl;

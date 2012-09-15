@@ -53,8 +53,11 @@
   <ItemGroup>
     <ClInclude Include="Calibration.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Common\Common.h" />
     <ClInclude Include="Common\Factory.h" />
+    <ClInclude Include="Common\mymath.h" />
     <ClInclude Include="Common\RUN_MODE.h" />
+    <ClInclude Include="Common\SectName.h" />
     <ClInclude Include="Common\TARG_CTRL_METHOD.h" />
     <ClInclude Include="DetectionPart\Battery.h" />
     <ClInclude Include="DetectionPart\Coordinates.h" />
@@ -69,6 +72,8 @@
     <ClInclude Include="DetectionPart\Timer.h" />
     <ClInclude Include="DetectionPart\TurnAngle.h" />
     <ClInclude Include="DirectorPart\CngSectLisnner.h" />
+    <ClInclude Include="DirectorPart\ROBOT_STATE.h" />
+    <ClInclude Include="DirectorPart\RunnerRobot.h" />
     <ClInclude Include="DirectorPart\Running.h" />
     <ClInclude Include="DrivenPart\Curvature.h" />
     <ClInclude Include="DrivenPart\CurvatureCtrl.h" />
@@ -80,7 +85,6 @@
     <ClInclude Include="DrivenPart\LightValCtrlParm.h" />
     <ClInclude Include="DrivenPart\PIDCurvatureCtrl.h" />
     <ClInclude Include="DrivenPart\PIDCurvatureCtrlParm.h" />
-    <ClInclude Include="DrivenPart\PIDCurvatureParm.h" />
     <ClInclude Include="DrivenPart\PIDLightValCtrl.h" />
     <ClInclude Include="DrivenPart\PIDLightValCtrlParm.h" />
     <ClInclude Include="DrivenPart\PIDTailAngleCtrl.h" />
@@ -96,6 +100,7 @@
     <ClInclude Include="NXTHardWare\GyroSensor.h" />
     <ClInclude Include="NXTHardWare\LightSensor.h" />
     <ClInclude Include="NXTHardWare\MotorEncoder.h" />
+    <ClInclude Include="NXTHardWare\Sound.h" />
     <ClInclude Include="NXTHardWare\TouchSensor.h" />
     <ClInclude Include="NXTHardWare\SonorSensor.h" />
     <ClInclude Include="PIDCalcDebug.h" />
@@ -106,12 +111,14 @@
     <ClInclude Include="StrategyPart\Sector.h" />
     <ClInclude Include="StrategyPart\TargetDrivenParm.h" />
     <ClInclude Include="TailControl.h" />
+    <ClInclude Include="TestCode.h" />
     <ClInclude Include="WLReceiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="balancer_param.c" />
     <ClCompile Include="Calibration.c" />
     <ClCompile Include="Common\Factory.c" />
+    <ClCompile Include="Common\mymath.c" />
     <ClCompile Include="DetectionPart\Battery.c" />
     <ClCompile Include="DetectionPart\Coordinates.c" />
     <ClCompile Include="DetectionPart\DetcMarker.c" />
@@ -125,6 +132,7 @@
     <ClCompile Include="DetectionPart\Timer.c" />
     <ClCompile Include="DetectionPart\TurnAngle.c" />
     <ClCompile Include="DirectorPart\CngSectLisnner.c" />
+    <ClCompile Include="DirectorPart\RunnerRobot.c" />
     <ClCompile Include="DirectorPart\Running.c" />
     <ClCompile Include="DrivenPart\Curvature.c" />
     <ClCompile Include="DrivenPart\CurvatureCtrl.c" />
@@ -136,7 +144,6 @@
     <ClCompile Include="DrivenPart\LightValCtrlParm.c" />
     <ClCompile Include="DrivenPart\PIDCurvatureCtrl.c" />
     <ClCompile Include="DrivenPart\PIDCurvatureCtrlParm.c" />
-    <ClCompile Include="DrivenPart\PIDCurvatureParm.c" />
     <ClCompile Include="DrivenPart\PIDLightValCtrl.c" />
     <ClCompile Include="DrivenPart\PIDLightValCtrlParm.c" />
     <ClCompile Include="DrivenPart\PIDTailAngleCtrl.c" />
@@ -152,6 +159,7 @@
     <ClCompile Include="NXTHardWare\GyroSensor.c" />
     <ClCompile Include="NXTHardWare\LightSensor.c" />
     <ClCompile Include="NXTHardWare\MotorEncoder.c" />
+    <ClCompile Include="NXTHardWare\Sound.c" />
     <ClCompile Include="NXTHardWare\TouchSensor.c" />
     <ClCompile Include="NXTHardWare\SonorSensor.c" />
     <ClCompile Include="PIDCalcDebug.c" />
@@ -162,6 +170,7 @@
     <ClCompile Include="StrategyPart\Sector.c" />
     <ClCompile Include="StrategyPart\TargetDrivenParm.c" />
     <ClCompile Include="TailControl.c" />
+    <ClCompile Include="TestCode.c" />
     <ClCompile Include="WLReceiver.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

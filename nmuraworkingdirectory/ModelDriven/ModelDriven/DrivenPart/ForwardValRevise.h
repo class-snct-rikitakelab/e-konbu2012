@@ -21,7 +21,7 @@
 	/**
 	 * 前進量を補正する
 	 */
-	S8 ForwardValRevise_reviseForwardVal(ForwardValRevise *this_ForwardValRevise);
+	S32 ForwardValRevise_reviseForwardVal(ForwardValRevise *this_ForwardValRevise);
 
 	/**
 	 * 目標前進量を設定する

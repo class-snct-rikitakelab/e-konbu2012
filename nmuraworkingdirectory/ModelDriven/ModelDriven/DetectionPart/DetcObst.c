@@ -1,20 +1,19 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "DetcObst.h"
+#include "../Common/Factory.h"
 
-namespace DetectionPart
-{
+void DetcObst_init(DetcObst *this_DetcObst){
 
-void DetcObst::DetcObst_init(DetcObst *this_DetcObst)
-{
 }
 
-bool DetcObst::DetcObstacle_DetcObst(DetcObst *this_DetcObst)
-{
-	return false;
+	/**
+	 * Žw’è‹——£‚ðŒŸ’m‚·‚é
+	 */
+BOOL DetcObstacle_DetcObst(DetcObst *this_DetcObst){
+	BOOL res = false;
+	if(SonorSensor_getSonor(&mSonorSensor)<this_DetcObst->dectDist){
+		res=true;
+	}
+
+	return res;
 }
-}  // namespace DetectionPart

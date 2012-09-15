@@ -12,26 +12,31 @@ USER_LIB = nxtway_gs_balancer
 
 # User application source
 TARGET_SOURCES := \
-	../DrivenPart/TailMotor.c \
-	../DrivenPart/TailAngle.c \
-	../DrivenPart/TailAngleCtrl.c \
-	../DrivenPart/TailMotorEncoder.c \
-	../DrivenPart/PIDTailAngleCtrl.c \
-	../DrivenPart/PIDTailAngleCtrlParm.c \
-	../Common/Factory.c \
-	../LogSend.c \
-	../DrivenPart/LightValCtrl.c \
-	../DrivenPart/LightVal.c \
-	../DrivenPart/PIDLightValCtrl.c \
-	../DrivenPart/PIDLightValCtrlParm.c \
-	../NXTHardware/LightSensor.c \
-	../DrivenPart/CurvatureCtrl.c \
-	../DrivenPart/Curvature.c \
-	../DrivenPart/PIDCurvatureCtrl.c \
-	../DrivenPart/PIDCurvatureCtrlParm.c \
-	../DrivenPart/CurvatureEncoder.c \
-	../DrivenPart/ForwardValRevise.c \
-	../TestCode.c
+	balancer_param.c \
+	DrivenPart/TailMotor.c \
+	DrivenPart/TailAngle.c \
+	DrivenPart/TailAngleCtrl.c \
+	DrivenPart/TailMotorEncoder.c \
+	DrivenPart/PIDTailAngleCtrl.c \
+	DrivenPart/PIDTailAngleCtrlParm.c \
+	Common/Factory.c \
+	LogSend.c \
+	DrivenPart/LightValCtrl.c \
+	DrivenPart/LightVal.c \
+	DrivenPart/PIDLightValCtrl.c \
+	DrivenPart/PIDLightValCtrlParm.c \
+	NXTHardware/LightSensor.c \
+	DrivenPart/CurvatureCtrl.c \
+	DrivenPart/Curvature.c \
+	DrivenPart/PIDCurvatureCtrl.c \
+	DrivenPart/PIDCurvatureCtrlParm.c \
+	DrivenPart/CurvatureEncoder.c \
+	DrivenPart/ForwardValRevise.c \
+	DrivenPart/RobotDrivenDirect.c \
+	DrivenPart/WheelMotor.c \
+	DrivenPart/WheelMotorCtrl.c \
+	DetectionPart/LocationInfo.c \
+	TestCode.c
 
 TOPPERS_OSEK_OIL_SOURCE := prog.oil
 

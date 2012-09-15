@@ -1,5 +1,5 @@
 #include "TestCode.h"
-#include "Common\Factory.h"
+#include "Common/Factory.h"
 
 //カウンタの宣言
 DeclareCounter(SysTimerCnt);
@@ -58,26 +58,27 @@ void user_1ms_isr_type2(void){
 
 //走行体管理タスク(4ms)
 TASK(ActionTask)
-{/*
-	static int wait = 0;
-	wait++;
-
-	if(wait < 2000)
-		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,95);
-
-	else
-		TailAngleCtrl_setTargTailAngle(&mTailAngleCtrl,0);
-
-	TailAngleCtrl_doTailCtrl(&mTailAngleCtrl);
-	*/
+{
+	RobotDrivenDirect_directDrive(&mRobotDrivenDirect);
 	TerminateTask();
 }
 
 //走行状態管理タスク(10ms)
 TASK(ActionTask2)
-{/*
-	logSend(ForwardValRevise_reviseForwardVal(&mForwardValRevise),LightValCtrl_doLightValCtrl(&mLightValCtrl),
-		LightVal_getLightVal(&mLightVal),PIDTailAngleCtrl_calcTailAngleCtrlVal(&mPIDTailAngleCtrl,TailAngle_getTargTailAngle(&mTailAngle),TailAngle_getTailAngle(&mTailAngle)),0,0);
-		*/
-		TerminateTask();
+{
+	TargetDrivenParm parm;
+	parm.blackVal = 560;
+	parm.curvature = 1.0;
+	parm.gyroOffset = 0;
+	parm.runMode = TAIL_RUNNING;
+	parm.tailAngle = 95;
+	parm.targCtrlMethod = LIGHT_PID;
+	parm.targForwardVal = 50;
+	parm.targLightVal = 600;
+	parm.volt = 7800;
+	parm.whiteVal = 620;
+	RobotDrivenDirect_seDriveParm(&mRobotDrivenDirect,parm);
+	logSend(0,0,LightVal_getTargLightVal(&mLightVal),
+		PID_LightValCtrl_calcLightValCtrlVal(&mPIDLightValCtrl,LightVal_getTargLightVal(&mLightVal),LightVal_getLightVal(&mLightVal)),parm.blackVal,parm.whiteVal);
+	TerminateTask();
 }

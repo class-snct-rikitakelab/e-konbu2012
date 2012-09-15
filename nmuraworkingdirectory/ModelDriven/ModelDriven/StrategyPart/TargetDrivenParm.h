@@ -2,15 +2,14 @@
 #define __TargetDriveParm
 
 
-#include "../DrivenPart/WheelMotorCtrl.h"
 #include "../Common/RUN_MODE.h"
 #include "../Common/TARG_CTRL_METHOD.h"
+#include "ecrobot_interface.h"
 
 /**
  * 目標駆動パラメータ
  */
-typedef struct 
-{
+typedef struct {
 
 	/**
 	 * 目標前進速度
@@ -47,12 +46,12 @@ typedef struct
 	 * 白色輝度値
 	 */
 	
-	S8 whiteVal;
+	U16 whiteVal;
 
 	/**
 	 * 黒色輝度値
 	 */
-	S8 blackVal;
+	U16 blackVal;
 
 	/**
 	 * 電圧値
@@ -67,3 +66,4 @@ typedef struct
 }TargetDrivenParm;
 
 #endif
+

@@ -1,3 +1,7 @@
+#ifndef __TouchSensor
+#define __TouchSensor
+
+
 #include "ecrobot_interface.h"
 
 /**
@@ -10,3 +14,5 @@ typedef struct {
 void TouchSensor_init(TouchSensor *this_TouchSensor);
 
 U8 TouchSensor_getTouchSensor(TouchSensor *this_TouchSensor);
+
+#endif

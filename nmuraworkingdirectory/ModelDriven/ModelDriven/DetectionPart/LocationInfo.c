@@ -1,19 +1,61 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "LocationInfo.h"
+#include "math.h"
 
-namespace DetectionPart
-{
-
-void LocationInfo::位置情報を更新する()
-{
+void LocationInfo_init(LocationInfo *this_LocationInfo){
+	this_LocationInfo->xCoo = 0;		//車体のX座標
+this_LocationInfo->yCoo = 0;		//車体のY座標
+this_LocationInfo->dist = 0;		//移動距離
+this_LocationInfo->theta = 0;		//車体の角度
+this_LocationInfo->R = 0;			//曲率半径
 }
 
-void LocationInfo::LocationInfo_init(int *this_LocationInfo)
-{
+void LocationInfo_selfLocate(LocationInfo *this_LocationInfo){
+	static float dist_t = 0.0;
+	static float theta_t = 0.0;
+
+	float fi_l = (float)nxt_motor_get_count(NXT_PORT_C);
+	float fi_r = (float)nxt_motor_get_count(NXT_PORT_B);
+	float dist_l = deg2rad(fi_l * W_RADIUS);
+	float dist_r = deg2rad(fi_r * W_RADIUS);
+
+	this_LocationInfo->dist = (dist_l + dist_r) / 2.0;
+	this_LocationInfo->theta = W_RADIUS / W_DIST * (fi_r - fi_l);
+	this_LocationInfo->xCoo += (this_LocationInfo->dist - dist_t) * sin(deg2rad(this_LocationInfo->theta));
+	this_LocationInfo->yCoo += (this_LocationInfo->dist - dist_t) * cos(deg2rad(this_LocationInfo->theta));
+	
+	if(!(this_LocationInfo->theta == theta_t)){
+		this_LocationInfo->R = rad2deg((this_LocationInfo->dist - dist_t) / (this_LocationInfo->theta - theta_t));
+	}
+	else{
+		this_LocationInfo->R = 0.0;
+	}
+		
+	dist_t = this_LocationInfo->dist;
+	theta_t = this_LocationInfo->theta;
 }
-}  // namespace DetectionPart
+
+
+float LocationInfo_getDistance(LocationInfo *this_LocationInfo )
+{
+	return this_LocationInfo->dist;
+}
+
+float LocationInfo_getXCoo(LocationInfo *this_LocationInfo )
+{
+	return this_LocationInfo->xCoo;
+}
+
+float LocationInfo_getYCoo(LocationInfo *this_LocationInfo )
+{
+	return this_LocationInfo->yCoo;
+}
+
+float LocationInfo_getTheta(LocationInfo *this_LocationInfo )
+{
+	return this_LocationInfo->theta;
+}
+float LocationInfo_getR(LocationInfo *this_LocationInfo){
+
+	return this_LocationInfo->R;
+}

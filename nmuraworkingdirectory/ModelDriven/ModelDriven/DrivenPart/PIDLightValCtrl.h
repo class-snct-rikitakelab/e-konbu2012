@@ -3,6 +3,7 @@
 
 #include "ecrobot_interface.h"
 #include "PIDLightValCtrlParm.h"
+#include "../Common/Common.h"
 
 typedef struct{
 	float deviation;			//ïŒç∑

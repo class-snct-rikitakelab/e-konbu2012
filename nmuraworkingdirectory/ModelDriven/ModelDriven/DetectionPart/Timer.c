@@ -1,19 +1,23 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "Timer.h"
-
-namespace DetectionPart
-{
-
-void Timer::Timer_init(Timer *this_Timer)
-{
+void Timer_init(Timer *this_Timer){
+	this_Timer->timerbuf = 0;
+	this_Timer->targTimer=0;
 }
 
-void Timer::Timer_detcPassTargTimer(Timer *this_Timer)
-{
+	/**
+	 * Žw’èŽžŠÔ‚ðŒŸ’m‚·‚é
+	 */
+BOOL Timer_detcPassTargTimer(Timer *this_Timer){
+	BOOL res = false;
+	
+	
+	if(systick_get_ms() - this_Timer->timerbuf > this_Timer->targTimer){
+		res = true;
+	}
+	return res;
 }
-}  // namespace DetectionPart
+
+void Timer_reset(Timer *this_Timer){
+	this_Timer->timerbuf=systick_get_ms();
+}

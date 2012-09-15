@@ -30,11 +30,11 @@ LightSensor_init(&mLightSensor);
 LightValCtrl_init(&mLightValCtrl);
 PIDLightValCtrl_init(&mPIDLightValCtrl);
 PIDLightValCtrlParm_init(&mPIDLightValCtrlParm);
-//RobotDrivenDirect_init(&mRobotDrivenDirect);
+RobotDrivenDirect_init(&mRobotDrivenDirect);
 TailAngleCtrl_init(&mTailAngleCtrl);
-//WheelMotor_init(&rightWheelMotor,NXT_PORT_B);
-//WheelMotor_init(&leftWheelMotor,NXT_PORT_C);
-//WheelMotorCtrl_init(&mWheelMotorCtrl);
+WheelMotor_init(&rightWheelMotor,NXT_PORT_B);
+WheelMotor_init(&leftWheelMotor,NXT_PORT_C);
+WheelMotorCtrl_init(&mWheelMotorCtrl);
 
 //added
 TailAngle_init(&mTailAngle);

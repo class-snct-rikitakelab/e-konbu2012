@@ -1,34 +1,25 @@
-
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#ifndef __TurnAngle
+#define __TurnAngle
 
 #include "DetectionPart/Notice.h"
 #include "DetectionPart/LocationInfo.h"
+#include "../Common/Common.h"
 
-namespace DetectionPart
-{
 /**
  * ê˘âÒäpìx
  */
-class TurnAngle
-{
-private:
-	/**
+typedef struct {
+		/**
 	 * éwíËï˚à 
 	 */
 	float targAngle;
+}TurnAngle;
 
-	Notice notice;
-	LocationInfo locationInfo;
 
-public:
-	void TurnAngle_init(TurnAngle *this_TurnAngle);
+void TurnAngle_init(TurnAngle *this_TurnAngle);
 
-	bool TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle);
+BOOL TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle);
 
-};
 
-}  // namespace DetectionPart
+#endif
+

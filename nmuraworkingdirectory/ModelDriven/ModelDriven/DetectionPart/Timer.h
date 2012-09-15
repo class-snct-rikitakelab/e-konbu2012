@@ -1,29 +1,26 @@
-
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
-namespace DetectionPart
-{
+#ifndef __Timer
+#define __Timer
+#include "../Common/Common.h"
+#include "ecrobot_interface.h"
 /**
- * 時間計
+ * 時間計 時間の指定はms単位
  */
-class Timer
-{
-private:
+typedef struct {
 	int targTimer;
+	int timerbuf;
+}
+Timer;
 
-
-public:
 	void Timer_init(Timer *this_Timer);
 
 	/**
-	 * 指定時間を検知する
+	 * 指定時間経過を検知する
 	 */
-	void Timer_detcPassTargTimer(Timer *this_Timer);
+	BOOL Timer_detcPassTargTimer(Timer *this_Timer);
+	
+	/**
+ * 区間走行経過時間をリセット
+**/
+	void Timer_reset(Timer *this_Timer);
 
-};
-
-}  // namespace DetectionPart
+#endif

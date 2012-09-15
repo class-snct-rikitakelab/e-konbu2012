@@ -1,38 +1,27 @@
+#ifndef __Gradient
+#define __Gradient
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
-#include "DetectionPart/U16.h"
-#include "DetectionPart/Notice.h"
-#include "NXTHardWare/GyroSensor.h"
-
-namespace DetectionPart
-{
+#include "../NXTHardWare/GyroSensor.h"
+#include "../Common/Common.h"
 /**
  * 傾き検出
  */
-class Gradient
-{
-private:
+typedef struct {
 	/**
 	 * 指定角速度
 	 */
 	U16 TargetGradient;
+}
+Gradient;
 
-	NXTHardWare::GyroSensor gyroSensor;
-	Notice notice;
-
-public:
-	void Gradient_init(Gradient *this_Gradient);
+void Gradient_init(Gradient *this_Gradient);
 
 	/**
 	 * 指定角速度を検知する
 	 */
-	bool Gradient_dectTargGradient(Gradient *this_Gradient);
+extern BOOL Gradient_dectTargGradient(Gradient *this_Gradient);
 
-};
 
-}  // namespace DetectionPart
+#endif
+
+

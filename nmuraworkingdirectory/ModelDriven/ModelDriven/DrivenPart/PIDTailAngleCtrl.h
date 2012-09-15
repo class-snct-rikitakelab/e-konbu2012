@@ -7,7 +7,7 @@
  */
 
 #include "../DrivenPart/PIDTailAngleCtrlParm.h"
-#include "../Common.h"
+#include "../Common/Common.h"
 
 typedef struct{
 	float deviation;				//î‰ó·åWêî

@@ -1,31 +1,27 @@
+#ifndef __Sector
+#define __Sector
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
+#include "../StrategyPart/TargetDrivenParm.h"
+#include "../StrategyPart/CngSectTerm.h"
+#include "../Common/SectName.h"
 
-#include "StrategyPart/TargetDrivenParm.h"
-#include "StrategyPart/CngSectTerm.h"
-
-namespace StrategyPart
-{
 /**
  * 区間
  */
-class Sector
-{
-private:
-	/**
+typedef struct  {
+		/**
 	 * 区間ID
 	 */
-	int sectID;
 
-	TargetDrivenParm 目標駆動パラメータ;
-	CngSectTerm 切替条件[];
-	Sector 次区間[];
+	SectName sectName;
 
-public:
+	TargetDrivenParm targetDrvenParm;
+	CngSectTerm cngTerm[CNG_TERM_MAX_NUM];
+	//Sector 次区間[];
+
+}Sector;
+
+
 	void Sector_init(Sector *this_Sector);
 
 	/**
@@ -34,20 +30,19 @@ public:
 	int Sector_getSectID(Sector *this_Sector);
 
 	/**
-	 * 次区間切替条件取得
+	 * 次区間への切替条件取得
 	 */
-	CngSectTerm Sector_getNextCngSectTerm(Sector *this_Sector);
+	CngSectTerm Sector_getCngSectTerm(Sector *this_Sector);
 
 	/**
 	 * 次区間を取得する
 	 */
-	Sector Sector_GetNextSect(Sector *this_Sector);
+	Sector Sector_getNextSect(Sector *this_Sector);
 
 	/**
 	 * 目標駆動パラメータを取得する
 	 */
 	TargetDrivenParm Sector_getTargDrienParm(Sector *this_Sector);
 
-};
+#endif
 
-}  // namespace StrategyPart

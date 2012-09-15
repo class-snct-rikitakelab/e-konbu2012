@@ -8,7 +8,7 @@
  */
 
 //目標速度取得メソッド
-S8 ForwardValRevise_reviseForwardVal(ForwardValRevise *this_ForwardValRevise)
+S32 ForwardValRevise_reviseForwardVal(ForwardValRevise *this_ForwardValRevise)
 {	
 	static int counter = 0;
 	counter++;

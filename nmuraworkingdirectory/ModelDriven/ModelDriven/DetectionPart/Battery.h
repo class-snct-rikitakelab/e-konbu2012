@@ -1,29 +1,22 @@
+#ifndef __Battery
+#define __Battery
+#include "../Common/Common.h"
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
-namespace DetectionPart
-{
 /**
  * 電圧計
  */
-class Battery
-{
-private:
+typedef struct {
 	/**
 	 * バッテリ閾値
 	 */
 	int batteryThereshold;
 
+}Battery;
 
-public:
 	void Battery_init(Battery *this_Battery);
 
-	void 指定バッテリ電圧値を取得する(Battery *this_Battery);
+	BOOL Battery_dectBatteryThreShold(Battery *this_Battery);
 
-};
+#endif
 
-}  // namespace DetectionPart
+

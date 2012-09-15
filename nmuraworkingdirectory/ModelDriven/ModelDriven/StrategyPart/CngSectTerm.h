@@ -1,23 +1,27 @@
+#ifndef __CngSectTerm
+#define __CngSectTerm
+#include "../Common/Common.h"
+#include "../Common/SectName.h"
 
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
-
-namespace StrategyPart
-{
 /**
  * ‹æŠÔØ‘ÖğŒ
  */
-class CngSectTerm
-{
-private:
+typedef struct  {
 	/**
 	 * Ø‘ÖğŒ
 	 */
-	CngSectTerm cngTerm;
+	SectName sectName;
+	BOOL jBT;
+	int targDist;
+	int lineEdgeThreshold;
+U16 targetGradient;
+	S32 targTime;
+	float targXCoo;
+	float targYCoo;
+	S8 makerThreshold;
+	int targObstDist;
+	int targTurnAngle;
+	int targBatteryVol;
+}CngSectTerm;
 
-};
-
-}  // namespace StrategyPart
+#endif

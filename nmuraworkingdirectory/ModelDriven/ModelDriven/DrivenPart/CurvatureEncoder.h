@@ -1,6 +1,8 @@
 #ifndef _CURVATURE_ENCODER_H
 #define _CURVATURE_ENCODER_H
 
+#include "../DetectionPart/LocationInfo.h"
+
 typedef struct{
 }CurvatureEncoder;
 

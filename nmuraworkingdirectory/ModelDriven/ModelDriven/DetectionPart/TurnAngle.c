@@ -1,20 +1,14 @@
-#include <string>
-#include <vector>
-#include <list>
-#include <iostream>
-#include <assert.h>
 
 #include "TurnAngle.h"
 
-namespace DetectionPart
-{
 
-void TurnAngle::TurnAngle_init(TurnAngle *this_TurnAngle)
-{
+void TurnAngle_init(TurnAngle *this_TurnAngle){
+
 }
 
-bool TurnAngle::TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle, TurnAngle TurnAngle)
-{
+BOOL TurnAngle_detcTurnAngle(TurnAngle *this_TurnAngle){
+
 	return false;
+
 }
-}  // namespace DetectionPart
+

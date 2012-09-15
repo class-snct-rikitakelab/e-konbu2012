@@ -44,8 +44,8 @@ void PIDLightValCtrlParm_setLKd(PIDLightValCtrlParm *this_PIDLightValCtrlParm, f
 //‰Šú‰»ƒƒ\ƒbƒh
 void PIDLightValCtrlParm_init(PIDLightValCtrlParm *this_PIDLightValCtrlParm)
 {
-	this_PIDLightValCtrlParm->lKp = 0.446;
-	this_PIDLightValCtrlParm->lKi = 1.2;
-	this_PIDLightValCtrlParm->lKd = 0.005;
+	this_PIDLightValCtrlParm->lKp = 1.85;
+	this_PIDLightValCtrlParm->lKi = 2.6;
+	this_PIDLightValCtrlParm->lKd = 0.000;
 }
 
