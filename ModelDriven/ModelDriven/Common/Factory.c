@@ -87,7 +87,7 @@ CngSectTerm mCngSecTerm[CNG_TERM_MAX_NUM];
  void TargetDrivenParm_init(TargetDrivenParm *this_TargetDrivenParm,
 	S8 targForwardVal,float curvature,RUN_MODE runMode,int tailAngle,U16 targLightVal,TARG_CTRL_METHOD targCtrlMethod,U16 whiteVal,U16 blackVal,U16 volt,U16 gyroOffset);
 	*/
- TargetDrivenParm_init(&mTargetDrivenParm,0,0,TAIL_RUNNING,95,0,HYBRID_PID,0,0,0,0);
+ TargetDrivenParm_init(&mTargetDrivenParm,0,0,BALANCING,95,0,HYBRID_PID,0,0,0,0);
 
  /* data format
  void CngSectTerm_init(CngSectTerm *this_CngSectTerm,SectName nextSectName1,BOOL jBT1,int targDist1,BOOL jLineEdge1,U16 targGradient1,

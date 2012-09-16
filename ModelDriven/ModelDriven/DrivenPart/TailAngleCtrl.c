@@ -7,7 +7,6 @@
  */
 
 
-
 //‰Šú‰»ƒƒ\ƒbƒh
 void TailAngleCtrl_init(TailAngleCtrl *this_TailAngleCtrl)
 {

@@ -41,10 +41,10 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 	static int resultAngle = 0;
 
 	counter++;
-	/*
+	
 	if(targTailAngle == 0)
 		resultAngle = 0;
-		*/
+		
 	if(counter >= TAIL_ANGLE_COUNT_MAX)
 	{
 		if(targTailAngle - resultAngle >= 0){
@@ -67,23 +67,22 @@ S8 PIDTailAngleCtrl_calcTailAngleCtrlVal(PIDTailAngleCtrl *this_PIDTailAngleCtrl
 	 *	‚µ‚Á‚Û§Œä—ÊZo
 	 */
 
-	S8 t_speed;
+	S32 t_speed;
 
-	this_PIDTailAngleCtrl->deviation = (float)resultAngle - (float)tailAngle;
-	/*
+	this_PIDTailAngleCtrl->deviation = (float)targTailAngle - (float)tailAngle;
+	
 	this_PIDTailAngleCtrl->integratedDeviation = this_PIDTailAngleCtrl->integratedDeviation+(this_PIDTailAngleCtrl->deviation*this_PIDTailAngleCtrl->lastMeasurementTime);
 	this_PIDTailAngleCtrl->differentialDeviation = (this_PIDTailAngleCtrl->deviation - this_PIDTailAngleCtrl->bfDeviation)/this_PIDTailAngleCtrl->lastMeasurementTime;
 	this_PIDTailAngleCtrl->bfDeviation = this_PIDTailAngleCtrl->deviation;
-*/	
-	t_speed = PIDTailAngleCtrl_getPIDTailAngleCtrlParm(&mPIDTailAngleCtrl).Kp * this_PIDTailAngleCtrl->deviation;/* + 
+
+	t_speed = PIDTailAngleCtrl_getPIDTailAngleCtrlParm(&mPIDTailAngleCtrl).Kp * this_PIDTailAngleCtrl->deviation; + 
 		PIDTailAngleCtrlParm_getTKi(&mPIDTailAngleCtrlParm) * this_PIDTailAngleCtrl->integratedDeviation + 
-		PIDTailAngleCtrlParm_getTKd(&mPIDTailAngleCtrlParm) * this_PIDTailAngleCtrl->differentialDeviation;*/
+		PIDTailAngleCtrlParm_getTKd(&mPIDTailAngleCtrlParm) * this_PIDTailAngleCtrl->differentialDeviation;
 		
-	/*
 	if (t_speed < -100)
 		t_speed = -100;
 	else if (t_speed > 100)
 		t_speed = 100;
-		*/
-	return t_speed;
+		
+	return (S8)t_speed;
 }

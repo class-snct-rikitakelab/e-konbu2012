@@ -1,20 +1,24 @@
-
 #include "CurvatureCtrl.h"
+#include "../Common/Factory.h"
 
-void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl){
+/*
+ *	CurvatureCtrl.c
+ *	曲率半径制御器クラス
+ */
 
+//初期化メソッド
+void CurvatureCtrl_init(CurvatureCtrl *this_CurvatureCtrl)
+{
 }
 
-	/**
-	 * 目標曲率半径を設定する
-	 */
-void CurvatureCtrl_setTargCurature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature){
-
+//目標曲率半径設定メソッド
+void CurvatureCtrl_setTargCurvature(CurvatureCtrl *this_CurvatureCtrl, float targCurvature)
+{
+	Curvature_setTargCurvature(&mCurvature,targCurvature);
 }
 
-	/**
-	 * 曲率半径目標制御を実行する
-	 */
-S8 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl){
-
+//曲率半径制御メソッド
+S32 CurvatureCtrl_doCurvatureCtrl(CurvatureCtrl *this_CurvatureCtrl)
+{
+	return PIDCurvatureCtrl_calcCurvatureCtrlVal(&mPIDCurvatureCtrl,Curvature_getTargCurvature(&mCurvature),Curvature_getCurvature(&mCurvature));
 }

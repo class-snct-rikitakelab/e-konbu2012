@@ -52,8 +52,11 @@
 #include "../DrivenPart/TailMotor.h"
 #include "../DrivenPart/TailMotorEncoder.h"
 
-
-
+#include "../DrivenPart/Curvature.h"
+#include "../DrivenPart/PIDCurvatureCtrl.h"
+#include "../DrivenPart/CurvatureEncoder.h"
+#include "../DrivenPart/PIDCurvatureCtrlParm.h"
+	
 /****end DrivenPart include ****/
 
 
@@ -113,6 +116,12 @@ Running mRunning;
 
 /****start create Driven part objects****/
 CurvatureCtrl mCurvatureCtrl;
+Curvature mCurvature;
+PIDCurvatureCtrl mPIDCurvatureCtrl;
+CurvatureEncoder mCurvatureEncoder;
+PIDCurvatureCtrlParm mPIDCurvatureCtrlParm;
+
+
 ForwardValRevise mForwardValRevise;
 LightValCtrl mLightValCtrl;
 

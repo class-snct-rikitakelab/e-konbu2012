@@ -2,12 +2,12 @@
 #define _LIGHT_VAL_CTRL_METHOD_H
 
 #include "../Common/Common.h"
-//#include "PIDLightValCtrlParm.h"
 
 typedef struct{
 }LightValCtrlMethod;
 
-extern void LightValCtrlMethod_setCtrlParm(LightValCtrlMethod *this_LightValCtrlMethod,CtrlParm parm);
+//extern void LightValCtrlMethod_setCtrlParm(LightValCtrlMethod *this_LightValCtrlMethod, CtrlParm parm);
+
 extern void LightValCtrlMethod_init(LightValCtrlMethod *this_LightValCtrlMethod);
 
 #endif

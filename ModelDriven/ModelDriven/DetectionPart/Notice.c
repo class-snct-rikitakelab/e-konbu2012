@@ -102,6 +102,9 @@ void Notice_judgeNotice(Notice *this_Notice){
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		numOfOnFlag[i] = Notice_countOnFlag(this_Notice,this_Notice->noticeTerm[i]);
 	}
+	if(numOfOnFlag[0]=10){
+	//Sound_soundTone(&mSound,250,100,20);
+	}
 	//区間切替条件のトリガーを満たした数をカウント	
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		Notice_setTargVal(this_Notice,this_Notice->term[i]); //検出条件を切り替える

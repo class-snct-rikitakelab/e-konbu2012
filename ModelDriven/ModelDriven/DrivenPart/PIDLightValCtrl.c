@@ -1,27 +1,40 @@
 #include "PIDLightValCtrl.h"
 #include "../Common/Factory.h"
 
+/*
+ *	PIDLightValCtrl.c
+ *	輝度値PID制御クラス
+ */
+
+//初期化メソッド
 void PIDLightValCtrl_init(PIDLightValCtrl *this_PIDLightValCtrl)
 {
+	this_PIDLightValCtrl->deviation = 0;
+	this_PIDLightValCtrl->integratedDeviation = 0;
+	this_PIDLightValCtrl->differentialDeviation = 0;
+	this_PIDLightValCtrl->bfDeviation = 0;
+	this_PIDLightValCtrl->lastMeasurementTime = 0.004;
 }
 
-
-S8 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
+//PIDパラメータ設定メソッド
+void LightValCtrlMethod_setCtrlParm(PIDLightValCtrl *this_PIDLightValCtrl, CtrlParm parm)
 {
-	//PID制御用偏差値
+	PIDLightValCtrlParm_setLKp(&mPIDLightValCtrlParm,parm.Kp);
+	PIDLightValCtrlParm_setLKi(&mPIDLightValCtrlParm,parm.Ki);
+	PIDLightValCtrlParm_setLKd(&mPIDLightValCtrlParm,parm.Kd);
+}
 
-	static float hensa = 0;
-	static float i_hensa = 0;			//I制御用
-	static float d_hensa = 0;			//D制御用
-	static float bf_hensa = 0;
+//PID制御計算メソッド
+S32 PID_LightValCtrl_calcLightValCtrlVal(PIDLightValCtrl *this_PIDLightValCtrl, U16 targLightVal, U16 lightVal)
+{
+	this_PIDLightValCtrl->deviation = (float)targLightVal - (float)lightVal;
+
+	this_PIDLightValCtrl->integratedDeviation = this_PIDLightValCtrl->integratedDeviation+(this_PIDLightValCtrl->deviation*this_PIDLightValCtrl->lastMeasurementTime);
+	this_PIDLightValCtrl->differentialDeviation = (this_PIDLightValCtrl->deviation - this_PIDLightValCtrl->bfDeviation)/this_PIDLightValCtrl->lastMeasurementTime;
+	this_PIDLightValCtrl->bfDeviation = this_PIDLightValCtrl->deviation;
 	
-	hensa = (float)targLightVal - (float)lightVal;//(float)ecrobot_get_light_sensor(NXT_PORT_S3);
-
-	i_hensa = i_hensa+(hensa*0.004);		//0が1つ多い
-	d_hensa = (hensa - bf_hensa)/0.004;
-	bf_hensa = hensa;
-
-	return -(PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * hensa + 
-		PIDLightValCtrlParm_getLKi(&mPIDLightValCtrlParm) * i_hensa + PIDLightValCtrlParm_getLKd(&mPIDLightValCtrlParm) * d_hensa);
+	return (PIDLightValCtrlParm_getLKp(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->deviation + 
+		PIDLightValCtrlParm_getLKi(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->integratedDeviation + 
+		PIDLightValCtrlParm_getLKd(&mPIDLightValCtrlParm) * this_PIDLightValCtrl->differentialDeviation);
 }
 

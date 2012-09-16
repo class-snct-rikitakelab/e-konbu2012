@@ -76,10 +76,9 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 		{
 			Sound_soundTone(&mSound,932, 512, 10);
 			gyroOffset=GyroSensor_getGyroAngVelocity(&mGyroSensor);
-			mSector.targetDrvenParm.gyroOffset = gyroOffset;
-			//傾き検知器に基準となるオフセット値をセット
-			mGradient.baseGyroVal=gyroOffset;
-			//基準バッテリ電圧値をセット
+			mWheelMotorCtrl.gyroOffset=gyroOffset; //倒立制御用のオフセットをセット
+			mSector.targetDrvenParm.gyroOffset = gyroOffset;//傾き検知器に基準となるオフセット値をセット
+			mGradient.baseGyroVal=gyroOffset;//基準バッテリ電圧値をセット
 			mBattery.initVol=ecrobot_get_battery_voltage();
 
 			systick_wait_ms(500);
@@ -90,10 +89,10 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 		if(TouchSensor_getTouchSensor(&mTouchSensor) == TRUE)
 		{
 			Sound_soundTone(&mSound,932, 512, 10);
-			setTargVals(mSector.targetDrvenParm); //test code
+			setTargVals(idleSector.targetDrvenParm); //test code
 			RunnerRobot_updateRobotState(this_RunnerRobot,DRIVING);
 
-			systick_wait_ms(500);
+			systick_wait_ms(20);
 			break;
 		}
 	}

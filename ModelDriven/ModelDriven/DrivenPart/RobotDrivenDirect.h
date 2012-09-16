@@ -10,7 +10,7 @@
  * 車体駆動指示器
  */
 typedef struct {
-	TargetDrivenParm drivenParm;
+	TargetDrivenParm drivenParm;	//駆動パラメータ
 }RobotDrivenDirect;
 
 	void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect);

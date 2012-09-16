@@ -35,6 +35,10 @@ TARGET_SOURCES := \
 	DirectorPart/RunnerRobot.c \
 	DirectorPart/CngSectLisnner.c \
 	DrivenPart/CurvatureCtrl.c \
+	DrivenPart/Curvature.c \
+	DrivenPart/PIDCurvatureCtrl.c \
+	DrivenPart/CurvatureEncoder.c \
+	DrivenPart/PIDCurvatureCtrlParm.c \
 	DrivenPart/ForwardValRevise.c \
 	DrivenPart/LightValCtrl.c \
 	DrivenPart/RobotDrivenDirect.c \

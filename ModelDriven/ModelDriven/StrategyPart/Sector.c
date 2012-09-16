@@ -1,5 +1,7 @@
 
 #include "Sector.h"
+#include "../NXTHardWare/Sound.h"
+#include "../Common/Factory.h"
 
 void  Sector_init(Sector *this_Sector,SectName sectName,TargetDrivenParm targetDrivenParm, CngSectTerm *cngTerm){
 	int i=0;

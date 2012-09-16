@@ -4,7 +4,7 @@
 
 
 void setTargVals(TargetDrivenParm parm){
-	parm.targForwardVal =20;
-	parm.runMode=BALANCING;
+	//parm.targForwardVal =0;
+	//parm.runMode=BALANCING;
 	RobotDrivenDirect_seDriveParm(&mRobotDrivenDirect,parm);
 }

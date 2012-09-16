@@ -6,7 +6,7 @@
 #include "../NXTHardWare/LightSensor.h"
 
 typedef struct{
-	float targetLightVal;
+	float targetLightVal;	//–Ú•W‹P“x’l
 }LightVal;
 
 void LightVal_init(LightVal * this_LightVal);

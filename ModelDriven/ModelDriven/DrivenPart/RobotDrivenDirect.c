@@ -1,12 +1,12 @@
-
-
 #include "RobotDrivenDirect.h"
-
 #include "../Common/Factory.h"
 
+/*
+ *	RobotDrivenDirect.c
+ *	‹ì“®ŽwŽ¦ŠíƒNƒ‰ƒX
+ */
 
 void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect){
-	RobotDrivenDirect_seDriveParm(this_RobotDrivenDirect,idleSector.targetDrvenParm);
 	//none
 }
 
@@ -15,6 +15,7 @@ void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect){
 	 */
 void RobotDrivenDirect_directDrive(RobotDrivenDirect *this_RobotDrivenDirect){
 	WheelMotorCtrl_doMotorCtrl(&mWheelMotorCtrl);
+	TailAngleCtrl_doTailCtrl(&mTailAngleCtrl);
 }
 
 	/**
