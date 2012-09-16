@@ -15,8 +15,9 @@
 #define RIGHT_ANGLE_AIM 240				//回転角度(160)
 
 
+//shockとtime_countを逆にする
 //バッテリ降下値
-#define STEP_BATTERY 600		//段差検知時
+#define STEP_BATTERY 1000		//段差検知時
 #define STOP_BATTERY 400
 
 /*
