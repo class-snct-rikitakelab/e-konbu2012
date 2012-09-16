@@ -15,7 +15,7 @@ Running_init(&mRunning);
 	
 
 
-Sector_init(&mSector);
+//Sector_init(&mSector);
 
 /****start detectionPart part objects****/
 Notice_init(&mNotice);
@@ -61,3 +61,46 @@ Timer_init(&mTimer);
 /****end create NXT HarDware init****/
 }
 
+
+
+void makeSectors(){
+		//Sector idleSector;
+//Sector fstStraightSector;
+
+TargetDrivenParm mTargetDrivenParm;
+CngSectTerm mCngSecTerm[CNG_TERM_MAX_NUM];
+
+/*___________________MAKE IDLE ___________________________*/
+
+/* data format
+ void TargetDrivenParm_init(TargetDrivenParm *this_TargetDrivenParm,
+	S8 targForwardVal,float curvature,RUN_MODE runMode,int tailAngle,U16 targLightVal,TARG_CTRL_METHOD targCtrlMethod,U16 whiteVal,U16 blackVal,U16 volt,U16 gyroOffset);
+	*/
+ TargetDrivenParm_init(&mTargetDrivenParm,0,0,TAIL_RUNNING,95,0,HYBRID_PID,0,0,0,0);
+
+ /* data format
+ void CngSectTerm_init(CngSectTerm *this_CngSectTerm,SectName nextSectName1,BOOL jBT1,int targDist1,BOOL jLineEdge1,U16 targGradient1,
+ S32 targTime1,float targXCoo1,float targYCoo1,U16 makerhreshold1,int targObstDist1,int targTurnAngle1,int targBatteryVol1,
+	SectName nextSectName2,BOOL jBT2,int targDist2,BOOL jLineEdge2,U16 targGradient2,S32 targTime2,float targXCoo2,float targYCoo2,U16 makerhreshold2,int targObstDist2,int targTurnAngle2,int targBatteryVol2,
+	SectName nextSectName3,BOOL jBT3,int targDist3,BOOL jLineEdge3,U32 targGradient3,S32 targTime3,float targXCoo3,float targYCoo3,U32 makerhreshold3,int targObstDist3,int targTurnAngle3,int targBatteryVol3)
+*/
+
+ CngSectTerm_init(mCngSecTerm,FST_STRAIGHT,true,0,false,0,0,0,0,0,0,0,0,IDLE,false,0,false,0,0,0,0,0,0,0,0,IDLE,false,0,false,0,0,0,0,0,0,0,0);
+
+ Sector_init(&idleSector,IDLE,mTargetDrivenParm,mCngSecTerm);
+ idleSector.nextSect[0]=(Sector*)&fstStraightSector; //ãLñ@Ç†Ç¡ÇƒÇ‹Ç∑Ç©ÅH
+ idleSector.nextSect[1]=NULL;
+ idleSector.nextSect[2]=NULL;
+// idleSector.nextSector[0]=&fstStraightSector;
+
+ /*___________________MAKE FST_STRAIGHT____________________*/
+
+ TargetDrivenParm_init(&mTargetDrivenParm,30,0,TAIL_RUNNING,95,0,HYBRID_PID,0,0,0,0);
+
+ 
+ CngSectTerm_init(mCngSecTerm,UP_SLOPE,false,30,false,30,2000,0,0,0,0,0,0,IDLE,false,0,false,0,0,0,0,0,0,0,0,IDLE,false,0,false,0,0,0,0,0,0,0,0);
+ Sector_init(&fstStraightSector,FST_STRAIGHT,mTargetDrivenParm,mCngSecTerm);
+ /*____________________________________________________*/
+
+
+}

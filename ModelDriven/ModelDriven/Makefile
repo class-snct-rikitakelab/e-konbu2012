@@ -18,6 +18,7 @@ TARGET_SOURCES := \
 	Common/mymath.c \
 	StrategyPart/CngSectTerm.c \
 	StrategyPart/Sector.c \
+	StrategyPart/TargetDrivenParm.c \
 	DetectionPart/RunDist.c \
 	DetectionPart/TurnAngle.c \
 	DetectionPart/Coordinates.c \

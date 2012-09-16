@@ -17,12 +17,12 @@ typedef struct  {
 
 	TargetDrivenParm targetDrvenParm;
 	CngSectTerm cngTerm[CNG_TERM_MAX_NUM];
-	//Sector Ÿ‹æŠÔ[];
+	struct Sector *nextSect[CNG_TERM_MAX_NUM];
 
 }Sector;
 
 
-	void Sector_init(Sector *this_Sector,/*  */);
+	void Sector_init(Sector *this_Sector,SectName sectName,TargetDrivenParm targetDrivenParm, CngSectTerm *cngTerm);
 
 	/**
 	 * ‹æŠÔID‚ğæ“¾‚·‚é
@@ -32,7 +32,7 @@ typedef struct  {
 	/**
 	 * Ÿ‹æŠÔ‚Ö‚ÌØ‘ÖğŒæ“¾
 	 */
-	CngSectTerm Sector_getCngSectTerm(Sector *this_Sector);
+	CngSectTerm* Sector_getCngSectTerm(Sector *this_Sector);
 
 	/**
 	 * Ÿ‹æŠÔ‚ğæ“¾‚·‚é

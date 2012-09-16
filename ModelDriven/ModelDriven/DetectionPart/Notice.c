@@ -12,9 +12,9 @@ void Notice_copyTerm(Notice *this_Notice,CngSectTerm *term){
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
 		this_Notice->term[i].jBT = term[i].jBT;
 		this_Notice->term[i].targDist =term[i].targDist;
-		this_Notice->term[i].jlineEdge = term[i].jlineEdge;
+		this_Notice->term[i].jLineEdge = term[i].jLineEdge;
 		this_Notice->term[i].targBatteryVol = term[i].targBatteryVol;
-		this_Notice->term[i].targetGradient = term[i].targetGradient;
+		this_Notice->term[i].targGradient = term[i].targGradient;
 		this_Notice->term[i].targTime = term[i].targTime;
 		this_Notice->term[i].targXCoo = term[i].targXCoo;
 		this_Notice->term[i].targYCoo = term[i].targYCoo;
@@ -56,14 +56,14 @@ void Notice_setCngSectTerm(Notice *this_Notice,CngSectTerm *term){
 			this_Notice->noticeTerm[i].fDist =true;
 		}
 		
-		if(term[i].jlineEdge ==true ){
+		if(term[i].jLineEdge ==true ){
 			this_Notice->noticeTerm[i].fLineEdge =true;
 		}
 
 		if(term[i].targBatteryVol !=0 ){
 			this_Notice->noticeTerm[i].fBattery =true;
 		}
-		if(term[i].targetGradient !=0 ){
+		if(term[i].targGradient !=0 ){
 			this_Notice->noticeTerm[i].fGradient =true;
 		}
 		if(term[i].targTime !=0 ){
@@ -222,7 +222,7 @@ void Notice_setTargVal(Notice *this_Notice,CngSectTerm term){
 	mCoordinates.targYCoo = term.targYCoo;
 	mDetcMarker.markerThreshold = term.makerThreshold;
 	mDetcObst.dectDist=term.targObstDist;
-	mGradient.targRange=term.targetGradient;
+	mGradient.targRange=term.targGradient;
 	mRunDist.targRunDist=term.targDist;
 	mTimer.targTimer=term.targTime;
 	mTurnAngle.targAngle=term.targTurnAngle;

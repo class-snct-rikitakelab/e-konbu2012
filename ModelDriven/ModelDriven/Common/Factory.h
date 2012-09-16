@@ -94,7 +94,7 @@ TurnAngle mTurnAngle;
 
 /****start create Strategy part objects****/
 Sector mSector;
-Sector idelSector;
+Sector idleSector;
 Sector fstStraightSector;
 
 
@@ -161,8 +161,9 @@ SonorSensor mSonorSensor;
 
 
 extern void factory();
-
+extern void makeSectors();
 #endif
+
 
 
 

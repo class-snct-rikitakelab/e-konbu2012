@@ -64,6 +64,9 @@ typedef struct {
 	U16 gyroOffset;
 
 }TargetDrivenParm;
+void TargetDrivenParm_init(TargetDrivenParm *this_TargetDrivenParm,
+	S8 targForwardVal,float curvature,RUN_MODE runMode,int tailAngle,U16 targLightVal,TARG_CTRL_METHOD targCtrlMethod,U16 whiteVal,U16 blackVal,U16 volt,U16 gyroOffset);
+
 
 #endif
 

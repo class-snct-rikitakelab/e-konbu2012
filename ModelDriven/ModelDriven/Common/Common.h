@@ -33,7 +33,7 @@
 
 #define CIRCUMFERENCE	25.8	//ŽÔ—Ö‚Ì‰~Žü
 
-
+#define NULL (void *)0
 /*
 typedef struct {
 float forward_val;
