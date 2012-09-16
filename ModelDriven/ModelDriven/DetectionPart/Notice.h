@@ -23,7 +23,7 @@
 
 
 typedef struct {
-BOOL SectID;
+BOOL sectName;
 BOOL fBT;
 BOOL fLineEdge;
 BOOL fDist;

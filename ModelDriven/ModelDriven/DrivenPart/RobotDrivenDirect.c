@@ -6,6 +6,7 @@
 
 
 void RobotDrivenDirect_init(RobotDrivenDirect *this_RobotDrivenDirect){
+	RobotDrivenDirect_seDriveParm(this_RobotDrivenDirect,idleSector.targetDrvenParm);
 	//none
 }
 

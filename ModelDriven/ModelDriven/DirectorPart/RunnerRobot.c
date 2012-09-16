@@ -47,7 +47,7 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 			blackVal=LightSensor_getLightSensorVal(&mLightSensor);
 			mSector.targetDrvenParm.blackVal=blackVal;
 
-			systick_wait_ms(500);
+			systick_wait_ms(300);
 
 			break;
 		}

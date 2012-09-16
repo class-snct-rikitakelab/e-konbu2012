@@ -3,13 +3,14 @@
 #include "../Common/Factory.h"
 
 void Notice_init(Notice *this_Notice){
-	Notice_setCngSectTerm(this_Notice,mSector.cngTerm);
+	Notice_setCngSectTerm(this_Notice,idleSector.cngTerm);
 }
 
 void Notice_copyTerm(Notice *this_Notice,CngSectTerm *term){
 	int i=0;
 
 	for(i=0;i<CNG_TERM_MAX_NUM;++i){
+		this_Notice->term[i].nextSectName =term[i].nextSectName;
 		this_Notice->term[i].jBT = term[i].jBT;
 		this_Notice->term[i].targDist =term[i].targDist;
 		this_Notice->term[i].jLineEdge = term[i].jLineEdge;
@@ -116,7 +117,7 @@ void Notice_judgeNotice(Notice *this_Notice){
 			Timer_reset(&mTimer); //区間走行経過時間をリセット
 			Coordinates_rest(&mCoordinates);//現在座標をバッファに保存　区間開始点を基準とするため
 			//need more reset methods
-			//Running_cngNextSect(&mRunning,this_Notice->term[i].sectName);
+			Running_cngNextSect(&mRunning,this_Notice->term[i].nextSectName);
 		}
 	}
 	

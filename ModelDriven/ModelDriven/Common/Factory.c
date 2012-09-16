@@ -20,7 +20,17 @@ Running_init(&mRunning);
 /****start detectionPart part objects****/
 Notice_init(&mNotice);
 LocationInfo_init(&mLocationInfo);
-//not yet all initlized
+
+Battery_init(&mBattery);
+Coordinates_init(&mCoordinates);
+DetcMarker_init(&mDetcMarker);
+DetcObst_init(&mDetcObst);
+Gradient_init(&mGradient);
+LineEdge_init(&mLineEdge);
+RunDist_init(&mRunDist);
+RunStartSigRecv_init(&mRunStartSigRecv);
+Timer_init(&mTimer);
+TurnAngle_init(&mTurnAngle);
 
 /****end dectionPart part objects****/
 
@@ -41,6 +51,7 @@ WheelMotorCtrl_init(&mWheelMotorCtrl);
 
 
 /****start Strategy part init****/
+
 
 //test object
 
