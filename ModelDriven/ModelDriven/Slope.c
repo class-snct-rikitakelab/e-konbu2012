@@ -149,8 +149,7 @@ TASK(LogTask)
 	//logSend(SelfLocation_GetDistance(&mSelfLocation),cmd_turn,SelfLocation_GetDistance(&mSelfLocation),ecrobot_get_gyro_sensor(NXT_PORT_S1),		//Bluetoothを用いてデータ送信
 	//		BLACK_VALUE,WHITE_VALUE);
 
-	///sonarcheck();											//超音波センサ状態管理
-	//getsonarvalue();
+	
 
 	TerminateTask();
 }

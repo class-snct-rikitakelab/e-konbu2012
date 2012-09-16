@@ -65,9 +65,26 @@ CngSectTerm* Sector_getCngSectTerm(Sector *this_Sector){
 	/**
 	 * 次区間を取得する
 	 */
-Sector Sector_getNextSect(Sector *this_Sector){
+Sector Sector_getNextSect(Sector *this_Sector,SectName sectName){
+	Sector *nextSect;
+	int i=0;
+//	nextSect = this_Sector-*nextSect.sectName
+	nextSect = (Sector*)(this_Sector->nextSect[i]);
+
 	
-	return *this_Sector; //test code
+	//nextSect.sectName
+	for(i=0;i<CNG_TERM_MAX_NUM;++i){
+		nextSect = (Sector*)(this_Sector->nextSect[i]);
+		
+		if(nextSect->sectName==sectName){
+		break;
+		}
+		
+	return *nextSect; 
+
+	/*これであってるか分からない。 ポインタの使いドコロがあやしいかも	*/
+}
+
 }
 
 	/**

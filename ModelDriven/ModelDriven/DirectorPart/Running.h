@@ -15,7 +15,7 @@
  */
 
 typedef struct {
-	int currentSect;
+	Sector currentSect;
 }Running; 
 	/**
 	 * Œ»İ‹æŠÔ
