@@ -37,7 +37,7 @@ typedef enum{
 	RN_STEP,				//ルックアップゲート
 	RN_RUN_THIRD,				//ルックアップゲート後の基本走行
 	RN_SEESAW,				//ドリフトターン
-	RN_KEEP_RUN,
+	RN_KEEPRUN,
 } RN_SETTINGMODE;
 
 //初期状態
@@ -142,24 +142,24 @@ void RN_setting()
 		case (RN_SETTINGMODE_START):
 			if(RN_calibrate() == 1)
 			{
-				setting_mode = RN_RUN;
-				PWMGeneratorModeChange(RN_MODE_TAIL);
-				TailAngleChange(ANGLEOFDOWN);
+				setting_mode = RN_STEP;
+				PWMGeneratorModeChange(RN_MODE_BALANCE);
+				TailAngleChange(ANGLEOFUP);
 			}
 			break;
 		
 			//通常走行状態
 		case (RN_RUN):
-			setCmdForward(RA_speed(100));
+			setCmdForward(RA_speed(30));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			
+			/*
 			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
 				timecounter = 0;
 			}
-			
+			*/
 			break;
 			
 		case (RN_SLOPE):
@@ -173,8 +173,11 @@ void RN_setting()
 			break;
 
 		case (RN_STEP):
+			/*
 			if(runningStep() == 1)
 				setting_mode = RN_RUN_THIRD;
+			*/
+			runningStep();
 			break;
 			
 		case (RN_RUN_THIRD):
@@ -229,7 +232,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(0,cmd_turn,dist,getDistance(),getInitGyroOffset(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
+	logSend(0,cmd_turn,dist,getDistance(),ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
 	TerminateTask();
 }

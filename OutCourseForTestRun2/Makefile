@@ -23,9 +23,12 @@ TARGET_SOURCES := \
 	LogSend.c \
 	PWMGenerator.c \
 	Slope.c \
-	CalcDistance.c
-
-
+	CalcDistance.c \
+	Step.c \
+	SeeSaw.c \
+	BatteryCheck.c \
+	mymath.c \
+	runnerForTestRun.c \
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

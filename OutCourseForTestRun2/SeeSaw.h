@@ -27,7 +27,7 @@ typedef enum{
 	RN_FORWARD,
 } SEESAWMODE;
 
-SEESAWMODE seesawmode = EN_SEESAW_START;
+SEESAWMODE seesawmode = RN_SEESAW_START;
 
 
 #endif
