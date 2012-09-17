@@ -71,13 +71,14 @@ TASK(ActionTask2)
 	parm.blackVal = 560;
 	parm.curvature = 0.0;
 	parm.gyroOffset = 0;
-	parm.runMode = TAIL_RUNNING;
+	parm.runMode = BALANCING;
 	parm.tailAngle = 95;
-	parm.targCtrlMethod = CURV_PID;
-	parm.targForwardVal = 50;
+	parm.targCtrlMethod = LIGHT_PID/*CURV_PID*/;
+	parm.targForwardVal = 10;
 	parm.targLightVal = 600;
 	parm.volt = 7800;
 	parm.whiteVal = 620;
+
 	RobotDrivenDirect_seDriveParm(&mRobotDrivenDirect,parm);
 	LocationInfo_selfLocate(&mLocationInfo);
 	logSend(0,0,Curvature_getCurvature(&mCurvature),Curvature_getTargCurvature(&mCurvature),0,0);

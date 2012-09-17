@@ -23,6 +23,8 @@ void WheelMotorCtrl_setMotionTargVal(WheelMotorCtrl *this_WheelMotorCtrl,TargetD
 	this_WheelMotorCtrl->runMode = parm.runMode;										//走行モード(倒立,尻尾）
 	this_WheelMotorCtrl->targCtrlMethod = parm.targCtrlMethod;							//制御方式（輝度値,曲率半径,ハイブリッド）
 	ForwardValRevise_setTargForwardVal(&mForwardValRevise,parm.targForwardVal);			//目標前進量
+	
+	
 	LightValCtrl_setTargLightVal(&mLightValCtrl,((parm.whiteVal + parm.blackVal)/2));	//目標輝度値
 	CurvatureCtrl_setTargCurvature(&mCurvatureCtrl,parm.curvature);						//目標曲率半径
 	this_WheelMotorCtrl->gyroOffset=this_WheelMotorCtrl->gyroOffset + parm.gyroOffset;									//ジャイロオフセット値
@@ -43,9 +45,11 @@ void WheelMotorCtrl_doMotorCtrl(WheelMotorCtrl *this_WheelMotorCtrl){
 
 		case BALANCING :
 			WheelMotorCtrl_calcBalancingMotorCtrlVal(this_WheelMotorCtrl,forward,turn,this_WheelMotorCtrl->gyroOffset);
+			
 			break;
 
 		default :
+			
 			//none
 			break;
 	}
@@ -61,6 +65,7 @@ S8 WheelMotorCtrl_calTurnVal(WheelMotorCtrl *this_WheelMotorCtrl){
 	switch (this_WheelMotorCtrl->targCtrlMethod){
 		case  LIGHT_PID :
 			turn = LightValCtrl_doLightValCtrl(&mLightValCtrl);
+			
 			break;
 
 		case CURV_PID :

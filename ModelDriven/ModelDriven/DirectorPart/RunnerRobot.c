@@ -45,7 +45,7 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 		{
 			Sound_soundTone(&mSound,880, 512, 10);
 			blackVal=LightSensor_getLightSensorVal(&mLightSensor);
-			mSector.targetDrvenParm.blackVal=blackVal;
+			idleSector.targetDrvenParm.blackVal=blackVal;
 
 			systick_wait_ms(300);
 
@@ -59,7 +59,7 @@ void  RunnerRobot_calibrate(RunnerRobot *this_RunnerRobot){
 		{
 			Sound_soundTone(&mSound,880, 512, 10);
 			whiteVal=LightSensor_getLightSensorVal(&mLightSensor);
-			mSector.targetDrvenParm.whiteVal=whiteVal;
+			idleSector.targetDrvenParm.whiteVal=whiteVal;
 			systick_wait_ms(500);
 			break;
 		}

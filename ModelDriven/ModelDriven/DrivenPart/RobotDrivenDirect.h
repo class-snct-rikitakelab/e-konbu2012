@@ -23,7 +23,7 @@ typedef struct {
 	/**
 	 * 目標駆動パラメータを設定する
 	 */
-	void RobotDrivenDirect_seDriveParm(RobotDrivenDirect *this_RobotDrivenDirect,TargetDrivenParm parm);
+	void RobotDrivenDirect_setDriveParm(RobotDrivenDirect *this_RobotDrivenDirect,TargetDrivenParm parm);
 
 #endif
 

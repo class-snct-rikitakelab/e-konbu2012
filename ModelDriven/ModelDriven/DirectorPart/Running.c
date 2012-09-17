@@ -24,7 +24,7 @@ void Running_cngNextSect(Running *this_Running,SectName nextSectName){
 	TargetDrivenParm drivenParm = Sector_getTargDrienParm(&(this_Running->currentSect));
 
 	//駆動パラメータをセット
-	RobotDrivenDirect_seDriveParm(&mRobotDrivenDirect,drivenParm);
+	RobotDrivenDirect_setDriveParm(&mRobotDrivenDirect,drivenParm);
 
 	//新しい区間の区間切替条件を取得しセット
 	CngSectTerm  *term = Sector_getCngSectTerm(&(this_Running->currentSect));
