@@ -61,10 +61,10 @@ int runningStep()
 			}
 			distance_back = getNowDistance();
 			time_count++;
-			setCmdForward(RA_speed(-10));
+			setCmdForward(RA_speed(-5));
 			setCmdTurn(RA_curvatureCtrl_PID(0.0));
 			
-			if(distance_back - distance_stop < -2)
+			if(distance_back - distance_stop < -4)
 			{
 				//setGyroOffset(getGyroOffset() + 4);
 				stepmode = RN_STEP_RAPID;
@@ -73,53 +73,49 @@ int runningStep()
 
 			//‰Á‘¬
 		case (RN_STEP_RAPID):
-			setCmdForward(RA_speed(-5));
+			setCmdForward(RA_speed(-10));
 			setCmdTurn(RA_curvatureCtrl_PID(0.0));
 			distance_back = getNowDistance();
 			if(distance_back - distance_stop < -4)
 			{
-			setCmdForward(RA_speed(25));
+			setCmdForward(RA_speed(0));
 			setCmdTurn(0);
 			setGyroOffset(getGyroOffset() + 30);
 			time_count = 0;
 			stepmode = RN_STEP_SHOCK;
-			ecrobot_sound_tone(880, 30, 30);
+
 			}
 			break;
 
 			//’i·ŒŸ’m
 		case (RN_STEP_SHOCK):
-			setCmdForward(RA_speed(25));
-			setCmdTurn(0);
-			time_count++;
-			
-			if(time_count > 
-				150)
+			if(shock(STEP_BATTERY) == 1)
 			{
-				if(shock(STEP_BATTERY) == 1)
-				{
-					//ecrobot_sound_tone(880, 512, 30);
-					setMinVol(getbatteryvalue());
-					stepmode = RN_STEP_SLOW;
-				}
+				ecrobot_sound_tone(880, 512, 30);
+				setMinVol(getbatteryvalue());
+				stepmode = RN_STEP_SLOW;
+				time_count = 0;
 			}
 			
 			break;
 
 			//Œ¸‘¬
 		case (RN_STEP_SLOW):
+			time_count++;
 			setCmdForward(0);
 			setCmdTurn(0);
-			setGyroOffset(getGyroOffset() - 32);
-			//ecrobot_sound_tone(880, 512, 30);
-			stepmode = RN_STEP_STAY;
-			time_count = 0;
+			if(time_count > 50)
+			{
+				setGyroOffset(getGyroOffset() - 30);
+				stepmode = RN_STEP_STAY;
+				time_count = 0;
+			}
 			break;
 
 			//—¯‚Ü‚é
 		case (RN_STEP_STAY):
-			setCmdForward(0);
-			setCmdTurn(0);
+			setCmdForward(25);
+			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			time_count++;
 			
 			if(time_count == 150)
