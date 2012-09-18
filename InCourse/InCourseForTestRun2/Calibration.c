@@ -30,7 +30,9 @@ int RN_calibrate(void)
 	}
 
 	//灰色値計算
-	GRAY_VALUE=(BLACK_VALUE*0.4+WHITE_VALUE*0.6);
+	//GRAY_VALUE=(BLACK_VALUE*0.4+WHITE_VALUE*0.6);
+	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
+	
 	/*
 	//尻尾をルックアップゲート時の角度に
 	TailAngleChange(ANGLEOFLOOKUP);

@@ -137,7 +137,7 @@ int RA_wheels(int turn){
 void RN_setting()
 {
 	static int timecounter = 0;
-	float weight = 0.8;
+	float weight = 1.0;
 	if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
 				setting_mode = TYREAL;
@@ -178,12 +178,15 @@ void RN_setting()
 	
 			//通常走行状態
 		case (RN_RUN):
-			setCmdForward(RA_speed(getTargSpeed()));
-			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
-			setSection_in();
+			
+			setCmdForward(/*RA_speed(*/getTargSpeed()/*)*/);
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR())+RA_directionCtrl_PID(-1/*getTargetTheta())*/));
+			//setSection_in();
+
 			if(crt_sect==LOOKUP){
 				setting_mode = RN_LOOKUPGATE;
 			}
+		
 		/*	
 			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 1000)
 			{
@@ -262,7 +265,7 @@ TASK(LogTask)
 
 //logSend(cmd_forward, cmd_turn,BLACK_VALUE,WHITE_VALUE,GRAY_VALUE, (S16)getDistance());
 
-logSend(cmd_forward, cmd_turn, (S16) getXCoo(), (S16) getYCoo(), getTheta(),(U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)/* (S16)getDistance()*/);
+logSend(cmd_forward, cmd_turn, (S16) getXCoo(), (S16) getYCoo(), getTheta(),/*(U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)*/  (S16)getDistance());
 	//logSend(0,cmd_turn,dist,getDistance(),,ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
 	getSonarValue();
