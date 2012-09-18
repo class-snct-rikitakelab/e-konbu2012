@@ -11,13 +11,13 @@
 #include "RemoteStart.h"
 #include "runnerForTestRun.h"
 
-#define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.95		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.97		//ラインから脱した際の光センサの値(570)
 #define RIGHT_ANGLE_AIM 240				//回転角度(160)
 
 
 //shockとtime_countを逆にする
 //バッテリ降下値
-#define STEP_BATTERY 1000		//段差検知時
+
 #define STOP_BATTERY 400
 
 /*
@@ -43,5 +43,7 @@ typedef enum{
 RN_STEPMODE stepmode = RN_STEP_START;
 
 extern int runningStep();
+
+extern int getcount();
 
 #endif

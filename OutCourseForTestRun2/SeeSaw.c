@@ -38,7 +38,7 @@ int runningSeeSaw(){
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			if(timer_count > 100)
 			{
-				if(shock(STEP_BATTERY) == 1)
+				if(shock(900) == 1)
 				{
 					ecrobot_sound_tone(880, 512, 30);
 					min_vol = battery_value;

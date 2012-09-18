@@ -1,8 +1,15 @@
 #include "Step.h"
 
+static int time_count;
+
+int getcount()
+{
+	return time_count;
+}
+
 int runningStep()
 {
-	static int time_count = 0;
+//	static int time_count = 0;
 	static int step_count = 0;
 
 		//距離計測用変数
@@ -21,27 +28,32 @@ int runningStep()
 
 	static int stependflag = 0;
 
+	static int STEP_BATTERY;		//段差検知時、バッテリが減るとどんどん下がっていく（80で800下がらないくらい→残量に応じた設定が必要？）
+
 	switch (stepmode){
-								//通常走行
+								//通常走行 
 		case (RN_STEP_START):
+			STEP_BATTERY = 800;
 			time_count++;
-			setCmdForward(RA_speed(30));
+			setCmdForward(RA_speed(20));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			
 			if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 70 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 70 )
-				&& time_count > 600)
+				&& time_count > 1000)
 			{
 				stepmode = RN_STEP_BACK;
 				time_count = 0;
 				ecrobot_sound_tone(900,30,50);
+				setGyroOffset(getGyroOffset() - 6);
+				distance_stop = getNowDistance();
 			} 
 			
-			/*
+			
 			if(RN_rapid_speed_up_signal_recevie() == 1)
 			{
 				stepmode = RN_STEP_RAPID;
 			}
-			*/
+			
 			//直角カーブ部分
 			/*
 			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 300)
@@ -54,37 +66,45 @@ int runningStep()
 			break;
 
 		case (RN_STEP_BACK):
+			time_count++;
 			if(time_count == 0)
 			{
-				setGyroOffset(getGyroOffset() - 8);
-				distance_stop = getNowDistance();
+
 			}
+			if(time_count == 200)
+			{
+				setGyroOffset(getGyroOffset() + 4);
+				ecrobot_sound_tone(880, 512, 30);
+			}
+				//distance_stop = getNowDistance();
+
 			distance_back = getNowDistance();
 			time_count++;
-			setCmdForward(RA_speed(-5));
+			setCmdForward(RA_speed(-10));
 			setCmdTurn(RA_curvatureCtrl_PID(0.0));
 			
-			if(distance_back - distance_stop < -4)
+			if(distance_back - distance_stop < -4 || distance_back - distance_stop > 4)
 			{
 				//setGyroOffset(getGyroOffset() + 4);
+				ecrobot_sound_tone(880, 512, 30);
 				stepmode = RN_STEP_RAPID;
 			}
 			break;
 
 			//加速
 		case (RN_STEP_RAPID):
-			setCmdForward(RA_speed(-10));
+			//setCmdForward(RA_speed(-10));
 			setCmdTurn(RA_curvatureCtrl_PID(0.0));
-			distance_back = getNowDistance();
-			if(distance_back - distance_stop < -4)
-			{
+			//distance_back = getNowDistance();
+			//if(distance_back - distance_stop < -4)
+			//{
 			setCmdForward(RA_speed(0));
-			setCmdTurn(0);
-			setGyroOffset(getGyroOffset() + 30);
+			//setCmdTurn(0);
+			setGyroOffset(getGyroOffset() + 33);	//30:弱すぎ 33:強すぎ
 			time_count = 0;
 			stepmode = RN_STEP_SHOCK;
 
-			}
+			//}
 			break;
 
 			//段差検知
@@ -95,31 +115,31 @@ int runningStep()
 				setMinVol(getbatteryvalue());
 				stepmode = RN_STEP_SLOW;
 				time_count = 0;
-			}
-			
+			}			
 			break;
 
 			//減速
 		case (RN_STEP_SLOW):
 			time_count++;
-			setCmdForward(0);
-			setCmdTurn(0);
-			if(time_count > 50)
+			setCmdForward(RA_speed(0));
+			setCmdTurn(RA_curvatureCtrl_PID(0.0));
+			if(time_count > 120)
 			{
-				setGyroOffset(getGyroOffset() - 30);
+				setGyroOffset(getGyroOffset() - 38);	//ブレーキは概ねこの値？
 				stepmode = RN_STEP_STAY;
 				time_count = 0;
+			     
 			}
 			break;
 
 			//留まる
 		case (RN_STEP_STAY):
-			setCmdForward(25);
+			setCmdForward(20);
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			time_count++;
 			
 			if(time_count == 150)
-			setGyroOffset(getGyroOffset() + 8);
+			setGyroOffset(getGyroOffset() + 10);		//？ 
 			
 			if(time_count >= 600)
 			{
@@ -137,24 +157,27 @@ int runningStep()
 
 			if(step_count == 0)
 			{
+				STEP_BATTERY = 1200;
 				distance_second = getNowDistance();
-				setCmdForward(RA_speed(25));
+				setCmdForward(RA_speed(20));
 				setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 70 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 70 ) 
-				&& time_count > 600)
+			if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 100 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 100 ) 
+				&& time_count > 400)
 			{
 				stepmode = RN_STEP_BACK;
 				step_count = 1;
 				time_count = 0;
 				ecrobot_sound_tone(900,30,50);
+				setGyroOffset(getGyroOffset() - 4);
+				distance_stop = getNowDistance();
 			} 
-				/*
-				if(RN_rapid_speed_up_signal_recevie() == 1 || distance_second - distance_stay > 8)
+				
+				if(RN_rapid_speed_up_signal_recevie() == 1/* || distance_second - distance_stay > 8*/)
 				{
 					step_count = 1;
-					//stepmode = RN_STEP_RAPID;
+					stepmode = RN_STEP_RAPID;
 				}
-				*/
+		
 			}
 
 
@@ -179,9 +202,9 @@ int runningStep()
 
 		case (RN_STEP_TURN_START):
 			time_count++;
-			setCmdForward(RA_speed(15));
+			setCmdForward(RA_speed(20));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 300)
+			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 1000)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				stepmode = RN_STEP_TURN_LEFT;

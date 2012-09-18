@@ -232,7 +232,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(0,cmd_turn,dist,getDistance(),ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
+	logSend(R,cmd_turn,getcount(),getDistance(),ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
 	TerminateTask();
 }

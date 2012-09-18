@@ -2,7 +2,6 @@
 #define _BATTERYCHECK_H_
 
 //バッテリ降下値
-#define STEP_BATTERY 300
 #define STOP_BATTERY 400
 
 #include "ecrobot_interface.h"
