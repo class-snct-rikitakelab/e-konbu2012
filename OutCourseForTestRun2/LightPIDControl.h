@@ -6,9 +6,9 @@
 
 //ライントレース時PID制御用係数
 
-static float Kp = 1.53;//0.436;				//P制御用
-static float Ki = 1.2;//0;//1.31;					//I制御用
-static float Kd = 0.25;//0.074;//0.011;				//D制御用
+static float Kp = 1.15;//0.436;				//P制御用
+static float Ki = 0.3;//0;//1.31;					//I制御用
+static float Kd = 0.3;//0.074;//0.011;				//D制御用
 /*
 static float Kp = 1.85;
 static float Ki = 2.6;

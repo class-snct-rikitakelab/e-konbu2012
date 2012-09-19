@@ -11,10 +11,12 @@
 #define ANGLEOFZERO		0
 #define ANGLEOFUP		6	//尻尾不使用
 #define ANGLEOFLOOKUP	56	//ルックアップゲート通過
-#define ANGLEOFSTAND	100	//直立状態
-#define ANGLEOFPUSH		120	//走行体跳ね上げ
+#define ANGLEOFSTAND	103	//直立状態
+#define ANGLEOFPUSH		110	//走行体跳ね上げ
+#define ANGLEOFSLOPEUP	80	//坂道下り
+#define	ANGLEOFSLOPEDOWN	110	//坂道上り
 
-#define TAIL_ANGLE_COUNT 5
+#define TAIL_ANGLE_COUNT 3
 /*
 //尻尾の状態
 typedef enum{

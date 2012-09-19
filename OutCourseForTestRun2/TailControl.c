@@ -29,6 +29,9 @@ void TargetTailAngleControl(){
 	if(target_angle == ANGLEOFUP)
 		result_angle = ANGLEOFUP;
 
+	if(target_angle == ANGLEOFPUSH)
+		result_angle = ANGLEOFPUSH;
+
 	if(counter >= TAIL_ANGLE_COUNT)
 	{
 		if(target_angle - result_angle >= 0){
