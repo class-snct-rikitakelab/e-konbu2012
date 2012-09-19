@@ -166,9 +166,9 @@ void RN_setting()
 		case (RN_SETTINGMODE_START):
 			if(RN_calibrate() == 1)
 			{
-				setting_mode = RN_RUN;
-				PWMGeneratorModeChange(RN_MODE_TAIL);
-				TailAngleChange(ANGLEOFDOWN);
+				setting_mode = RN_STEP;
+				PWMGeneratorModeChange(RN_MODE_BALANCE);
+				TailAngleChange(ANGLEOFUP);
 				resetSelfLocation();
 				bufClear();//　キャリブレーション後に自己位置推定関連のバッファをクリア
 				systick_wait_ms(500);
