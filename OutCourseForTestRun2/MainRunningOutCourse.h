@@ -27,6 +27,7 @@
 
 #include "mymath.h"
 #include "runnerForTestRun.h"
+#include "TailtoBalance.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

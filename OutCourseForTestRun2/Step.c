@@ -156,41 +156,29 @@ int runningStep()
 				distance_second = getNowDistance();
 				setCmdForward(RA_speed(20));
 				setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 100 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 100 ) 
-				&& time_count > 400)
-			{
-				batteryweight = 1.4;
-				stepmode = RN_STEP_BACK;
-				step_count = 1;
-				time_count = 0;
-				//ecrobot_sound_tone(900,30,50);
-				setGyroOffset(getGyroOffset() - 4);
-				distance_stop = getNowDistance();
-			} 
-				
-				if(RN_rapid_speed_up_signal_recevie() == 1/* || distance_second - distance_stay > 8*/)
+				if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 120 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 120 ) 
+					&& time_count > 400)
 				{
+					batteryweight = 1.0;
+					stepmode = RN_STEP_BACK;
 					step_count = 1;
-					stepmode = RN_STEP_RAPID;
-				}
-		
+					time_count = 0;
+					//ecrobot_sound_tone(900,30,50);
+					setGyroOffset(getGyroOffset() - 4);
+					distance_stop = getNowDistance();
+				}	 
+				
 			}
-
 
 			else if(step_count == 1)
 			{
 				setCmdForward(RA_speed(20));
 				setCmdTurn(RA_linetrace_PID(getCmdForward()));
-				if(time_count > 300)
+				if(time_count > 350);
 				{
-					//gyro_offset -= 30;
-					if(time_count > 350);
-					{
-						time_count = 0;
-						stepmode = RN_STEP_TURN_START;
-					}
+					time_count = 0;
+					stepmode = RN_STEP_TURN_START;
 				}
-
 			}
 
 			break;
@@ -200,7 +188,7 @@ int runningStep()
 			time_count++;
 			setCmdForward(RA_speed(20));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 1000)
+			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				stepmode = RN_STEP_TURN_LEFT;
@@ -211,7 +199,6 @@ int runningStep()
 			//íºäpÉJÅ[Éu
 		case (RN_STEP_TURN_LEFT):
 			setCmdForward(0);
-			setCmdTurn(0);
 			if(time_count == 0)
 			{
 				angle_l_now = ecrobot_get_motor_rev(NXT_PORT_B);
@@ -223,11 +210,12 @@ int runningStep()
 			if(ecrobot_get_motor_rev(NXT_PORT_B) - angle_l_now <= RIGHT_ANGLE_AIM)
 			{
 				/* âÒì]Ç∑ÇÈ */
-				cmd_turn = -100;
+				setCmdTurn(-100);
 			}
 			else
 			{
 				/* é~Ç‹ÇÈ */
+				setCmdTurn(0);
 				time_count = 0;
 				stepmode = RN_STEP_TURN_FORWARD;
 			}

@@ -167,8 +167,11 @@ void RN_setting()
 			if(RN_calibrate() == 1)
 			{
 				setting_mode = RN_STEP;
+				
 				PWMGeneratorModeChange(RN_MODE_BALANCE);
+				
 				TailAngleChange(ANGLEOFUP);
+				
 				resetSelfLocation();
 				bufClear();//　キャリブレーション後に自己位置推定関連のバッファをクリア
 				systick_wait_ms(500);
@@ -178,21 +181,19 @@ void RN_setting()
 	
 			//通常走行状態
 		case (RN_RUN):
+			/*
 			setCmdForward(RA_speed(getTargSpeed()));
 			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
 			setSection_out();
-			/*
-			if(crt_sect == UP_SLOPE){
-				setting_mode = RN_SLOPE;
-			}
-		*/
+
 			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
 				timecounter = 0;
 			}
-			
+			*/
+			tailToBalance();
 			break;
 			
 		case (RN_SLOPE):

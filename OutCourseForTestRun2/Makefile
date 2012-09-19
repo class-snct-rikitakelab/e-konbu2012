@@ -29,6 +29,7 @@ TARGET_SOURCES := \
 	BatteryCheck.c \
 	mymath.c \
 	runnerForTestRun.c \
+	TailtoBalance.c
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 
