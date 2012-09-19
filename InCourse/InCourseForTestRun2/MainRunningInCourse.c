@@ -137,7 +137,7 @@ int RA_wheels(int turn){
 void RN_setting()
 {
 	static int timecounter = 0;
-	float weight = 1.0;
+	float weight = 0.7;
 	if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
 			{
 				setting_mode = TYREAL;
@@ -178,10 +178,28 @@ void RN_setting()
 	
 			//通常走行状態
 		case (RN_RUN):
+			setCmdForward(RA_speed(25));
+			setCmdForward(RA_speed(getTargSpeed()));
+			switch (targCtrlMethod){
+			case HYBRID : 
+				setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR())+RA_directionCtrl_PID(getTargetTheta()));
+					   break;
 			
-			setCmdForward(/*RA_speed(*/getTargSpeed()/*)*/);
-			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR())+RA_directionCtrl_PID(-1/*getTargetTheta())*/));
-			//setSection_in();
+			case LIGHT_PID :
+				setCmdTurn(RA_linetrace_PID(getCmdForward()));
+				break;
+			case CURV_PID :
+					setCmdTurn(RA_curvatureCtrl_PID(getTargetR())+RA_directionCtrl_PID(getTargetTheta()));
+				break;
+			default :
+				setCmdTurn(0);
+				break;
+
+			}
+			
+			setSection_in(); //インコース用
+			//setSection_out(); //アウトコース用
+
 
 			if(crt_sect==LOOKUP){
 				setting_mode = RN_LOOKUPGATE;

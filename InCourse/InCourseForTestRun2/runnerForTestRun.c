@@ -8,6 +8,8 @@
 #include "mymath.h"
 #include "SelfLocation.h"
 #include "Calibration.h"
+#include "MainRunningInCourse.h"
+
 
 void cngSection(IN_SECTION *crt_sect, float *buf_l, int tone); 
 
@@ -124,24 +126,29 @@ void setSection_in(){
 
 	switch(crt_sect){
 	case (START):			//スタート→坂道
-		if(getInitGyroOffset()-15 /*- 30*/ > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500){
+		if(getInitGyroOffset()-20 /*- 30*/ > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && wait_count > 500){
 			ecrobot_sound_tone(220, 100, 50);
+			theta=0; //角度補正
+			x_r=0;
+			y_r=185;
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = UP_SLOPE;
 			trgt_speed = trgt_speed;
 			trgt_theta = 0;
+			
 		}
 		trgt_R = 0.0;
 		break;
 
 		case (UP_SLOPE):		//坂道始点→37cm//頂点
-			if(def_l >= 30){
+			if(def_l >= 25){
 		//if(def_l >= 57/*65*/ && getInitGyroOffset() - 20 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)){
 
 			ecrobot_sound_tone(233, 100, 50);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = SLOPE_SLOW_DOWN;
 			trgt_speed = trgt_speed -30;
+			theta=0; //角度補正
 		}
 		trgt_R = 0.0;
 		trgt_theta = 0;
@@ -159,6 +166,7 @@ void setSection_in(){
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = DOWN_SLOPE;
 			GRAY_VALUE -=20;
+			theta=0; //角度補正
 		}
 		trgt_R = 0.0;
 		
@@ -171,11 +179,12 @@ void setSection_in(){
 		//頂点→坂道終点,坂道後平地ストレート
 		//if(getDistance() >= 390){
 		if(getInitGyroOffset() - 10 >(U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)){
-			ecrobot_sound_tone(246, 100, 50);
+			//ecrobot_sound_tone(246, 100, 50);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = MINI_STRARIGHT;
 			trgt_speed = trgt_speed + 30;	
 			GRAY_VALUE +=20;
+			theta=0; //角度補正
 		}
 		trgt_R = 0.0;
 		trgt_theta = 0;
@@ -186,6 +195,7 @@ void setSection_in(){
 			ecrobot_sound_tone(246, 100, 50);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_CORNER;
+			theta=0; //角度補正
 			}
 
 		break;
@@ -195,8 +205,8 @@ void setSection_in(){
 			ecrobot_sound_tone(261, 100, 100);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_STRAIGHT;
-			trgt_speed = trgt_speed +0;
-
+			trgt_speed = trgt_speed +10;
+			theta=90; //角度補正
 		}
 		trgt_theta = -1;
 		trgt_R = 67.59;
@@ -212,7 +222,6 @@ void setSection_in(){
 			trgt_speed = trgt_speed -10;
 		}
 		trgt_R = 0.0;
-		trgt_theta = 90;
 		break;
 	case (SND_CORNER):		//第一ストレート終点→第二カーブ
 		if(def_th >= 240){
@@ -221,7 +230,7 @@ void setSection_in(){
 			ecrobot_sound_tone(293, 100, 100);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = SND_STRAIGHT;
-			trgt_speed = trgt_speed +0;
+			trgt_speed = trgt_speed +10;
 		}
 		trgt_R = 56.59;
 		trgt_theta = -1;
@@ -232,56 +241,71 @@ void setSection_in(){
 			ecrobot_sound_tone(311, 100, 100);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = TRD_CORNER;
-			trgt_speed = trgt_speed +20;
+			trgt_speed = trgt_speed -10;
 		}
 		trgt_R = 0.0;
 		trgt_theta = -1;/*-45;*/ //正確に測る必要有り
 		break;
 	case (TRD_CORNER):		//第二ストレート終点→第三カーブ
-		if(def_x <= -80 && def_y <= -80 && def_l >= 235 && def_th <= -210){
+		if(def_l >= 235 && def_th <= -210){
+		
+		//if(def_x <= -80 && def_y <= -80 && def_l >= 235 && def_th <= -210){
 			ecrobot_sound_tone(329, 100, 100);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = TRD_STRAIGHT;
-			trgt_speed = trgt_speed -10;
+			trgt_speed = trgt_speed +10;
 		}
 		trgt_R = -64.02;
 		trgt_theta = -1;
 		break;
 	case (TRD_STRAIGHT):	//第三カーブ終点→第三ストレート
-		if(def_x <= -50 && def_y >= 105 && def_l >= 115){
+		if( def_l >= 95){
+		
+		//if(def_x <= -50 && def_y >= 105 && def_l >= 115){
 			ecrobot_sound_tone(349, 100, 100);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FIN_APPROACH;
-			trgt_speed = trgt_speed +10;
+			trgt_speed = trgt_speed -10;
 		}
 		trgt_R = 0.0;
 		trgt_theta = -1; //正確に測って入力する
 		break;
 	case (FIN_APPROACH):	//第三ストレート終点→マーカー
-		if(1){
-			ecrobot_sound_tone(369, 100, 100);
+			if(def_l >=80){
+	
+	//	if(def_l >= 80){
+				cngSection(&crt_sect, &buf_l, 220);
+		ecrobot_sound_tone(369, 100, 100);
 			trgt_speed = trgt_speed +0;
+		GRAY_VALUE -=40;
 		}
+		trgt_speed = 30;
 		trgt_R = 51.80;
 		trgt_theta = -1;
 		break;
 
 //以下、ボーナスステージ
 	case (B_FST_STRAIGHT):
-		if(def_l >= 64){
+		if(def_l >= 34){
+		
+		//if(def_l >= 64){
 			cngSection(&crt_sect, &buf_l, 220);
+			GRAY_VALUE +=40;
+		ecrobot_sound_tone(869, 100, 50);
 		}
-		trgt_speed = 30;
+		trgt_speed = 20;
 		
 		//Kp = 1.85;			//P制御用
 		//Ki = 1.6;			//I制御用
 		//Kd = 0.003;			//D制御用
-		
-
+	//targCtrlMethod = CURV_PID;
 		trgt_R = 0.0;
+		trgt_theta = -1;
+
 		break;
 	case (B_FST_CORNER):
 		if(def_l >= 70){
+			targCtrlMethod = HYBRID;
 			cngSection(&crt_sect, &buf_l, 233);
 		}
 		trgt_R = 30.0;
@@ -382,7 +406,9 @@ typedef enum{
 		trgt_R = 0.0;
 		break;
 	case (FST_CORNER):		//坂道終点→第一カーブ
-		if(def_x >= 74 && def_y >= 70 && def_l >= 110 && def_th >= 90){
+		if(def_th >= 80){
+		
+		//if(def_x >= 74 && def_y >= 70 && def_l >= 110 && def_th >= 90){
 			ecrobot_sound_tone(261, 100, 50);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = FST_STRAIGHT;
@@ -397,6 +423,8 @@ typedef enum{
 			crt_sect = SND_CORNER;
 		}
 		trgt_R = 0.0;
+		ecrobot_sound_tone(246, 100, 100);
+
 		break;
 	case (SND_CORNER):		//第一ストレート終点→第二カーブ
 		if(def_x <= -95 && def_y <= -5 && def_l >= 245 && def_th >= 240){
@@ -405,9 +433,12 @@ typedef enum{
 			crt_sect = SND_STRAIGHT;
 		}
 		trgt_R = 56.59;
+		changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 		break;
 	case (SND_STRAIGHT):	//第二カーブ終点→第二ストレート
-		if(def_x >= 40 && def_y <= -15 && def_l >= 40){
+		if( def_l >= 40){
+	
+	//	if(def_x >= 40 && def_y <= -15 && def_l >= 40){
 			ecrobot_sound_tone(311, 100, 50);
 			changeSection(&buf_x, &buf_y, &buf_l, &buf_th);
 			crt_sect = TRD_CORNER;

@@ -33,7 +33,7 @@ int RN_calibrate(void)
 	//GRAY_VALUE=(BLACK_VALUE*0.4+WHITE_VALUE*0.6);
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 	
-	/*
+	
 	//尻尾をルックアップゲート時の角度に
 	TailAngleChange(ANGLEOFLOOKUP);
 
@@ -64,7 +64,7 @@ int RN_calibrate(void)
 
 	//尻尾を直立停止状態の角度に
 	TailAngleChange(ANGLEOFDOWN);
-	*/
+
 	//ジャイロオフセット及びバッテリ電圧値
 	while(1){
 		if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)

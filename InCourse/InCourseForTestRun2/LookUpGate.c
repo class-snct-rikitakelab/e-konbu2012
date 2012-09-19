@@ -1,4 +1,5 @@
 #include "LookUpGate.h"
+#include "runnerForTestRun.h"
 
 int runningLookUpGate(){
 
@@ -29,7 +30,7 @@ int runningLookUpGate(){
 			//ルックアップゲート走行準備状態
 		case (LOOKUPGATE_STOP):
 			setCmdForward(RA_speed(5));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdTurn(RA_linetrace_PID(getCmdForward())+ RA_curvatureCtrl_PID(0));
 
 			timecounter++;
 
@@ -66,7 +67,8 @@ int runningLookUpGate(){
 		case (LOOKUPGATE_MOVE):
 
 			setCmdForward(RA_speed(25));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdTurn(RA_linetrace_PID(getCmdForward())+ RA_curvatureCtrl_PID(0));
+
 
 			distance_after_gate = getNowDistance();
 			

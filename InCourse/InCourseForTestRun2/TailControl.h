@@ -13,7 +13,7 @@
 #define ANGLEOFLOOKUP	56	//ルックアップゲート通過
 #define ANGLEOFSTAND	100	//直立状態
 #define ANGLEOFPUSH		120	//走行体跳ね上げ
-#define ANGLEOFSLOPEDOWN	80//下り坂
+#define ANGLEOFSLOPEDOWN	95//下り坂
 
 #define TAIL_ANGLE_COUNT 3
 /*

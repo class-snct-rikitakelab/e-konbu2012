@@ -30,6 +30,13 @@
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 
+typedef enum {
+HYBRID,
+CURV_PID,
+LIGHT_PID,
+}TARGET_CTRL_METHOD;
+TARGET_CTRL_METHOD targCtrlMethod=HYBRID;
+
 #endif
 
 

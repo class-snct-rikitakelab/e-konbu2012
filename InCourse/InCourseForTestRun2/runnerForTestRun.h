@@ -10,7 +10,7 @@
 
 //ジャイロ振幅値
 #define PM_GYRO 65
-#define TARGET_SPEED 90
+#define TARGET_SPEED 80
 
 /* 走行区間 */
 typedef enum{
@@ -50,7 +50,7 @@ static unsigned int LV_buf = 0;		/* Light Value buffer */
 
 static float buf_x = 0.0, buf_y = 0.0, buf_l = 0.0, buf_th = 0.0; //区間推定用バッファ
 
-static float RKp=0.6,RKi=0,RKd=0.03;
+static float RKp=1.2,RKi=0,RKd=0.03;
 
 extern int RA_directionCtrl_PID(float target);//車体角度が目標角度になるように旋回量を計算
 extern int RA_curvatureCtrl_PID(float target);//引数で渡された目標曲率に近づくように旋回量を計算
