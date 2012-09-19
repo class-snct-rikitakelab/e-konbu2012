@@ -25,6 +25,9 @@ static float dist = 0;		//ˆÚ“®‹——£
 static float theta = 0;		//ŽÔ‘Ì‚ÌŠp“x
 static float R = 0;			//‹È—¦”¼Œa
 
+static float dist_t = 0.0;
+	static float theta_t = 0.0;
+
 extern void self_location();
 
 extern float getDistance();
@@ -36,6 +39,6 @@ extern float getYCoo();
 extern float getTheta();
 
 extern float getR();
-
+void resetSelfLocation();
 
 #endif

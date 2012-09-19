@@ -38,6 +38,7 @@ typedef enum{
 	RN_RUN_THIRD,				//ルックアップゲート後の基本走行
 	RN_SEESAW,				//ドリフトターン
 	RN_KEEPRUN,
+	TYREAL,
 } RN_SETTINGMODE;
 
 //初期状態
@@ -136,39 +137,74 @@ int RA_wheels(int turn){
 void RN_setting()
 {
 	static int timecounter = 0;
-	switch (setting_mode){
+	float weight = 0.8;
+	if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				setting_mode = TYREAL;
+				crt_sect=START;
+				ecrobot_sound_tone(880, 512, 10);
+			
+			}
 
+	switch (setting_mode){
+		case (TYREAL) :
+			//do_tyreal(&Kp,&Ki,&Kd);
+			
+		TailAngleChange(ANGLEOFUP);
+		PWMGeneratorModeChange(RN_MODE_STOP);
+
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(880, 512, 10);
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+				
+			}
+			
+			break;
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
 			if(RN_calibrate() == 1)
 			{
-				setting_mode = RN_STEP;
-				PWMGeneratorModeChange(RN_MODE_BALANCE);
-				TailAngleChange(ANGLEOFUP);
+				setting_mode = RN_RUN;
+				PWMGeneratorModeChange(RN_MODE_TAIL);
+				TailAngleChange(ANGLEOFDOWN);
+				resetSelfLocation();
+				bufClear();//　キャリブレーション後に自己位置推定関連のバッファをクリア
+				systick_wait_ms(500);
+				
 			}
 			break;
-		
+	
 			//通常走行状態
 		case (RN_RUN):
-			setCmdForward(RA_speed(30));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			setCmdForward(RA_speed(getTargSpeed()));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
+			setSection_out();
 			/*
-			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
+			if(crt_sect == UP_SLOPE){
+				setting_mode = RN_SLOPE;
+			}
+		*/
+			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
 				timecounter = 0;
 			}
-			*/
+			
 			break;
 			
 		case (RN_SLOPE):
+			setSection_out();
 			if(runningSlope() == 1)
 				setting_mode = RN_RUN_SECOND;
 			break;
 			
+			
 		case (RN_RUN_SECOND):
-			setCmdForward(RA_speed(60));
+			setSection_out();
+			setCmdForward(RA_speed(80));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			break;
 

@@ -12,7 +12,7 @@
 #include "SpeedControl.h"
 #include "LogSend.h"
 #include "MarkerDetector.h"
-//#include "positionPresumption.h"
+#include "positionPresumption.h"
 #include "RemoteStart.h"
 #include "SelfLocation.h"
 #include "TailControl.h"
@@ -24,6 +24,9 @@
 #include "MarkerDetector.h"
 #include "Step.h"
 #include "SeeSaw.h"
+
+#include "mymath.h"
+#include "runnerForTestRun.h"
 
 extern PWMValues calcPWMValue(int forward_speed,int cmd_turn);
 

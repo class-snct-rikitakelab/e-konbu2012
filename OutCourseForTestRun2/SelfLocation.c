@@ -27,9 +27,7 @@ float getR(){
 
 //©ŒÈˆÊ’u“¯’èŠÖ”
 void self_location(){
-	static float dist_t = 0.0;
-	static float theta_t = 0.0;
-
+	
 	float fi_l = (float)nxt_motor_get_count(NXT_PORT_C);
 	float fi_r = (float)nxt_motor_get_count(NXT_PORT_B);
 	float dist_l = deg2rad(fi_l * W_RADIUS);
@@ -43,11 +41,19 @@ void self_location(){
 		R = rad2deg((dist - dist_t) / (theta - theta_t));
 	}
 	else{
-		R = 0.0;
+		R= 0.0;
 	}
 		
 	dist_t = dist;
 	theta_t = theta;
 }
 
-
+void resetSelfLocation(){
+	dist_t = 0;
+	theta_t = 0;
+	R =0;
+	dist=0;
+	theta=0;
+	x_r = 0;		//Ô‘Ì‚ÌXÀ•W
+	 y_r = 0;
+}
