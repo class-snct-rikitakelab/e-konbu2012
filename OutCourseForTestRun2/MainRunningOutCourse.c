@@ -166,14 +166,14 @@ void RN_setting()
 		case (RN_SETTINGMODE_START):
 			if(RN_calibrate() == 1)
 			{
-				setting_mode = RN_STEP;
+				setting_mode = RN_RUN;
 				
-				PWMGeneratorModeChange(RN_MODE_BALANCE);
+				PWMGeneratorModeChange(RN_MODE_TAIL);
 				
-				TailAngleChange(ANGLEOFUP);
+				TailAngleChange(ANGLEOFDOWN);
 				
 				resetSelfLocation();
-				bufClear();//　キャリブレーション後に自己位置推定関連のバッファをクリア
+				bufClear();			//キャリブレーション後に自己位置推定関連のバッファをクリア
 				systick_wait_ms(500);
 				
 			}
@@ -228,8 +228,13 @@ void RN_setting()
 			break;
 			
 		case (RN_KEEPRUN):
+			setCmdForward(RA_speed(0));
+			setCmdTurn(RA_linetrace_PID(0));
+
+			/*
 			setCmdForward(RA_speed(60));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			*/
 			break;
 			
 		default:

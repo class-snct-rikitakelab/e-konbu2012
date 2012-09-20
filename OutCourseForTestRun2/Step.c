@@ -85,7 +85,7 @@ int runningStep()
 			//ecrobot_sound_tone(820, 512, 30);
 			setCmdTurn(RA_curvatureCtrl_PID(0.0));
 			setCmdForward(RA_speed(0));
-			setGyroOffset(getGyroOffset() + 18);	//30:Žã‚·‚¬ 33:‹­‚·‚¬
+			setGyroOffset(getGyroOffset() + 19);	//30:Žã‚·‚¬ 33:‹­‚·‚¬
 			time_count = 0;
 			stepmode = RN_STEP_SHOCK;
 
@@ -136,7 +136,7 @@ int runningStep()
 				setGyroOffset(getGyroOffset() + 10);	//ƒuƒŒ[ƒL‚ÍŠT‚Ë‚±‚Ì’lH
 			}
 
-			if(time_count >= 600)
+			if(time_count >= 300)
 			{
 				stepmode = RN_STEP_SECOND;
 				distance_stay = getNowDistance();
@@ -159,7 +159,7 @@ int runningStep()
 				if((ecrobot_get_gyro_sensor(NXT_PORT_S1) > getInitGyroOffset() + 120 || ecrobot_get_gyro_sensor(NXT_PORT_S1) < getInitGyroOffset() - 120 ) 
 					&& time_count > 400)
 				{
-					batteryweight = 1.0;
+					batteryweight = 1.2;
 					stepmode = RN_STEP_BACK;
 					step_count = 1;
 					time_count = 0;
@@ -177,7 +177,7 @@ int runningStep()
 				if(time_count > 350);
 				{
 					time_count = 0;
-					stepmode = RN_STEP_TURN_START;
+					stepmode = RN_STEP_TURN_FORWARD;
 				}
 			}
 
@@ -186,14 +186,15 @@ int runningStep()
 
 		case (RN_STEP_TURN_START):
 			time_count++;
-			setCmdForward(RA_speed(20));
+			setCmdForward(RA_speed(10));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 500)
+			/*
+			if(ecrobot_get_light_sensor(NXT_PORT_S3) < RIGHT_ANGLE_LIGHT_VALUE && time_count > 1500)
 			{
-				ecrobot_sound_tone(880, 512, 30);
-				stepmode = RN_STEP_TURN_LEFT;
+				//ecrobot_sound_tone(880, 512, 30);
+				//stepmode = RN_STEP_TURN_LEFT;
 				time_count = 0;
-			}
+			}*/
 			break;
 
 			//’¼ŠpƒJ[ƒu
@@ -203,6 +204,7 @@ int runningStep()
 			{
 				angle_l_now = ecrobot_get_motor_rev(NXT_PORT_B);
 				angle_r_now = ecrobot_get_motor_rev(NXT_PORT_C);
+								ecrobot_sound_tone(880, 512, 30);
 			}
 
 			time_count++;
@@ -211,24 +213,27 @@ int runningStep()
 			{
 				/* ‰ñ“]‚·‚é */
 				setCmdTurn(-100);
+
 			}
 			else
 			{
 				/* Ž~‚Ü‚é */
 				setCmdTurn(0);
-				time_count = 0;
-				stepmode = RN_STEP_TURN_FORWARD;
+				//time_count = 0;
+				//stepmode = RN_STEP_TURN_FORWARD;
 			}
 	
 			break;
 
 		case (RN_STEP_TURN_FORWARD):
-			setCmdForward(RA_speed(20));
+			time_count++;
+			setCmdForward(RA_speed(10));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			
-			if(getInitGyroOffset() - 50 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || getInitGyroOffset() + 50 < ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 200)
+			if(getInitGyroOffset() - 150 > ecrobot_get_gyro_sensor(NXT_PORT_S1) || getInitGyroOffset() + 150 < ecrobot_get_gyro_sensor(NXT_PORT_S1) && time_count > 1000)
 			{
-				setGyroOffset(getGyroOffset() + 7);
+				setGyroOffset(getGyroOffset() + 5);
+				ecrobot_sound_tone(880, 512, 30);
 				stepmode = RN_STEP_STOP;
 				stependflag = 1;
 			}

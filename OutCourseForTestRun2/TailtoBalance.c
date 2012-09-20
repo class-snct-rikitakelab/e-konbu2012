@@ -4,7 +4,7 @@ void tailToBalance(void)
 {
 	static int timecounter = 0;
 
-	setCmdForward(30);
+	setCmdForward(20);
 	setCmdTurn(RA_linetrace_PID(getCmdForward()));
 
 	if(timecounter > 1000)
@@ -15,7 +15,7 @@ void tailToBalance(void)
 
 	if(timecounter >= 2100)
 	{
-		setCmdForward(30);
+		setCmdForward(10);
 		setCmdTurn(RA_linetrace_PID(getCmdForward()));
 	}
 
@@ -28,14 +28,14 @@ void tailToBalance(void)
 		nxt_motor_set_speed(NXT_PORT_B, 0, 1);
 	}
 
-	if(timecounter == 1600)
+	if(timecounter == 2000)
 		TailAngleChange(ANGLEOFPUSH);
 
-	if(timecounter == 1800)
+	if(timecounter == 1750)
 	{
 		TailAngleChange(ANGLEOFUP);
 		PWMGeneratorModeChange(RN_MODE_BALANCE);
-		setGyroOffset(getInitGyroOffset()-10);
+		setGyroOffset(getInitGyroOffset()+6);
 	}
 
 }

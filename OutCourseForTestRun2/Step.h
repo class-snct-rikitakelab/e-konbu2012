@@ -11,12 +11,15 @@
 #include "RemoteStart.h"
 #include "runnerForTestRun.h"
 
-#define STEP_BATTERY getbatteryvalue() * 0.10		//段差検知時、バッテリが減るとどんどん下がっていく（80で800下がらないくらい→残量に応じた設定が必要？）
-
+#define STEP_BATTERY getbatteryvalue() * 0.08		//段差検知時、バッテリが減るとどんどん下がっていく（80で800下がらないくらい→残量に応じた設定が必要？）
+/*
+試走会成功
 #define RIGHT_ANGLE_LIGHT_VALUE getGrayValue() * 0.97		//ラインから脱した際の光センサの値(570)
 #define RIGHT_ANGLE_AIM 240				//回転角度(160)
+*/
 
-
+#define RIGHT_ANGLE_LIGHT_VALUE getGrayValue() * 0.97		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_AIM 140				//回転角度(160)
 //shockとtime_countを逆にする
 //バッテリ降下値
 
