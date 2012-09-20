@@ -4,8 +4,7 @@
 #include "ecrobot_interface.h"
 #include "Calibration.h"
 
-
-
+#define LINE_THRESHOLD 100
 typedef enum{
 ON_BLACK,
 ON_WHITE,
@@ -21,7 +20,8 @@ LineEdgeDetecterState lineEdgeDetecterState;
 extern void LineEdgeDetecter_init(LineEdgeDetecter *this_LineEdgeDetecter);
 extern int  LineEdgeDetecter_getLineEdgeDetectPulse(LineEdgeDetecter *this_LineEdgeDetecter);
 
-extern LineEdgeDetecter_detectLineEdge(LineEdgeDetecter *this_LineEdgeDetecter);
+extern int LineEdgeDetecter_detectLineEdge(LineEdgeDetecter *this_LineEdgeDetecter);
+
 void LineEdgeDetecter_setLineEdgeDetecterState(LineEdgeDetecter *this_LineEdgeDetecter,LineEdgeDetecterState state);
 LineEdgeDetecterState LineEdgeDetecter_getLineEdgeDetecterState(LineEdgeDetecter *this_LineEdgeDetecter);
 
