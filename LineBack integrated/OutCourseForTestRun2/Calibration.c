@@ -101,3 +101,13 @@ unsigned int getLookUpGrayValue()
 {
 	return LOOKUP_GRAY_VALUE;
 }
+
+unsigned int getWhiteValue()
+{
+	return WHITE_VALUE;
+}
+unsigned int getBlackValue()
+{
+	return BLACK_VALUE;
+}
+

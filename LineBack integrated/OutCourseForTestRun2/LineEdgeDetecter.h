@@ -4,7 +4,7 @@
 #include "ecrobot_interface.h"
 #include "Calibration.h"
 
-#define LINE_THRESHOLD 100
+#define LINE_THRESHOLD 50
 typedef enum{
 ON_BLACK,
 ON_WHITE,

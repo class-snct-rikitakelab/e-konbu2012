@@ -26,4 +26,7 @@ extern void setGyroOffset(int setvalue);
 extern unsigned int getGrayValue();
 extern unsigned int getLookUpGrayValue();
 
+extern unsigned int getWhiteValue();
+extern  unsigned int getBlackValue();
+
 #endif

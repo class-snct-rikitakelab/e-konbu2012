@@ -33,7 +33,7 @@ TARGET_SOURCES := \
 	Factory.c \
 	LineBack.c \
 	LineEdgeDetecter.c \
-
+	LightSensor.c
 
 TOPPERS_OSEK_OIL_SOURCE := ./prog.oil
 

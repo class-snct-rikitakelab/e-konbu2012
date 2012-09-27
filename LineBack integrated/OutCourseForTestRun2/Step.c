@@ -249,8 +249,10 @@ int runningStep()
 			setCmdTurn(0);
 				ecrobot_sound_tone(880, 512, 30);
 				stepmode=LINE_BACK;
+				systick_wait_ms(3000);
+				
 			}
-			
+					
 			break;
 		case (LINE_BACK) :
 			LineBack_headToLine(&mLineBack);
@@ -284,7 +286,7 @@ int goForwardAction(){
 		onceDoFlag = 1;
 	}
 
-	setCmdForward(RA_speed(10));
+	setCmdForward(RA_speed(5));
 	setCmdTurn(RA_wheels(0));
 
 
@@ -300,13 +302,12 @@ int balanceToTail(){
 	//TailControl_TailStateChange(&mTailControl,TAIL_DOWN);
 	TailAngleChange(ANGLEOFDOWN);
 	
-	setGyroOffset(getGyroOffset()+200);
+	setGyroOffset(getGyroOffset()-50);
 	
 //	RobotPosture_setPostureMode(this_RobotPosture,TAIL_RUNNING);
-
+	systick_wait_ms(50);
 	PWMGeneratorModeChange(RN_MODE_TAIL);
-	systick_wait_ms(500);
 	//RobotPosture_setGyroOffset(this_RobotPosture,this_RobotPosture->gyroOffset-200);
-	setGyroOffset(getGyroOffset()-200);
+	setGyroOffset(getGyroOffset()+50);
 	return 1;
 }

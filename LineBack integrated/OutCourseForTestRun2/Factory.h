@@ -4,4 +4,5 @@
 LightSensor mLightSensor;
 LineBack mLineBack;
 LineEdgeDetecter mLineEdgeDetecter;
+
 void factory();

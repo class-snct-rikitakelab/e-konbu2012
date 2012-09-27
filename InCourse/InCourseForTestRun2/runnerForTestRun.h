@@ -10,7 +10,7 @@
 
 //ジャイロ振幅値
 #define PM_GYRO 65
-#define TARGET_SPEED 80
+#define TARGET_SPEED 65
 
 /* 走行区間 */
 typedef enum{

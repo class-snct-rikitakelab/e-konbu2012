@@ -42,10 +42,10 @@ int LineBack_headToLine(LineBack * this_LineBack){
 
 		//ライン右側に落下した場合の処理の流れで並んでいる。
 		case TURNING_LEFT :
-			LineBack_turningLeftAction(this_LineBack,10,-30,TURN_ANGLE);
+			LineBack_turningLeftAction(this_LineBack,15,-10,TURN_ANGLE);
 			break;
 		case BACK_TO_RIGHT_EDGE:
-		LineBack_backToRightEdgeAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);		
+		LineBack_backToRightEdgeAction(this_LineBack,-15,10,TURN_ANGLE /*-10*/);		
 		break;
 		case ENTRY_LINE_EDGE :
 			LineBack_entryLineEdgeAction(this_LineBack);
@@ -59,18 +59,20 @@ int LineBack_headToLine(LineBack * this_LineBack){
 		//ここまで
 		
 		case BACK_TO_INIT_POSITION :
-		LineBack_backToInitPositionAction(this_LineBack,-10,30,TURN_ANGLE /*-10*/);
+		LineBack_backToInitPositionAction(this_LineBack,-15,10,TURN_ANGLE /*-10*/);
 		break;
 		case TURNING_RIGHT :
-			LineBack_turningRightAction(this_LineBack,10,30,TURN_ANGLE);
+			LineBack_turningRightAction(this_LineBack,15,10,TURN_ANGLE);
 			break;
-		//test code from here
+
+			//test code from here
 		case LINE_TRACE_DEBUG :
-		/*
-			 forward_val = 30;
-			 turn_val = PIDControl_PIDLineTrace(&mPIDControl, forward_val);	
-			RobotPosture_robotPostureControl(&mRobotPosture,controlVals);
-		*/
+		
+			 
+			setCmdForward(30);
+			setCmdTurn(RA_linetrace_PID(30));
+			
+		
 		break;
 		//test code end
 		default :
@@ -134,7 +136,6 @@ void LineBack_lineCatchAction(LineBack * this_LineBack){
 		lineEdgeDetectCounter++;
 		ecrobot_sound_tone(220, 100, 10);
 		if(lineEdgeDetectCounter>15){
-			ecrobot_sound_tone(220, 100, 50);
 			exitFlag =1;
 			headToLineState = LINE_TRACE_DEBUG;
 		}
@@ -175,6 +176,7 @@ void LineBack_turningRightAction(LineBack * this_LineBack,int forwardSpeed,int t
 			if(initLeftMotorRev + ecrobot_get_motor_rev(NXT_PORT_C) > aimAngle ){
 				//ライン復帰失敗
 			}
+	
 }
 
 void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed,int turnSpeed,int aimAngle){
@@ -182,7 +184,6 @@ void LineBack_backToInitPositionAction(LineBack * this_LineBack,int forwardSpeed
 	static int onceDoFlag = 0;
 	static S32 initRightMotorRev = 0;
 	static S32 initLeftMotorRev = 0;
-	ecrobot_sound_tone(220, 100, 10);
 	//1回だけ実行
 	if(onceDoFlag ==0 ){
 		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B);
@@ -208,7 +209,7 @@ void LineBack_backToRightEdgeAction(LineBack * this_LineBack,int forwardSpeed,in
 	lineEdgeDetectTimes += LineEdgeDetecter_getLineEdgeDetectPulse(&mLineEdgeDetecter);
 	LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
 
-		if(lineEdgeDetectTimes==2){
+		if(lineEdgeDetectTimes>=2){
 			lineEdgeDetectTimes = 0;	
 			headToLineState = ENTRY_LINE_EDGE; //右エッジ検出後からさらに右に旋回する。
 			}
@@ -219,7 +220,7 @@ void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int tu
 	static int onceDoFlag = 0;
 	static S32 initRightMotorRev = 0;
 	static S32 initLeftMotorRev = 0;
-	
+		
 	//1回だけ実行
 	if(onceDoFlag ==0 ){
 		initRightMotorRev = ecrobot_get_motor_rev(NXT_PORT_B); 
@@ -230,7 +231,6 @@ void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int tu
 	//ラインエッジ検出回数をカウント
 			if(LineEdgeDetecter_getLineEdgeDetectPulse(&mLineEdgeDetecter) == 1){
 			lineEdgeDetectTimes++;
-			ecrobot_sound_tone(220, 100, 10);
 			}
 
 			LineBack_turning(this_LineBack,forwardSpeed,turnSpeed);
@@ -238,7 +238,7 @@ void LineBack_turningLeftAction(LineBack * this_LineBack,int forwardSpeed,int tu
 			if(ecrobot_get_motor_rev(NXT_PORT_B)-initRightMotorRev > aimAngle*4 ){
 
 	
-				if(lineEdgeDetectTimes==2){
+				if(lineEdgeDetectTimes>=2){
 					lineEdgeDetectTimes = 0;
 					headToLineState = BACK_TO_RIGHT_EDGE;
 					}

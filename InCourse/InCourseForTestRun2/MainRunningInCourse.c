@@ -72,7 +72,7 @@ void ecrobot_device_initialize(void)
 	ecrobot_set_light_sensor_active(NXT_PORT_S3);	//光センサ起動
 	ecrobot_init_bt_slave("LEJOS-OSEK");			//Bluetooth起動
 	ecrobot_init_sonar_sensor(NXT_PORT_S2);			//超音波センサ起動
-
+	
 	//モータリセット
 	ecrobot_set_motor_rev(NXT_PORT_A,0);
 	ecrobot_set_motor_rev(NXT_PORT_B,0);
