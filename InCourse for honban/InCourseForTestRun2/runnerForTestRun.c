@@ -13,8 +13,6 @@
 
 void cngSection(IN_SECTION *crt_sect, float *buf_l, int tone); 
 
-
-
 //曲率半径PID制御関数
 int RA_curvatureCtrl_PID(float target) {
 	static float bf_dev = 0.0;
@@ -25,7 +23,6 @@ int RA_curvatureCtrl_PID(float target) {
 	bf_dev = dev;
 
 	S8 turn = RKp * dev + RKi * i_dev + RKd * d_dev;
-	//S8 turn = 0.6 * dev;
 	if (-100 > turn) {
 		turn = -100;
 	}
@@ -41,11 +38,9 @@ int RA_directionCtrl_PID(float target) {
 	static float bf_dev = 0.0;
 	
 	float dev = getTheta( ) - target;
-	//float i_dev = i_dev + (dev * 0.0005);
 	float d_dev = (dev - bf_dev) / 0.004;
 	bf_dev = dev;
 
-	//S8 turn = Kp * dev + Ki * i_dev + Kd * d_dev;
 	S8 turn = 1.2 * dev + 0.5 * d_dev;
 	if (-100 > turn) {
 		turn = -100;
@@ -59,61 +54,6 @@ int RA_directionCtrl_PID(float target) {
 	}
 	return turn;
 }
-
-
-/*test code for 曲率輝度ハイブリッドPID制御  
-//走行状態設定関数
-void RN_setting(){
-	static unsigned char buf = 0;
-	if (ecrobot_get_touch_sensor(NXT_PORT_S4)){
-		buf = 1;
-	}
-	if (!ecrobot_get_touch_sensor(NXT_PORT_S4) && buf){
-		runner_mode = RN_MODE_INIT;
-		setting_mode = RN_SETTINGMODE_START;
-	}
-
-	switch (setting_mode){
-	//キャリブレーション状態
-	case (RN_SETTINGMODE_START):
-		RN_calibrate();
-		LV_buf = ecrobot_get_light_sensor(NXT_PORT_S3);
-		break;
-		
-	
-	//通常走行状態 キャリブレーションが終わるとRN_RUN状態に遷移　wait_count の初期値はゼロで走りだしてからカウントし続ける。
-	case (RN_RUN):
-		RA_linetrace_PID_balanceoff(SPEED_COUNT);
-
-		cmd_turn += RA_curvatureCtrl_PID(trgt_R);
-		wait_count++;
-		break;
-	
-	// 曲率PID
-	case (RN_CVRUN):
-		cmd_forward = SPEED_COUNT;
-		cmd_turn = RA_curvatureCtrl_PID(trgt_R);
-		wait_count++;
-		break;
-		
-	case (RN_LOT90):
-		cmd_turn = 0;
-		cmd_turn = RA_directionCtrl_PID(90);
-		wait_count++;
-		break;
-
-	default:
-		break;
-	}
-}
-*/
-
-
-
-
-/*
-
-
 
 /* インコース走行区間検出 */
 void setSection_in(){

@@ -1,29 +1,7 @@
 
 #include "SelfLocation.h"
 
-float getDistance( )
-{
-	return dist;
-}
 
-float getXCoo( )
-{
-	return x_r;
-}
-
-float getYCoo( )
-{
-	return y_r;
-}
-
-float getTheta( )
-{
-	return theta;
-}
-float getR(){
-
-	return R;
-}
 
 //自己位置同定関数
 void self_location(){
@@ -56,4 +34,28 @@ void resetSelfLocation(){
 	theta=0;
 	x_r = 0;		//車体のX座標
 	 y_r = 0;
+}
+//ゲッター群
+float getDistance( )
+{
+	return dist;
+}
+
+float getXCoo( )
+{
+	return x_r;
+}
+
+float getYCoo( )
+{
+	return y_r;
+}
+
+float getTheta( )
+{
+	return theta;
+}
+float getR(){
+
+	return R;
 }

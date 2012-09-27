@@ -93,23 +93,13 @@ int runningLookUpGate(){
 			{
 				TailAngleChange(ANGLEOFDOWN);
 				
-				//ecrobot_set_motor_speed(NXT_PORT_B, -15);	//モータに速度を送る
-				//ecrobot_set_motor_speed(NXT_PORT_C, -15);	//モータに速度を送る
+				
 			}
-		/*
-			if(ecrobot_get_motor_rev(NXT_PORT_A) < ANGLEOFDOWN+5)
-			{
-				ecrobot_set_motor_speed(NXT_PORT_B, 0);	//モータに速度を送る
-				ecrobot_set_motor_speed(NXT_PORT_C, 0);	//モータに速度を送る	
-			}
-			*/
+	
 			if(ecrobot_get_motor_rev(NXT_PORT_A) < ANGLEOFDOWN+5 && timecounter >= 1050)
 			{
 
-				//ecrobot_set_motor_rev(NXT_PORT_B,0);
-				//ecrobot_set_motor_rev(NXT_PORT_C,0);
-				//ecrobot_set_motor_speed(NXT_PORT_B,0);
-				//ecrobot_set_motor_speed(NXT_PORT_C,0);
+				
 				changeGray();
 				lookupgateendflag = 1;
 			}

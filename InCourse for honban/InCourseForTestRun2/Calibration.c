@@ -30,7 +30,6 @@ int RN_calibrate(void)
 	}
 
 	//äDêFílåvéZ
-	//GRAY_VALUE=(BLACK_VALUE*0.4+WHITE_VALUE*0.6);
 	GRAY_VALUE=(BLACK_VALUE+WHITE_VALUE)/2;
 	
 	

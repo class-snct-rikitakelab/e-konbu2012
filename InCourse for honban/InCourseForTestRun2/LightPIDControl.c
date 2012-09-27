@@ -11,15 +11,15 @@
 int RA_linetrace_PID(int forward_speed) {
 
 	int cmd_turn;
-//	if(graybase == 0)
-//	{
+	if(graybase == 0)  //ルックアップゲート用の目標輝度値を用いるか、しっぽ走行用の輝度値を用いるか切替
+	{
 	//光センサ値と目標輝度値の偏差算出
 	if(forward_speed > 0)
-		hensa = (float)getGrayValue() - (float)LightSensor_getLPFLightSensorVal(&mLightSensor)/*ecrobot_get_light_sensor(NXT_PORT_S3)*/;
+		hensa = (float)getGrayValue() - (float)LightSensor_getLPFLightSensorVal(&mLightSensor);
 	else
-		hensa = (float)LightSensor_getLPFLightSensorVal(&mLightSensor)/*ecrobot_get_light_sensor(NXT_PORT_S3)*/ - (float)getGrayValue();
-//	}
-	/*
+		hensa = (float)LightSensor_getLPFLightSensorVal(&mLightSensor) - (float)getGrayValue();
+	}
+	
 	else
 	{
 		//光センサ値と目標輝度値の偏差算出
@@ -28,9 +28,9 @@ int RA_linetrace_PID(int forward_speed) {
 	else
 		hensa = (float)ecrobot_get_light_sensor(NXT_PORT_S3) - (float)getLookUpGrayValue();
 	}
-	*/
+	
 
-	i_hensa = i_hensa+(hensa*0.004);		//0が1つ多い
+	i_hensa = i_hensa+(hensa*0.004);
 	d_hensa = (hensa - bf_hensa)/0.004;
 	bf_hensa = hensa;
 
@@ -84,7 +84,7 @@ int online(void) {
 		return TRUE;					//ライン内
 
 }
-
+//ルックアップゲート用の目標輝度値を用いるか、しっぽ走行用の輝度値を用いるか切替
 void changeGray(){
 	if(graybase == 0)
 		graybase = 1;

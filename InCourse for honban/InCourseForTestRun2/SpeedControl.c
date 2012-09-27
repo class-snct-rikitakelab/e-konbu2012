@@ -4,7 +4,7 @@
 //段階的加速用関数（指定量だけ速度を徐々に上昇）
 int RA_speed(int forward_speed){
 
-	static int result_speed = /*TARGET_SPEED*/0;
+	static int result_speed = TARGET_SPEED;
 	static int counter = 0;
 	
 	counter++;
