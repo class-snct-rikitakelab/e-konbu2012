@@ -173,19 +173,19 @@ void RN_setting();
 void RN_modesetting();
 
 
-S8 RA_directionCtrl_PID(float target);
-S8 RA_curvatureCtrl_PID(float target);
+int RA_directionCtrl_PID(float target);
+int RA_curvatureCtrl_PID(float target);
 
-void self_location(void);
-void setSection();void changeSection(float *buf_x, float *buf_y, float *buf_l, float *buf_th);
-unsigned char MKTrigger(void);
-signed char LVTrigger(void);
+//void self_location(void);
+//void setSection();void changeSection(float *buf_x, float *buf_y, float *buf_l, float *buf_th);
+//unsigned char MKTrigger(void);
+//signed char LVTrigger(void);
 int abs(int n);
 float deg2rad(float degree);
 float rad2deg(float radian);
 
 //ã»ó¶îºåaPIDêßå‰ä÷êî
-S8 RA_curvatureCtrl_PID(float target) {
+int RA_curvatureCtrl_PID(float target) {
 	static float bf_dev = 0.0;
 
 	float dev = R - target;
@@ -194,7 +194,7 @@ S8 RA_curvatureCtrl_PID(float target) {
 	bf_dev = dev;
 
 	//S8 turn = Kp * dev + Ki * i_dev + Kd * d_dev;
-	S8 turn = 0.6 * dev;
+	int turn = 0.6 * dev;
 	if (-100 > turn) {
 		turn = -100;
 	}
@@ -206,7 +206,7 @@ S8 RA_curvatureCtrl_PID(float target) {
 }
 
 //é‘ëÃï˚å¸PIDêßå‰ä÷êî
-S8 RA_directionCtrl_PID(float target) {
+int RA_directionCtrl_PID(float target) {
 	static float bf_dev = 0.0;
 	
 	float dev = theta - target;
@@ -215,7 +215,7 @@ S8 RA_directionCtrl_PID(float target) {
 	bf_dev = dev;
 	
 	//S8 turn = Kp * dev + Ki * i_dev + Kd * d_dev;
-	S8 turn = 1.0 * dev + 0.5 * d_dev;
+	int turn = 1.0 * dev + 0.5 * d_dev;
 	if (-100 > turn) {
 		turn = -100;
 	}
@@ -261,7 +261,7 @@ void RN_setting(){
 	}
 }
 
-
+/*
 //é©å»à íuìØíËä÷êî
 void self_location(){
 	static float dist_t = 0.0;
@@ -286,7 +286,7 @@ void self_location(){
 	dist_t = dist;
 	theta_t = theta;
 }
-
+*/
 float deg2rad(float degree){
 	float radian = PI / 180.0 * degree;
 	return radian;
@@ -319,6 +319,7 @@ typedef enum{
 } IN_SECTION;
 
 /* ëñçsãÊä‘åüèo */
+/*
 void setSection(){
 	static IN_SECTION crt_sect = START;
 	
@@ -451,12 +452,14 @@ void setSection(){
 		break;
 	}
 }
-
+*/
+/*
 void cngSection(IN_SECTION *crt_sect, float *buf_l, int tone){
 	ecrobot_sound_tone(tone, 100, 50);
 	*crt_sect += 1;
 	*buf_l = dist;
 }
+*/
 /*
 void changeSection(float *buf_x, float *buf_y, float *buf_l, float *buf_th){
 	*buf_x = x_r;	*buf_y = y_r;

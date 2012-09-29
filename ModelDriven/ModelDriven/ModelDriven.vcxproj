@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2B440E15-04B7-48DF-AA31-B75C52046C76}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeOutput>ObjectOrientedProject.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <IncludePath>C:\cygwin\GNUARM\arm-elf\include; C:\cygwin\GNUARM\include; C:\cygwin\nxtOSEK\ecrobot\c; C:\cygwin\nxtOSEK\ecrobot\nxtcommfantom; C:\cygwin\nxtOSEK\ecrobot\nxtway_gs_balancer; C:\cygwin\nxtOSEK\ecrobot\bios; C:\cygwin\nxtOSEK\toppers_osek\include; C:\cygwin\nxtOSEK\toppers_osek\kernel; C:\cygwin\nxtOSEK\lejos_nxj\src\nxtvm\platform\nxt; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu; C:\cygwin\nxtOSEK\toppers_osek\config\at91sam7s-gnu\lego_nxt</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <NMakeOutput>ObjectOrientedProject.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+    <None Include="mk.cmd" />
+    <None Include="mk_clean.cmd" />
+    <None Include="prog.oil" />
+    <None Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Calibration.h" />
+    <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="Common\Factory.h" />
+    <ClInclude Include="Common\mymath.h" />
+    <ClInclude Include="Common\RUN_MODE.h" />
+    <ClInclude Include="Common\TARG_CTRL_METHOD.h" />
+    <ClInclude Include="DetectionPart\Battery.h" />
+    <ClInclude Include="DetectionPart\Coordinates.h" />
+    <ClInclude Include="DetectionPart\DetcMarker.h" />
+    <ClInclude Include="DetectionPart\DetcObst.h" />
+    <ClInclude Include="DetectionPart\Gradient.h" />
+    <ClInclude Include="DetectionPart\LineEdge.h" />
+    <ClInclude Include="DetectionPart\LocationInfo.h" />
+    <ClInclude Include="DetectionPart\Notice.h" />
+    <ClInclude Include="DetectionPart\RunDist.h" />
+    <ClInclude Include="DetectionPart\RunStartSigRecv.h" />
+    <ClInclude Include="DetectionPart\Timer.h" />
+    <ClInclude Include="DetectionPart\TurnAngle.h" />
+    <ClInclude Include="DirectorPart\CngSectLisnner.h" />
+    <ClInclude Include="DirectorPart\ROBOT_STATE.h" />
+    <ClInclude Include="DirectorPart\RunnerRobot.h" />
+    <ClInclude Include="DirectorPart\Running.h" />
+    <ClInclude Include="DrivenPart\Curvature.h" />
+    <ClInclude Include="DrivenPart\CurvatureCtrl.h" />
+    <ClInclude Include="DrivenPart\CurvatureEncoder.h" />
+    <ClInclude Include="DrivenPart\ForwardValRevise.h" />
+    <ClInclude Include="DrivenPart\LightVal.h" />
+    <ClInclude Include="DrivenPart\LightValCtrl.h" />
+    <ClInclude Include="DrivenPart\LightValCtrlMethod.h" />
+    <ClInclude Include="DrivenPart\LightValCtrlParm.h" />
+    <ClInclude Include="DrivenPart\PIDCurvatureCtrl.h" />
+    <ClInclude Include="DrivenPart\PIDCurvatureCtrlParm.h" />
+    <ClInclude Include="DrivenPart\PIDLightValCtrl.h" />
+    <ClInclude Include="DrivenPart\PIDLightValCtrlParm.h" />
+    <ClInclude Include="DrivenPart\PIDTailAngleCtrl.h" />
+    <ClInclude Include="DrivenPart\PIDTailAngleCtrlParm.h" />
+    <ClInclude Include="DrivenPart\RobotDrivenDirect.h" />
+    <ClInclude Include="DrivenPart\RUN_MODE.h" />
+    <ClInclude Include="DrivenPart\TailAngle.h" />
+    <ClInclude Include="DrivenPart\TailAngleCtrl.h" />
+    <ClInclude Include="DrivenPart\TailMotor.h" />
+    <ClInclude Include="DrivenPart\TailMotorEncoder.h" />
+    <ClInclude Include="DrivenPart\TARG_CTRL_METHOD.h" />
+    <ClInclude Include="DrivenPart\WheelMotor.h" />
+    <ClInclude Include="DrivenPart\WheelMotorCtrl.h" />
+    <ClInclude Include="NXTHardWare\GyroSensor.h" />
+    <ClInclude Include="NXTHardWare\LightSensor.h" />
+    <ClInclude Include="NXTHardWare\MotorEncoder.h" />
+    <ClInclude Include="NXTHardWare\Sound.h" />
+    <ClInclude Include="NXTHardWare\TouchSensor.h" />
+    <ClInclude Include="NXTHardWare\SonorSensor.h" />
+    <ClInclude Include="PIDCalcDebug.h" />
+    <ClInclude Include="SelfLocation.h" />
+    <ClInclude Include="Slope.h" />
+    <ClInclude Include="PWMValGenerator.h" />
+    <ClInclude Include="StrategyPart\CngSectTerm.h" />
+    <ClInclude Include="StrategyPart\Sector.h" />
+    <ClInclude Include="StrategyPart\TargetDrivenParm.h" />
+    <ClInclude Include="TailControl.h" />
+    <ClInclude Include="TestDrivenPart.h" />
+    <ClInclude Include="WLReceiver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="balancer_param.c" />
+    <ClCompile Include="Calibration.c" />
+    <ClCompile Include="Common\Factory.c" />
+    <ClCompile Include="Common\mymath.c" />
+    <ClCompile Include="DetectionPart\Battery.c" />
+    <ClCompile Include="DetectionPart\Coordinates.c" />
+    <ClCompile Include="DetectionPart\DetcMarker.c" />
+    <ClCompile Include="DetectionPart\DetcObst.c" />
+    <ClCompile Include="DetectionPart\Gradient.c" />
+    <ClCompile Include="DetectionPart\LineEdge.c" />
+    <ClCompile Include="DetectionPart\LocationInfo.c" />
+    <ClCompile Include="DetectionPart\Notice.c" />
+    <ClCompile Include="DetectionPart\RunDist.c" />
+    <ClCompile Include="DetectionPart\RunStartSigRecv.c" />
+    <ClCompile Include="DetectionPart\Timer.c" />
+    <ClCompile Include="DetectionPart\TurnAngle.c" />
+    <ClCompile Include="DirectorPart\CngSectLisnner.c" />
+    <ClCompile Include="DirectorPart\RunnerRobot.c" />
+    <ClCompile Include="DirectorPart\Running.c" />
+    <ClCompile Include="DrivenPart\Curvature.c" />
+    <ClCompile Include="DrivenPart\CurvatureCtrl.c" />
+    <ClCompile Include="DrivenPart\CurvatureEncoder.c" />
+    <ClCompile Include="DrivenPart\ForwardValRevise.c" />
+    <ClCompile Include="DrivenPart\LightVal.c" />
+    <ClCompile Include="DrivenPart\LightValCtrl.c" />
+    <ClCompile Include="DrivenPart\LightValCtrlMethod.c" />
+    <ClCompile Include="DrivenPart\LightValCtrlParm.c" />
+    <ClCompile Include="DrivenPart\PIDCurvatureCtrl.c" />
+    <ClCompile Include="DrivenPart\PIDCurvatureCtrlParm.c" />
+    <ClCompile Include="DrivenPart\PIDLightValCtrl.c" />
+    <ClCompile Include="DrivenPart\PIDLightValCtrlParm.c" />
+    <ClCompile Include="DrivenPart\PIDTailAngleCtrl.c" />
+    <ClCompile Include="DrivenPart\PIDTailAngleCtrlParm.c" />
+    <ClCompile Include="DrivenPart\RobotDrivenDirect.c" />
+    <ClCompile Include="DrivenPart\TailAngle.c" />
+    <ClCompile Include="DrivenPart\TailAngleCtrl.c" />
+    <ClCompile Include="DrivenPart\TailMotor.c" />
+    <ClCompile Include="DrivenPart\TailMotorEncoder.c" />
+    <ClCompile Include="DrivenPart\TestDrivenPart.c" />
+    <ClCompile Include="DrivenPart\WheelMotor.c" />
+    <ClCompile Include="DrivenPart\WheelMotorCtrl.c" />
+    <ClCompile Include="NXTHardWare\GyroSensor.c" />
+    <ClCompile Include="NXTHardWare\LightSensor.c" />
+    <ClCompile Include="NXTHardWare\MotorEncoder.c" />
+    <ClCompile Include="NXTHardWare\Sound.c" />
+    <ClCompile Include="NXTHardWare\TouchSensor.c" />
+    <ClCompile Include="NXTHardWare\SonorSensor.c" />
+    <ClCompile Include="PIDCalcDebug.c" />
+    <ClCompile Include="SelfLocation.c" />
+    <ClCompile Include="Slope.c" />
+    <ClCompile Include="PWMValGenerator.c" />
+    <ClCompile Include="StrategyPart\CngSectTerm.c" />
+    <ClCompile Include="StrategyPart\Sector.c" />
+    <ClCompile Include="StrategyPart\TargetDrivenParm.c" />
+    <ClCompile Include="TailControl.c" />
+    <ClCompile Include="TestDrivenPart.c" />
+    <ClCompile Include="WLReceiver.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

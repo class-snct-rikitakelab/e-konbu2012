@@ -37,7 +37,8 @@ typedef enum{
 	RN_STEP,				//ルックアップゲート
 	RN_RUN_THIRD,				//ルックアップゲート後の基本走行
 	RN_SEESAW,				//ドリフトターン
-	RN_KEEP_RUN,
+	RN_KEEPRUN,
+	TYREAL,
 } RN_SETTINGMODE;
 
 //初期状態
@@ -136,45 +137,84 @@ int RA_wheels(int turn){
 void RN_setting()
 {
 	static int timecounter = 0;
-	switch (setting_mode){
+	float weight = 0.8;
+	if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				setting_mode = TYREAL;
+				crt_sect=START;
+				ecrobot_sound_tone(880, 512, 10);
+			
+			}
 
+	switch (setting_mode){
+		case (TYREAL) :
+			//do_tyreal(&Kp,&Ki,&Kd);
+			
+		TailAngleChange(ANGLEOFUP);
+		PWMGeneratorModeChange(RN_MODE_STOP);
+
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == TRUE)
+			{
+				ecrobot_sound_tone(880, 512, 10);
+				systick_wait_ms(500);
+				setting_mode = RN_SETTINGMODE_START;
+				
+			}
+			
+			break;
 			//キャリブレーション状態
 		case (RN_SETTINGMODE_START):
 			if(RN_calibrate() == 1)
 			{
 				setting_mode = RN_RUN;
+				
 				PWMGeneratorModeChange(RN_MODE_TAIL);
+				
 				TailAngleChange(ANGLEOFDOWN);
+				
+				resetSelfLocation();
+				bufClear();			//キャリブレーション後に自己位置推定関連のバッファをクリア
+				systick_wait_ms(500);
+				
 			}
 			break;
-		
+	
 			//通常走行状態
 		case (RN_RUN):
-			setCmdForward(RA_speed(100));
-			setCmdTurn(RA_linetrace_PID(getCmdForward()));
-			
-			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
+			/*
+			setCmdForward(RA_speed(getTargSpeed()));
+			setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR()));
+			setSection_out();
+
+			if(getInitGyroOffset() - 30 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 500)
 			{
 				ecrobot_sound_tone(880, 512, 30);
 				setting_mode = RN_SLOPE;
 				timecounter = 0;
 			}
-			
+			*/
+			tailToBalance();
 			break;
 			
 		case (RN_SLOPE):
+			setSection_out();
 			if(runningSlope() == 1)
 				setting_mode = RN_RUN_SECOND;
 			break;
 			
+			
 		case (RN_RUN_SECOND):
-			setCmdForward(RA_speed(60));
+			setSection_out();
+			setCmdForward(RA_speed(80));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			break;
 
 		case (RN_STEP):
+			/*
 			if(runningStep() == 1)
 				setting_mode = RN_RUN_THIRD;
+			*/
+			runningStep();
 			break;
 			
 		case (RN_RUN_THIRD):
@@ -188,8 +228,13 @@ void RN_setting()
 			break;
 			
 		case (RN_KEEPRUN):
+			setCmdForward(RA_speed(0));
+			setCmdTurn(RA_linetrace_PID(0));
+
+			/*
 			setCmdForward(RA_speed(60));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
+			*/
 			break;
 			
 		default:
@@ -229,7 +274,7 @@ TASK(DisplayTask)
 //ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
 TASK(LogTask)
 {
-	logSend(0,cmd_turn,dist,getDistance(),getInitGyroOffset(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
+	logSend(R,cmd_turn,getcount(),getDistance(),ecrobot_get_battery_voltage(),ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
 
 	TerminateTask();
 }

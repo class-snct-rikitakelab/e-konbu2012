@@ -34,6 +34,11 @@ int RA_linetrace_PID(int forward_speed) {
 
 	cmd_turn = -(Kp * hensa + Ki * i_hensa + Kd * d_hensa);
 
+	if(cmd_turn > 100)
+		cmd_turn = 100;
+	else if(cmd_turn < -100)
+		cmd_turn = -100;
+
 	return cmd_turn;
 }
 

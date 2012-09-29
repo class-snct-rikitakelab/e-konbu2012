@@ -1,0 +1,390 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="balancer_param.c" />
+    <ClCompile Include="WLReceiver.c" />
+    <ClCompile Include="Calibration.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PIDCalcDebug.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="PWMValGenerator.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="SelfLocation.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Slope.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="TailControl.c">
+      <Filter>SorceCode</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\Battery.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\Coordinates.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\DetcMarker.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\DetcObst.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\Gradient.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\LineEdge.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\LocationInfo.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\Notice.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\RunDist.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\RunStartSigRecv.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\Timer.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DetectionPart\TurnAngle.c">
+      <Filter>DetectionPart</Filter>
+    </ClCompile>
+    <ClCompile Include="StrategyPart\CngSectTerm.c">
+      <Filter>StrategyPart</Filter>
+    </ClCompile>
+    <ClCompile Include="StrategyPart\Sector.c">
+      <Filter>StrategyPart</Filter>
+    </ClCompile>
+    <ClCompile Include="StrategyPart\TargetDrivenParm.c">
+      <Filter>StrategyPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectorPart\CngSectLisnner.c">
+      <Filter>DirectorPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectorPart\Running.c">
+      <Filter>DirectorPart</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\GyroSensor.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\LightSensor.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\MotorEncoder.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\TouchSensor.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\CurvatureCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\ForwardValRevise.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\LightValCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\RobotDrivenDirect.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\TailAngleCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\WheelMotorCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\SonorSensor.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Factory.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectorPart\RunnerRobot.c">
+      <Filter>DirectorPart</Filter>
+    </ClCompile>
+    <ClCompile Include="NXTHardWare\Sound.c">
+      <Filter>NXTHardware</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDrivenPart.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\LightVal.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\LightValCtrlMethod.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\LightValCtrlParm.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDLightValCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDLightValCtrlParm.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDTailAngleCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDTailAngleCtrlParm.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\TailAngle.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\TailMotor.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\TailMotorEncoder.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\TestDrivenPart.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\mymath.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDCurvatureCtrl.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\CurvatureEncoder.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\PIDCurvatureCtrlParm.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\Curvature.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivenPart\WheelMotor.c">
+      <Filter>DrivenPart</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Calibration.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="PIDCalcDebug.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="PWMValGenerator.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="SelfLocation.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="TailControl.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="WLReceiver.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Slope.h">
+      <Filter>headFile</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\Battery.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\Coordinates.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\DetcMarker.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\DetcObst.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\Gradient.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\LineEdge.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\LocationInfo.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\Notice.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\RunDist.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\RunStartSigRecv.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\TurnAngle.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectionPart\Timer.h">
+      <Filter>DetectionPart</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyPart\CngSectTerm.h">
+      <Filter>StrategyPart</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyPart\Sector.h">
+      <Filter>StrategyPart</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyPart\TargetDrivenParm.h">
+      <Filter>StrategyPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectorPart\CngSectLisnner.h">
+      <Filter>DirectorPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectorPart\Running.h">
+      <Filter>DirectorPart</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\GyroSensor.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\LightSensor.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\MotorEncoder.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\TouchSensor.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\CurvatureCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\ForwardValRevise.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\LightValCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\RobotDrivenDirect.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\TailAngleCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\WheelMotor.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\WheelMotorCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\SonorSensor.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\RUN_MODE.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\TARG_CTRL_METHOD.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Factory.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectorPart\RunnerRobot.h">
+      <Filter>DirectorPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectorPart\ROBOT_STATE.h">
+      <Filter>DirectorPart</Filter>
+    </ClInclude>
+    <ClInclude Include="NXTHardWare\Sound.h">
+      <Filter>NXTHardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDrivenPart.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\LightVal.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\LightValCtrlMethod.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\LightValCtrlParm.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDLightValCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDLightValCtrlParm.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDTailAngleCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDTailAngleCtrlParm.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\RUN_MODE.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\TailAngle.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\TailMotor.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\TailMotorEncoder.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\TARG_CTRL_METHOD.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\mymath.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\CurvatureEncoder.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDCurvatureCtrl.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\Curvature.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivenPart\PIDCurvatureCtrlParm.h">
+      <Filter>DrivenPart</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+    <None Include="mk.cmd" />
+    <None Include="prog.oil" />
+    <None Include="readme.txt" />
+    <None Include="mk_clean.cmd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="headFile">
+      <UniqueIdentifier>{77650cd3-8af2-4a6a-844e-ff5b4ad04073}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DetectionPart">
+      <UniqueIdentifier>{360be382-f2e9-4719-8e3e-8315bc203e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StrategyPart">
+      <UniqueIdentifier>{67814c64-621b-4502-b78d-9e54e0a070f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectorPart">
+      <UniqueIdentifier>{c569df6b-4fc6-4393-a87d-5f4e31a7f9b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NXTHardware">
+      <UniqueIdentifier>{66339422-5d23-4420-b73b-da781d3fed94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DrivenPart">
+      <UniqueIdentifier>{729f3e7d-8585-405b-ba4e-ecb59b5a1ca7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SorceCode">
+      <UniqueIdentifier>{d5de968a-76b5-4801-bb05-5dd03fa071a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{1afaaa71-a98b-4f90-b6ad-5a42ddd3b4e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

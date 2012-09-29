@@ -111,6 +111,7 @@ int LineBack_headToLine(LineBack * this_LineBack){
 	static float turn_angle = 0;
 
 	switch (headToLineState) {
+		/*
 		case SELECT_METHOD :
 			LineBack_selectLineBackMethod(this_LineBack);	
 			break;
@@ -121,7 +122,7 @@ int LineBack_headToLine(LineBack * this_LineBack){
 		case TURN_VERTICAL_TO_LINE :
 			LineBack_killRevDiff(this_LineBack);
 			break;
-
+*//*
 
 
 		case TURN_TO_LINE :
@@ -131,6 +132,8 @@ int LineBack_headToLine(LineBack * this_LineBack){
 			LineBack_goForwardToLine(this_LineBack);
 			break;
 		//___________________________		
+		*/
+
 
 		//ƒ‰ƒCƒ“‰E‘¤‚É—‰º‚µ‚½ê‡‚Ìˆ—‚Ì—¬‚ê‚Å•À‚ñ‚Å‚¢‚éB
 		case TURNING_LEFT :

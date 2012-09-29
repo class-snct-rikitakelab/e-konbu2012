@@ -4,6 +4,7 @@
 #include "TailControl.h"
 #include "ecrobot_interface.h"
 #include "RemoteStart.h"
+#include "BatteryCheck.h"
 
 //ライントレース用目標値
 static unsigned int BLACK_VALUE;	//黒値

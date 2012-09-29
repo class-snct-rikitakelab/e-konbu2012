@@ -12,7 +12,6 @@
 
 
 
-
 //ã»ó¶îºåaPIDêßå‰ä÷êî
 S8 RA_curvatureCtrl_PID(float target) {
 	static float bf_dev = 0.0;
@@ -97,7 +96,7 @@ void RN_setting(){
 		wait_count++;
 		break;
 
-	default:
+	default:77
 		break;
 	}
 }

@@ -9,13 +9,20 @@
 #include "BatteryCheck.h"
 #include "CalcDistance.h"
 #include "RemoteStart.h"
+#include "runnerForTestRun.h"
 
-#define RIGHT_ANGLE_LIGHT_VALUE GRAY_VALUE * 0.95		//ラインから脱した際の光センサの値(570)
+#define STEP_BATTERY getbatteryvalue() * 0.08		//段差検知時、バッテリが減るとどんどん下がっていく（80で800下がらないくらい→残量に応じた設定が必要？）
+/*
+試走会成功
+#define RIGHT_ANGLE_LIGHT_VALUE getGrayValue() * 0.97		//ラインから脱した際の光センサの値(570)
 #define RIGHT_ANGLE_AIM 240				//回転角度(160)
+*/
 
-
+#define RIGHT_ANGLE_LIGHT_VALUE getGrayValue() * 0.97		//ラインから脱した際の光センサの値(570)
+#define RIGHT_ANGLE_AIM 140				//回転角度(160)
+//shockとtime_countを逆にする
 //バッテリ降下値
-#define STEP_BATTERY 250		//段差検知時
+
 #define STOP_BATTERY 400
 
 /*
@@ -23,9 +30,8 @@
  */
 
 typedef enum{
-
-	RN_STOP,					//停止
 	RN_STEP_START,
+	RN_STEP_BACK,
 	RN_STEP_RAPID,
 	RN_STEP_SHOCK,
 	RN_STEP_SLOW,
@@ -36,10 +42,13 @@ typedef enum{
 	RN_STEP_TURN_FORWARD,
 	RN_STEP_TURN_TAILUP,
 	RN,
+	RN_STEP_STOP,
 } RN_STEPMODE;
 
 RN_STEPMODE stepmode = RN_STEP_START;
 
 extern int runningStep();
+
+extern int getcount();
 
 #endif
