@@ -10,7 +10,7 @@
 
 //ジャイロ振幅値
 #define PM_GYRO 65
-#define TARGET_SPEED 65
+#define TARGET_SPEED 65　　//走行開始時のforward値
 
 /* 走行区間 */
 typedef enum{
@@ -42,6 +42,8 @@ static float trgt_R = 0;
 static S8 trgt_speed = TARGET_SPEED;
 /*_____________________*/
 static  S8 trgt_theta = -1;
+extern  IN_SECTION crt_sect = START;
+
 //目標車体角度
 
 //マーカーフラグ　0: OFF, 1: ON
@@ -64,8 +66,7 @@ signed char LVTrigger(void);
 
 
 void changeSection(float *buf_x, float *buf_y, float *buf_l, float *buf_th);
-extern  IN_SECTION crt_sect = START;
-//違いが不明
+
 
 extern S8 getTargetTheta();
 extern float getTargetR(); //現在区間の目標曲率を取得

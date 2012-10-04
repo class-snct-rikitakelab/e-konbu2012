@@ -180,6 +180,8 @@ void RN_setting()
 		case (RN_RUN):
 			setCmdForward(RA_speed(25));
 			setCmdForward(RA_speed(getTargSpeed()));
+		
+			//輝度値制御だけか、輝度値＋曲率も入れるか、輝度値を切った制御をするかの状態遷移
 			switch (targCtrlMethod){
 			case HYBRID : 
 				setCmdTurn(weight * RA_linetrace_PID(getCmdForward())+(1 - weight) * RA_curvatureCtrl_PID(getTargetR())+RA_directionCtrl_PID(getTargetTheta()));
@@ -204,15 +206,6 @@ void RN_setting()
 			if(crt_sect==LOOKUP){
 				setting_mode = RN_LOOKUPGATE;
 			}
-		
-		/*	
-			if(getInitGyroOffset() - 50 > (U32)ecrobot_get_gyro_sensor(NXT_PORT_S1) && timecounter > 1000)
-			{
-				ecrobot_sound_tone(880, 512, 30);
-				setting_mode = RN_SLOPE;
-				timecounter = 0;
-			}
-			*/
 			break;
 			
 		case (RN_SLOPE):
@@ -238,10 +231,10 @@ void RN_setting()
 			setCmdForward(RA_speed(60));
 			setCmdTurn(RA_linetrace_PID(getCmdForward()));
 			break;
-			/*
+			
 		case (RN_DRIFTTURN):
 			break;
-			*/
+			
 		default:
 			break;
 	}
@@ -255,7 +248,6 @@ void RN_setting()
 //走行体管理タスク(4ms)
 TASK(ActionTask)
 {
-	//RN_modesetting();	//走行体状態設定
 	calcPWMValues();
 	TailControl();			//尻尾制御
 	self_location();			//自己位置同定
@@ -265,8 +257,8 @@ TASK(ActionTask)
 
 //走行状態管理タスク(5ms)
 TASK(ActionTask2)
-{RN_setting();
-		//走行状態設定
+{
+	RN_setting();//走行状態設定
 	TerminateTask();
 }
 
@@ -277,17 +269,12 @@ TASK(DisplayTask)
 	TerminateTask();
 }
 
-//ログ送信、超音波センサ管理タスク(50ms) (共に50msでなければ動作しない）
+//ログ送信、超音波センサ管理タスク(50ms) 
 TASK(LogTask)
 {
 
-//logSend(cmd_forward, cmd_turn,BLACK_VALUE,WHITE_VALUE,GRAY_VALUE, (S16)getDistance());
-
-logSend(cmd_forward, cmd_turn, (S16) getXCoo(), (S16) getYCoo(), getTheta(),/*(U32)ecrobot_get_gyro_sensor(NXT_PORT_S1)*/  (S16)getDistance());
-	//logSend(0,cmd_turn,dist,getDistance(),,ecrobot_get_gyro_sensor(NXT_PORT_S1));			//Bluetoothを用いてデータ送信
-
+logSend(cmd_forward, cmd_turn, (S16) getXCoo(), (S16) getYCoo(), getTheta(), (S16)getDistance());
 	getSonarValue();
-
 	TerminateTask();
 }
 
