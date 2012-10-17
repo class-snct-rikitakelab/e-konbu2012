@@ -204,7 +204,7 @@ void RN_setting()
 
 int boost(){
 
-//	static int counter = 0;
+	static int counter = 0;
 	int boostflag = 0;
 
 	switch(boostCheckMode){
@@ -213,7 +213,7 @@ int boost(){
 			if(cmd_forward == 0)
 			{
 				boostCheckMode = BC_TWO;
-				ecrobot_sound_tone(982,512,10);
+				counter = 0;
 			}
 			break;
 		case(BC_TWO):
@@ -222,7 +222,10 @@ int boost(){
 			{
 				boostCheckMode = BC_THREE;
 				ecrobot_sound_tone(982,512,10);
+				counter = 0;
 			}
+			else if(counter++ > BOOSTTIME/5)
+				boostCheckMode = BC_ONE;
 			break;
 		case (BC_THREE):
 			boostflag = 0;
@@ -230,7 +233,10 @@ int boost(){
 			{
 				boostCheckMode = BC_FOUR;
 				ecrobot_sound_tone(982,512,10);
+				counter = 0;
 			}
+			else if(counter++ > BOOSTTIME/5)
+				boostCheckMode = BC_ONE;
 			break;
 		case (BC_FOUR):
 			boostflag = 0;
@@ -239,7 +245,10 @@ int boost(){
 				boostflag = 1;
 				boostCheckMode = BC_ONE;
 				ecrobot_sound_tone(982,512,10);
+				counter = 0;
 			}
+			else if(counter++ > BOOSTTIME/5)
+				boostCheckMode = BC_ONE;
 			break;
 		default:
 			break;
