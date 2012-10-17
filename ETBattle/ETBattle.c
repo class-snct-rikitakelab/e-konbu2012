@@ -143,24 +143,25 @@ void RN_setting()
 		
 			//対戦中
 		case (RN_RUN):
-			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);
+			(void)ecrobot_read_bt_packet(bt_receive_buf, BT_RCV_BUF_SIZE);	/* スティック入力 */
 			
-			cmd_forward = -((S8)bt_receive_buf[0])/2;
-			cmd_turn = ((S8)bt_receive_buf[1]);
+			cmd_forward = -((S8)bt_receive_buf[0])/2;	/* 前進量(そのままでは早すぎるので値を半分） */
+			cmd_turn = ((S8)bt_receive_buf[1]);			/* 旋回量 */
 			
+			//ターボチェック
 			if(boost() == 1)
 			{
 				setting_mode = RN_BOOST;
 				ecrobot_sound_tone(980,512,100);
 			}
 
-			else
+			else /* ターボ無し、スティック操作 */
 			{
 				nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
 				nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
 			}
 
-			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
+			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)	/* ヒットチェック */
 			{
 				ecrobot_sound_tone(980,512,100);
 				nxt_motor_set_speed(NXT_PORT_C,100,1);
@@ -171,10 +172,15 @@ void RN_setting()
 			
 			break;
 
+			//ターボ動作(ver 2.0新機能）
 		case (RN_BOOST):
 			wait_count++;
+
+			/* 両車輪にモータ操作量の最大値を送信（スティック操作不可） */
 			nxt_motor_set_speed(NXT_PORT_C,127,1);
 			nxt_motor_set_speed(NXT_PORT_B,127,1);
+
+			/* 1秒後に通常モードに復帰 */
 			if(wait_count > 250)
 			{
 				setting_mode = RN_RUN;
@@ -203,20 +209,26 @@ void RN_setting()
 	}
 }
 
+
+/*
+ *	ターボ入力関数
+ *	素早く左スティックを2回上に入力することでターボ（各入力の間隔は0.2秒以内）
+ *	引数:無し、返り値:ターボフラグ
+ */
 int boost(){
 
 	static int counter = 0;
 	int boostflag = 0;
 
 	switch(boostCheckMode){
-		case (BC_ONE):
+		case (BC_ONE):	/* スティックが中央（1回目） */
 			if(cmd_forward == 0)
 			{
 				boostCheckMode = BC_TWO;
 				counter = 0;
 			}
 			break;
-		case(BC_TWO):
+		case(BC_TWO):	/* スティックが最上（1回目） */
 			if(cmd_forward == 50)
 			{
 				boostCheckMode = BC_THREE;
@@ -226,7 +238,7 @@ int boost(){
 			else if(counter++ > BOOSTTIME/25)
 				boostCheckMode = BC_ONE;
 			break;
-		case (BC_THREE):
+		case (BC_THREE):	/* スティックが中央（2回目） */
 			if(cmd_forward == 0)
 			{
 				boostCheckMode = BC_FOUR;
@@ -236,7 +248,7 @@ int boost(){
 			else if(counter++ > BOOSTTIME/25)
 				boostCheckMode = BC_ONE;
 			break;
-		case (BC_FOUR):
+		case (BC_FOUR):		/* スティックが最上（2回目）（成功でターボフラグON） */
 			if(cmd_forward == 50)
 			{
 				boostflag = 1;
@@ -251,7 +263,7 @@ int boost(){
 			break;
 	}
 
-	return boostflag;
+	return boostflag;	//ターボフラグ（0:無し、1:ターボON）
 }
 
 //キャリブレーション関数
