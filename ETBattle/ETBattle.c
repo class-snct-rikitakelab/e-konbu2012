@@ -36,12 +36,22 @@ typedef enum{
 typedef enum{
 	RN_START,					//開始待ちモード
 	RN_RUN,						//対戦モード
+	RN_BOOST,					//ターボ
 	RN_PUSHBUTTON				//ボタン押下モード
 } RN_SETTINGMODE;
+
+
+typedef enum{
+	BC_ONE,
+	BC_TWO,
+	BC_THREE,
+	BC_FOUR,
+} BC_MODE;
 
 //初期状態
 RN_MODE runner_mode = RN_MODE_INIT;
 RN_SETTINGMODE setting_mode = RN_START;
+BC_MODE boostCheckMode = BC_ONE;
 
 /*
  *	各種プライベート関数定義
@@ -52,6 +62,7 @@ void RN_calibrate();
 void RN_setting();
 void RN_modesetting();
 void runner_mode_change(int flag);
+int boost();
 
 #define BT_RCV_BUF_SIZE (32) /* it must be 32bytes with NXT GamePad */
 static U8 bt_receive_buf[BT_RCV_BUF_SIZE]; /* Bluetooth receive buffer(32bytes) */
@@ -137,9 +148,17 @@ void RN_setting()
 			cmd_forward = -((S8)bt_receive_buf[0])/2;
 			cmd_turn = ((S8)bt_receive_buf[1]);
 			
+			if(boost() == 1)
+			{
+				setting_mode = RN_BOOST;
+				ecrobot_sound_tone(980,512,100);
+			}
+
 			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
 			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
 		
+
+
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
 				ecrobot_sound_tone(980,512,100);
@@ -149,6 +168,17 @@ void RN_setting()
 				setting_mode = RN_PUSHBUTTON;
 			}
 			
+			break;
+
+		case (RN_BOOST):
+			wait_count++;
+			nxt_motor_set_speed(NXT_PORT_C,127,1);
+			nxt_motor_set_speed(NXT_PORT_B,127,1);
+			if(wait_count > 250)
+			{
+				setting_mode = RN_RUN;
+				wait_count = 0;
+			}
 			break;
 
 			//敗北動作
@@ -170,6 +200,52 @@ void RN_setting()
 		default:
 			break;
 	}
+}
+
+int boost(){
+
+//	static int counter = 0;
+	int boostflag = 0;
+
+	switch(boostCheckMode){
+		case (BC_ONE):
+			boostflag = 0;
+			if(cmd_forward == 0)
+			{
+				boostCheckMode = BC_TWO;
+				ecrobot_sound_tone(982,512,10);
+			}
+			break;
+		case(BC_TWO):
+			boostflag = 0;
+			if(cmd_forward == 50)
+			{
+				boostCheckMode = BC_THREE;
+				ecrobot_sound_tone(982,512,10);
+			}
+			break;
+		case (BC_THREE):
+			boostflag = 0;
+			if(cmd_forward == 0)
+			{
+				boostCheckMode = BC_FOUR;
+				ecrobot_sound_tone(982,512,10);
+			}
+			break;
+		case (BC_FOUR):
+			boostflag = 0;
+			if(cmd_forward == 50)
+			{
+				boostflag = 1;
+				boostCheckMode = BC_ONE;
+				ecrobot_sound_tone(982,512,10);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return boostflag;
 }
 
 //キャリブレーション関数

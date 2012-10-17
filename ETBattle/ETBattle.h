@@ -9,4 +9,8 @@
 #include "balancer.h"
 #include "math.h"
 
+#define BOOSTTIME 500	//[ms]
+
+
+
 #endif
