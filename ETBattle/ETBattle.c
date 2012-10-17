@@ -154,10 +154,11 @@ void RN_setting()
 				ecrobot_sound_tone(980,512,100);
 			}
 
-			nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
-			nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
-		
-
+			else
+			{
+				nxt_motor_set_speed(NXT_PORT_C, cmd_forward + cmd_turn/2, 1);
+				nxt_motor_set_speed(NXT_PORT_B, cmd_forward - cmd_turn/2, 1);
+			}
 
 			if(ecrobot_get_touch_sensor(NXT_PORT_S4) == 1)
 			{
@@ -209,7 +210,6 @@ int boost(){
 
 	switch(boostCheckMode){
 		case (BC_ONE):
-			boostflag = 0;
 			if(cmd_forward == 0)
 			{
 				boostCheckMode = BC_TWO;
@@ -217,37 +217,34 @@ int boost(){
 			}
 			break;
 		case(BC_TWO):
-			boostflag = 0;
 			if(cmd_forward == 50)
 			{
 				boostCheckMode = BC_THREE;
-				ecrobot_sound_tone(982,512,10);
+//				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/5)
+			else if(counter++ > BOOSTTIME/25)
 				boostCheckMode = BC_ONE;
 			break;
 		case (BC_THREE):
-			boostflag = 0;
 			if(cmd_forward == 0)
 			{
 				boostCheckMode = BC_FOUR;
-				ecrobot_sound_tone(982,512,10);
+//				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/5)
+			else if(counter++ > BOOSTTIME/25)
 				boostCheckMode = BC_ONE;
 			break;
 		case (BC_FOUR):
-			boostflag = 0;
 			if(cmd_forward == 50)
 			{
 				boostflag = 1;
 				boostCheckMode = BC_ONE;
-				ecrobot_sound_tone(982,512,10);
+//				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/5)
+			else if(counter++ > BOOSTTIME/25)
 				boostCheckMode = BC_ONE;
 			break;
 		default:
