@@ -181,7 +181,7 @@ void RN_setting()
 			nxt_motor_set_speed(NXT_PORT_B,127,1);
 
 			/* 1秒後に通常モードに復帰 */
-			if(wait_count > 250)
+			if(wait_count > 125)
 			{
 				setting_mode = RN_RUN;
 				wait_count = 0;
@@ -235,7 +235,7 @@ int boost(){
 //				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/25)
+			else if(counter++ > BOOSTTIME/20)
 				boostCheckMode = BC_ONE;
 			break;
 		case (BC_THREE):	/* スティックが中央（2回目） */
@@ -245,7 +245,7 @@ int boost(){
 //				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/25)
+			else if(counter++ > BOOSTTIME/20)
 				boostCheckMode = BC_ONE;
 			break;
 		case (BC_FOUR):		/* スティックが最上（2回目）（成功でターボフラグON） */
@@ -256,7 +256,7 @@ int boost(){
 //				ecrobot_sound_tone(982,512,10);
 				counter = 0;
 			}
-			else if(counter++ > BOOSTTIME/25)
+			else if(counter++ > BOOSTTIME/20)
 				boostCheckMode = BC_ONE;
 			break;
 		default:
