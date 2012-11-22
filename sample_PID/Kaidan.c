@@ -444,6 +444,7 @@ void RN_setting()
 			time_count++;
 
 			RA_linetrace_PID(x);
+		/*
 			if(time_count > 500)
 			{
 				if(hit()==1)
@@ -452,6 +453,7 @@ void RN_setting()
 					time_count = 0;
 				}
 			}
+		*/
 			/*
                         if (remote_stop()==1)
  			{                  
@@ -832,8 +834,8 @@ TASK(DisplayTask)
 TASK(LogTask)
 {
 	logSend(cmd_forward,cmd_turn,ecrobot_get_gyro_sensor(NXT_PORT_S1),0,0,0);		//ログ取り
-	sonar();	//超音波センサの値を更新
-	get_bottle();	//ペットボトルがあるかどうか更新
+	//sonar();	//超音波センサの値を更新
+	//get_bottle();	//ペットボトルがあるかどうか更新
 	TerminateTask();
 }
 
